@@ -2,6 +2,7 @@
 .npmignore
 api.ts
 apis/auth-api.ts
+apis/open-ai-api.ts
 apis/user-api.ts
 base.ts
 common.ts
@@ -11,6 +12,7 @@ index.ts
 models/access-token-output.ts
 models/core-output.ts
 models/create-account-dto.ts
+models/create-completion-dto.ts
 models/index.ts
 models/login-input.ts
 models/login-output.ts

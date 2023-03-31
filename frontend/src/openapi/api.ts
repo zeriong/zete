@@ -15,5 +15,6 @@
 
 
 export * from './apis/auth-api';
+export * from './apis/open-ai-api';
 export * from './apis/user-api';
 

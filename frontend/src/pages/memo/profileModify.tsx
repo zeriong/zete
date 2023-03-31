@@ -176,7 +176,7 @@ export const ProfileModify = () => {
                             items-center bg-orange-500 rounded-2xl text-white"
                                 text="프로필 변경하기"
                                 disabled={!isValid}
-                                loading={loading}
+                                loading={`${loading}`}
                     />
                 </div>
             </form>

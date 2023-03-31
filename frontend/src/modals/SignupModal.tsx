@@ -214,7 +214,7 @@ export const SignupModal = () => {
                                                     text="회원가입"
                                                     type="submit"
                                                     disabled={!isValid}
-                                                    loading={loading}
+                                                    loading={`${loading}`}
                                         />
                                     </form>
                                 </Dialog.Panel>

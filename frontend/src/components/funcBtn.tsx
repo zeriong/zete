@@ -3,14 +3,14 @@ import React from "react";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     disabled: boolean,
     text: string,
-    loading?: boolean,
+    loading?: string,
 }
 
 export const FuncButton = (props: ButtonProps) => { // { type, text, disabled, loading, className, onClick }: IButtonProps
     return <button
         {...props}
         style={
-            (props.disabled || props.loading) ?
+            (props.disabled || props.loading === 'true') ?
                 {
                     pointerEvents: "none",
                     //fontWeight: "500",
@@ -19,7 +19,7 @@ export const FuncButton = (props: ButtonProps) => { // { type, text, disabled, l
                 } : {}
         }
     >
-        {props.loading ? (
+        {props.loading === 'true' ? (
             <div className="flex justify-center">
                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
                      fill="none"

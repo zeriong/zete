@@ -15,7 +15,6 @@ export const Header = () => {
     }
 
     return (
-        <>
             <header
                 className="flex fixed h-[60px] items-center w-full z-30 ease-in-out duration-300 bg-white border-b border-gray-300"
             >
@@ -45,6 +44,5 @@ export const Header = () => {
                     </div>
                 </div>
             </header>
-        </>
     )
 }

@@ -44,6 +44,7 @@ export const SigninModal = () => {
         if (searchParams.get("modal") === "sign-in") {
             setIsShow(true);
         } else { setIsShow(false) }
+        console.log(typeof loading)
     },[searchParams]);
 
     /** 폼 컨트롤 */
@@ -154,11 +155,11 @@ export const SigninModal = () => {
                                             </div>
                                         </div>
                                         <FuncButton className="w-full py-1 bg-orange-500 text-white mx-auto mt-3 text-center
-                                          cursor-pointer text-[22px] items-center rounded-2xl"
+                                                    cursor-pointer text-[22px] items-center rounded-2xl"
                                                     type="submit"
                                                     text="로그인"
                                                     disabled={!isValid}
-                                                    loading={loading}
+                                                    loading={`${loading}`}
                                         />
                                         <button
                                             className="w-full py-1 bg-orange-500 text-white mx-auto mb-3 text-center

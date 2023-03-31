@@ -6,7 +6,7 @@ export interface AuthState {
         isLoggedIn: boolean,
         accessToken: string,
     }
-    loading: boolean,
+    loading: boolean|undefined,
 }
 
 const initAuthState: AuthState = {

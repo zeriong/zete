@@ -142,6 +142,25 @@ paths:
                 $ref: "#/components/schemas/CoreOutput"
       tags:
         - Auth
+  /openAi:
+    post:
+      operationId: createCompletion
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompletionDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Promise"
+      tags:
+        - OpenAi
 info:
   title: My API
   description: An API to do awesome things
@@ -265,3 +284,17 @@ components:
           type: string
       required:
         - success
+    CreateCompletionDto:
+      type: object
+      properties:
+        question:
+          type: string
+        model:
+          type: string
+        temperature:
+          type: number
+      required:
+        - question
+    Promise:
+      type: object
+      properties: {}
