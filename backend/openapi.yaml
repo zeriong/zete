@@ -1,0 +1,267 @@
+openapi: 3.0.0
+paths:
+  /user/all:
+    get:
+      operationId: getAll
+      parameters: []
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+      tags:
+        - User
+  /user/register:
+    post:
+      operationId: createAccount
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - User
+  /user/modify:
+    patch:
+      operationId: profileUpdate
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAccountDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - User
+  /user/profile:
+    get:
+      operationId: profile
+      parameters: []
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+      tags:
+        - User
+  "/user/{id}":
+    delete:
+      operationId: delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - User
+  /user/testApi:
+    post:
+      operationId: testApi
+      parameters: []
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - User
+  /auth/login:
+    post:
+      operationId: login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginOutput"
+      tags:
+        - Auth
+  /auth/refresh:
+    get:
+      operationId: refreshToken
+      parameters: []
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessTokenOutput"
+      tags:
+        - Auth
+  /auth/logout:
+    get:
+      operationId: logout
+      parameters: []
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - Auth
+info:
+  title: My API
+  description: An API to do awesome things
+  version: 1.0.0
+  contact: {}
+tags: []
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: number
+        createAt:
+          format: date-time
+          type: string
+        updateAt:
+          format: date-time
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        mobile:
+          type: string
+        refreshToken:
+          type: string
+      required:
+        - id
+        - createAt
+        - updateAt
+        - email
+        - password
+        - name
+        - mobile
+    CreateAccountDto:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        mobile:
+          type: string
+      required:
+        - email
+        - password
+        - name
+        - mobile
+    CoreOutput:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        success:
+          type: boolean
+      required:
+        - success
+    UpdateAccountDto:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        mobile:
+          type: string
+      required:
+        - email
+        - name
+        - mobile
+    LoginInput:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+    LoginOutput:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        success:
+          type: boolean
+        user:
+          $ref: "#/components/schemas/User"
+        accessToken:
+          type: string
+      required:
+        - success
+    AccessTokenOutput:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        success:
+          type: boolean
+        accessToken:
+          type: string
+      required:
+        - success
