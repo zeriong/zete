@@ -142,7 +142,7 @@ paths:
                 $ref: "#/components/schemas/CoreOutput"
       tags:
         - Auth
-  /openAi:
+  /openAi/createCompletion:
     post:
       operationId: createCompletion
       parameters: []
@@ -151,7 +151,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateCompletionDto"
+              $ref: "#/components/schemas/CreateCompletionInputDto"
       responses:
         default:
           description: ""
@@ -284,15 +284,11 @@ components:
           type: string
       required:
         - success
-    CreateCompletionDto:
+    CreateCompletionInputDto:
       type: object
       properties:
         question:
           type: string
-        model:
-          type: string
-        temperature:
-          type: number
       required:
         - question
     Promise:

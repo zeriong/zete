@@ -26,17 +26,5 @@ export interface CreateCompletionDto {
      * @memberof CreateCompletionDto
      */
     'question': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateCompletionDto
-     */
-    'model'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof CreateCompletionDto
-     */
-    'temperature'?: number;
 }
 

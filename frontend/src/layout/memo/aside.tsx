@@ -1,16 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
-import {BiPencil} from "@react-icons/all-files/bi/BiPencil";
+import {Link, useLocation, useSearchParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {SET_ALERT} from "../../store/slices/alert.slice";
 import {RootState} from "../../store";
-import {ConfigModal} from "../../modals/configModal";
 import {SET_SHOW_MENU, TOGGLE_SHOW_MENU} from "../../store/slices/changedMenu.slice";
-import {GiHamburgerMenu} from "@react-icons/all-files/gi/GiHamburgerMenu";
-import {BiGridSmall} from "@react-icons/all-files/bi/BiGridSmall";
-import {MdLabelImportant} from "react-icons/md";
-import {CiMemoPad} from "react-icons/ci";
-import {CheckList} from "./checkList";
+import {AllIcon, CategoryIcon, ModifyIcon, StarIcon, StickerMemoIcon, TagIcon} from "../../components/vectors";
 
 const MemoButton = (props: { label: string }) => {
     const [onMouseMemos, setOnMouseMemos] = useState<boolean>(false);
@@ -33,6 +27,7 @@ const MemoButton = (props: { label: string }) => {
 
 export const Aside = () => {
     const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
     const { alerts } = useSelector((state: RootState) => state.alert);
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
 
@@ -55,8 +50,14 @@ export const Aside = () => {
         dispatch(TOGGLE_SHOW_MENU());
     }
 
-    const [onMouseImportant, setOnMouseImportant] = useState(false);
-    const [onMouseAllShow, setOnMouseAllShow] = useState(false);
+    const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+    const [queryStr, setQueryStr] = useState('');
+    const categoryOpenHandler = () => setIsCategoryOpen(!isCategoryOpen);
+    const getQueryStr = () => setQueryStr(searchParams.get('search')); // url 쿼리를 넣어줌 (쿼리에 따른 active 변화)
+
+    useEffect(()=>{
+        getQueryStr();
+    },[searchParams])
 
     return (
         <>
@@ -67,52 +68,99 @@ export const Aside = () => {
             />
             <nav
                 className={`${showMenu ? "left-0" : "-left-asideWidth"}
-            fixed w-asideWidth bg-white z-20 ease-in-out duration-300 left-0 pt-headerHeight shadow-xl shadow-gray-300 h-full overflow-auto scroll-hidden`}
+                fixed w-asideWidth bg-white z-20 ease-in-out duration-300 left-0 pt-headerHeight h-full overflow-auto scroll-hidden`}
             >
-                <div className="flex flex-col h-full w-full py-8 min-h-[820px]">
-                    <div className="flex flex-col h-full justify-center text-center px-5 text-xl font-bold text-gray-800 tracking-wider">
-                        <Link
-                            to="/memo"
-                            onMouseEnter={() => setOnMouseAllShow(true)}
-                            onMouseLeave={() => setOnMouseAllShow(false)}
-                            className={`${onMouseAllShow ? "bg-orange-100" : ""} flex justify-start items-center w-full rounded-lg mb-2 text-lg transition-all duration-150 h-[50px]`}
+                <div className="flex flex-col h-full w-full min-h-[820px] px-17px text-zete-dark-500 font-light text-14">
+                    <div className="flex flex-col font-bold gap-1px">
+                        <button
+                            type='button'
+                            className='flex justify-between items-center hover:bg-zete-light-gray-200 rounded-[5px] p-12px group'
+                            onClick={()=> setIsCategoryOpen(false)}
                         >
-                            <BiGridSmall
-                                size="50"
-                                className={`${onMouseAllShow ? "" : ""} w-auto fill-orange-500`}
-                            />
-                            <span>전체보기</span>
-                        </Link>
-                        <Link
-                            to="/memo"
-                            onMouseEnter={() => setOnMouseImportant(true)}
-                            onMouseLeave={() => setOnMouseImportant(false)}
-                            className={`${onMouseImportant ? "bg-orange-100" : ""} flex justify-start items-center w-full rounded-lg mb-2 text-lg transition-all duration-150 h-[50px] pl-2`}
-                        >
-                            <MdLabelImportant
-                                size="32"
-                                className={`${onMouseImportant ? "" : ""} w-auto mr-[10px] fill-orange-500`}
-                            />
-                            <span>중요메모</span>
-                        </Link>
-                        <div className="flex flex-col grow w-auto bg-white pb-5">
-                            <div
-                                className="flex justify-start items-center w-full rounded-lg text-lg transition-all duration-150 h-[50px] pl-2 cursor-default"
+                            <Link
+                                to="/memo"
+                                className='flex justify-start items-center w-full font-light transition-all duration-150'
                             >
-                                <CiMemoPad
-                                    size="30"
-                                    className="fill-orange-600 ml-[1px] mr-3"/>
-                                <span>메모</span>
+                                <AllIcon className='mr-14px w-20px'/>
+                                <span>전체메모</span>
+                            </Link>
+                            <div className='rounded-full bg-zete-light-gray-300 text-zete-dark-100 py-3px px-8px text-12 group-hover:bg-white font-medium'>
+                                10
                             </div>
-                            <div className="flex flex-col g-white rounded-lg my-2 h-20 overflow-y-scroll custom-scroll font-normal grow pl-[21px]">
-                                <MemoButton label={"메모 라벨"} />
-                                <MemoButton label={"읽을 책 메모"} />
-                                <MemoButton label={"이메일 메모"} />
-                                <MemoButton label={"전화번호 저장소"} />
-                                <MemoButton label={"요리 레시피"} />
+                        </button>
+                        <button
+                            type='button'
+                            className='flex justify-between items-center hover:bg-zete-light-gray-200 rounded-[5px] p-12px group'
+                            onClick={()=> setIsCategoryOpen(false)}
+                        >
+                            <Link
+                                to="/memo"
+                                className='flex justify-start items-center w-full font-light transition-all duration-150'
+                            >
+                                <StarIcon className='mr-14px w-20px'/>
+                                <span>중요메모</span>
+                            </Link>
+                            <div className='rounded-full bg-zete-light-gray-300 text-zete-dark-100 py-3px px-8px text-12 group-hover:bg-white font-medium'>
+                                10
+                            </div>
+                        </button>
+                    </div>
+                    <p className='text-zete-dark-300 text-11 font-light py-14px pl-12px'>
+                        카테고리
+                    </p>
+                    <div
+                        className={`flex flex-col font-bold group rounded-[5px] hover:bg-zete-light-gray-200
+                        ${isCategoryOpen ? 'bg-zete-light-gray-200' : 'bg-white'}`}
+                    >
+                        <div className='flex flex-col justify-center'>
+                            <button
+                                type='button'
+                                className='flex w-full justify-between items-center p-12px'
+                                onClick={categoryOpenHandler}
+                            >
+                                <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
+                                    <CategoryIcon className='mr-10px'/>
+                                    <span>개발</span>
+                                </div>
+                                <div
+                                    className={`rounded-full text-zete-dark-100 py-3px px-8px text-12 font-medium
+                                    ${isCategoryOpen ? 'bg-white' : 'group-hover:bg-white bg-zete-light-gray-300'}`}
+                                >
+                                    2
+                                </div>
+                            </button>
+                            <div
+                                className={`overflow-hidden font-light text-13 transition-all duration-300 
+                                ${isCategoryOpen ? 'max-h-[200px] p-12px' : 'h-[0vh] p-0'}`}
+                            >
+                                <Link
+                                    to='/memo?search=React'
+                                    className={`flex h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
+                                    ${queryStr === 'React' && 'bg-zete-light-gray-500'}`}
+                                >
+                                    <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>
+                                    <span>React</span>
+                                </Link>
+                                <Link
+                                    to='/memo?search=Nodejs'
+                                    className={`flex py-8px pl-16px rounded-[5px] hover:bg-zete-light-gray-500
+                                    ${queryStr === 'Nodejs' && 'bg-zete-light-gray-500'}`}
+                                >
+                                    <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>
+                                    <span>Nodejs</span>
+                                </Link>
                             </div>
                         </div>
-                        <CheckList/>
+                    </div>
+                    <button
+                        type='button'
+                        className='flex w-full justify-between items-center p-12px rounded-[5px] hover:bg-zete-light-gray-200'
+                    >
+                        <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
+                            <ModifyIcon className='mr-10px'/>
+                            <span>카테고리 수정</span>
+                        </div>
+                    </button>
                         <button
                             className="fixed bg-black text-white bottom-0 right-0 p-2"
                             type="button"
@@ -127,7 +175,6 @@ export const Aside = () => {
                         >
                             알림 테스트
                         </button>
-                    </div>
                 </div>
             </nav>
         </>

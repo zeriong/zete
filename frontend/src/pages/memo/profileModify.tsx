@@ -106,7 +106,7 @@ export const ProfileModify = () => {
                                 required: true,
                                 minLength: 6,
                                 maxLength: 70,
-                                pattern: /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i,
+                                pattern: /^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i,
                             })}
                             placeholder="변경할 이메일을 입력해주세요."
                         />
@@ -127,7 +127,7 @@ export const ProfileModify = () => {
                             placeholder="휴대폰번호를 입력해주세요."
                             onInput={(e) => {
                                 let val = e.currentTarget.value.substring(0, 13).replace(/[^0-9]/g, '')
-                                    .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3").replace(/(\-{1,2})$/g, "");
+                                    .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3").replace(/(\\-{1,2})$/g, "");
                                 setValue("mobile", val);
                             }}
                         />

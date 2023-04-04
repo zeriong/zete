@@ -23,9 +23,6 @@ export const Home = ()=> {
     const isLoggedIn = useSelector((state: RootState) => (state.auth.data.isLoggedIn));
     const { data: { name } } = useSelector((state: RootState) => (state.user));
 
-    const [message, setMessage] = useState('');
-    const [response, setResponse] = useState('');
-
     useEffect(() => {
         if (isLoggedIn) {
             dispatch(sendMyProfile());

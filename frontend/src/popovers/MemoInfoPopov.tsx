@@ -1,13 +1,12 @@
 import React from 'react'
 import { Popover, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
-import {FaUserCircle} from "@react-icons/all-files/fa/FaUserCircle";
-import {BiChevronDown} from "@react-icons/all-files/bi/BiChevronDown";
 import {GrLogout} from "@react-icons/all-files/gr/GrLogout";
 import {FaRegIdCard} from "@react-icons/all-files/fa/FaRegIdCard";
 import {Link} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {RootState} from "../store";
+import {UserIcon} from "../components/vectors";
 
 const solutions = [
     {
@@ -25,20 +24,15 @@ export default function MemoInfoPopov() {
 
     return (
         <div className="w-auto max-w-sm">
-            <Popover className="relative">
+            <Popover className="relative h-28px">
                 {({ open, close }) => (
                     <>
                         <Popover.Button
                             className={`
-                ${open ? '' : 'text-opacity-90'}
-                group inline-flex items-center rounded-md px-2 py-2 border border-gray-200 bg-white text-base font-medium text-white hover:text-opacity-100`}
+                                ${open ? '' : 'text-opacity-90'}
+                                group inline-flex items-center rounded-md text-base font-medium text-white hover:text-opacity-100`}
                         >
-                            <FaUserCircle size="30" color="9f9f9f" className="bg-white rounded-full"/>
-                            <BiChevronDown
-                                className={`${open ? '' : 'text-opacity-70'}
-                  ml-1 h-5 w-5 text-[#5f5f5f] transition duration-150 ease-in-out group-hover:text-opacity-80`}
-                                aria-hidden="true"
-                            />
+                            <UserIcon/>
                         </Popover.Button>
                         <Transition
                             as={Fragment}

@@ -31,7 +31,6 @@ export const InitApi = () => {
         return config
     });
 
-
     instance.interceptors.response.use(
         (value: any) => value,
         async (error) => {

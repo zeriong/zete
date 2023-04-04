@@ -22,7 +22,7 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 // @ts-ignore
-import { CreateCompletionDto } from '../models';
+import { CreateCompletionInputDto } from '../models';
 /**
  * OpenAiApi - axios parameter creator
  * @export
@@ -31,14 +31,14 @@ export const OpenAiApiAxiosParamCreator = function (configuration?: Configuratio
     return {
         /**
          * 
-         * @param {CreateCompletionDto} createCompletionDto 
+         * @param {CreateCompletionInputDto} createCompletionInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createCompletion: async (createCompletionDto: CreateCompletionDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createCompletionDto' is not null or undefined
-            assertParamExists('createCompletion', 'createCompletionDto', createCompletionDto)
-            const localVarPath = `/openAi`;
+        createCompletion: async (createCompletionInputDto: CreateCompletionInputDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createCompletionInputDto' is not null or undefined
+            assertParamExists('createCompletion', 'createCompletionInputDto', createCompletionInputDto)
+            const localVarPath = `/openAi/createCompletion`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -57,7 +57,7 @@ export const OpenAiApiAxiosParamCreator = function (configuration?: Configuratio
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createCompletionDto, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(createCompletionInputDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -76,12 +76,12 @@ export const OpenAiApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {CreateCompletionDto} createCompletionDto 
+         * @param {CreateCompletionInputDto} createCompletionInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createCompletion(createCompletionDto: CreateCompletionDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createCompletion(createCompletionDto, options);
+        async createCompletion(createCompletionInputDto: CreateCompletionInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createCompletion(createCompletionInputDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -96,12 +96,12 @@ export const OpenAiApiFactory = function (configuration?: Configuration, basePat
     return {
         /**
          * 
-         * @param {CreateCompletionDto} createCompletionDto 
+         * @param {CreateCompletionInputDto} createCompletionInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createCompletion(createCompletionDto: CreateCompletionDto, options?: any): AxiosPromise<object> {
-            return localVarFp.createCompletion(createCompletionDto, options).then((request) => request(axios, basePath));
+        createCompletion(createCompletionInputDto: CreateCompletionInputDto, options?: any): AxiosPromise<object> {
+            return localVarFp.createCompletion(createCompletionInputDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -115,12 +115,12 @@ export const OpenAiApiFactory = function (configuration?: Configuration, basePat
 export class OpenAiApi extends BaseAPI {
     /**
      * 
-     * @param {CreateCompletionDto} createCompletionDto 
+     * @param {CreateCompletionInputDto} createCompletionInputDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OpenAiApi
      */
-    public createCompletion(createCompletionDto: CreateCompletionDto, options?: AxiosRequestConfig) {
-        return OpenAiApiFp(this.configuration).createCompletion(createCompletionDto, options).then((request) => request(this.axios, this.basePath));
+    public createCompletion(createCompletionInputDto: CreateCompletionInputDto, options?: AxiosRequestConfig) {
+        return OpenAiApiFp(this.configuration).createCompletion(createCompletionInputDto, options).then((request) => request(this.axios, this.basePath));
     }
 }
