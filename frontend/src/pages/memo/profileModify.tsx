@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {useForm} from "react-hook-form";
 import {Api} from "../../utile/api";
-import {FuncButton} from "../../components/funcBtn";
+import {FuncButton} from "../../components/common/funcBtn";
 import {SET_ALERT} from "../../store/slices/alert.slice";
 import {useNavigate} from "react-router-dom";
 

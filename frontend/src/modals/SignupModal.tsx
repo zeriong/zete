@@ -7,7 +7,7 @@ import {RootState} from "../store";
 
 import {Api} from "../utile/api";
 import {Dialog, Transition } from "@headlessui/react";
-import {FuncButton} from "../components/funcBtn";
+import {FuncButton} from "../components/common/funcBtn";
 
 /** 폼항목 */
 type FormData = {

@@ -2,14 +2,14 @@ import React, {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../store";
 import {sendMyProfile} from "../../store/slices/user.slice";
-import {Link, Outlet, useNavigate, useSearchParams} from "react-router-dom";
+import {Outlet} from "react-router-dom";
 import {Header} from "./header";
 
 export const HomeLayout = ()=> {
     /** state management */
     const dispatch = useDispatch<AppDispatch>();
     const { data:{ isLoggedIn }, loading} = useSelector((state: RootState) => (state.auth));
-    const { data: { name } } = useSelector((state: RootState) => (state.user));
+    // const { data: { name } } = useSelector((state: RootState) => (state.user));
 
     useEffect(() => {
         if (isLoggedIn) {

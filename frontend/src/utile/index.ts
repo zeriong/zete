@@ -17,3 +17,9 @@ export const existToken = () => {
         console.log(String(getCookie('rt')))
     } else { console.log(null); }
 }
+
+export const handleResizeHeight = (textareaRef) => {
+    const ref = textareaRef.current;
+    ref.style.height = 'auto';
+    ref.style.height = ref.scrollHeight + 'px';
+}

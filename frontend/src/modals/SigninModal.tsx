@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../store";
 
 import {Api} from "../utile/api";
-import {FuncButton} from "../components/funcBtn";
+import {FuncButton} from "../components/common/funcBtn";
 /** 폼항목 */
 type FormData = {
     email: string;
@@ -130,7 +130,7 @@ export const SigninModal = () => {
                                                     required: true,
                                                     minLength: 6,
                                                     maxLength: 70,
-                                                    pattern: /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i,
+                                                    pattern: /^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i,
                                                 })}
                                                 placeholder="이메일을 입력해주세요."
                                             />

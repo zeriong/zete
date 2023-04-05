@@ -1,6 +1,6 @@
 import React, {SVGProps} from "react";
 
-export const ThreeBarsMenu = (props: SVGProps<SVGSVGElement>) => (
+export const BarsMenuIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <g clipPath="url(#clip0_20_548)">
             <path d="M0 14V12.054H21V14H0ZM0 7.973V6.027H21V7.973H0ZM0 1.946V0H21V1.946H0Z" fill="black"/>
@@ -44,6 +44,12 @@ export const StarIcon = (props: SVGProps<SVGSVGElement>) => (
                 <rect width="20" height="19.0034" fill="white"/>
             </clipPath>
         </defs>
+    </svg>
+)
+
+export const FillStarIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 96 960 960" {...props}>
+        <path d="m233 976 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Z"/>
     </svg>
 )
 

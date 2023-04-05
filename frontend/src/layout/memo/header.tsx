@@ -3,8 +3,8 @@ import MemoInfoPopov from "../../popovers/MemoInfoPopov";
 import {useDispatch} from "react-redux";
 import {Link} from "react-router-dom";
 import {TOGGLE_SHOW_MENU} from "../../store/slices/changedMenu.slice";
-import {SearchIcon, ThreeBarsMenu} from "../../components/vectors";
-import {SearchMemo} from "../../components/searchMemo";
+import {BarsMenuIcon} from "../../components/vectors";
+import {SearchMemo} from "../../components/layout/searchMemo";
 export const Header = () => {
     const dispatch = useDispatch();
 
@@ -23,7 +23,7 @@ export const Header = () => {
                             className="ease-in-out duration-300 mr-7px md:hidden p-10px h-full"
                             onClick={toggleMenu}
                         >
-                            <ThreeBarsMenu/>
+                            <BarsMenuIcon/>
                         </button>
                         <>
                             <div className='w-26px h-26px bg-primary-500 rounded-[4px] mr-10px'/>

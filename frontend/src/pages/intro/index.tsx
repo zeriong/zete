@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {SuccessSignupModal} from "../../modals/SuccessSignupModal";
 import {SignupModal} from "../../modals/SignupModal";
 import {SigninModal} from "../../modals/SigninModal";

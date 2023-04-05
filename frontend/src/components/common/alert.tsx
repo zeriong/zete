@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState, store} from "../store";
-import {DELETE_ALERT, IAlertObject} from "../store/slices/alert.slice";
+import {RootState, store} from "../../store";
+import {DELETE_ALERT, IAlertObject} from "../../store/slices/alert.slice";
 
 export const Alert = () => {
     const { alerts } = useSelector((state:RootState) => state.alert);
@@ -40,12 +40,12 @@ export const Alert = () => {
         if (alert.type === "success") {return "bg-green-500"}
         if (alert.type === "error") {return "bg-red-200"}
     };
-//`${color()} flex absolute w-[200px] h-50 z-50 left-1/2 -translate-x-1/2 top-12`
+
     return (
         <div
             className={`${color()}
             bg-sky-200 flex items-center justify-center absolute w-auto h-10 px-3 z-20
-            top-10 rounded-lg transition-all duration-300 ease-in-out ${isShow ? "top-[88px] opacity-100" : "opacity-0"}`}
+            rounded-lg transition-all duration-300 ease-in-out ${isShow ? "top-64px opacity-100" : "opacity-0 top-0"}`}
             ref={alarm}
         >
             <div className={`w-full font-bold text-gray-700 ${color() === "bg-green-500" ? "text-white" : ""}`}>
