@@ -17,6 +17,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        'browser-width-900px': '900px',
+      },
       fontSize: {...createRemEntries(50)},
       colors: {
         'primary': {
@@ -30,6 +33,7 @@ module.exports = {
 
         },
         'zete': {
+          'scroll-gray': '#a0a0a0',
           'placeHolder': '#767676',
           'md-placeHolder': '#f3f3f3',
           'memo-border': '#e0e0e0',
@@ -58,7 +62,7 @@ module.exports = {
         'signUpLayout': '360px',
       },
       spacing: {
-        'asideWidth': '300px',
+        'asideWidth': '256px',
         'headerHeight': '46px',
         ...createPxEntries(100),
       },

@@ -42,7 +42,7 @@ export function renderThumbVerticalDefault({ style, ...props }) {
         ...style,
         cursor: 'pointer',
         borderRadius: 'inherit',
-        backgroundColor: 'rgba(102,102,102)',
+        backgroundColor: '#a0a0a0',
     };
     return <div style={finalStyle} {...props} />;
 }

@@ -21,7 +21,7 @@ export const SearchMemo = () => {
                 <input
                     onChange={inputOnChange}
                     placeholder='메모검색'
-                    className='placeholder:italic placeholder:text-zete-placeHolder w-full bg-transparent pr-20px md:pr-0'
+                    className='placeholder:italic placeholder:text-zete-placeHolder placeholder:font-light w-full bg-transparent pr-20px md:pr-0'
                     value={useInputValue}
                 />
             </div>

@@ -55,7 +55,7 @@ export const thumbHorizontalStyleDefault = {
 export const thumbVerticalStyleDefault = {
     position: 'relative',
     display: 'block',
-    width: '85%',
+    width: '100%',
 };
 
 export const disableSelectStyle = {

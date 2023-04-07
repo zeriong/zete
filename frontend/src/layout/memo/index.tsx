@@ -25,7 +25,7 @@ export const MemoLayout = () => {
             <Header/>
             <Aside/>
             <main
-                className={`${showMenu ? "pl-[300px] max-md:pl-0" : "pl-0"}
+                className={`${showMenu ? "pl-asideWidth max-md:pl-0" : "pl-0"}
                 flex relative flex-col justify-center h-full text-center items-center pt-headerHeight
                 overflow-auto duration-300 ease-in-out`}
             >
@@ -47,7 +47,7 @@ export const MemoLayout = () => {
                             <SearchMemo/>
                         </div>
                     </header>
-                    <div className='w-full h-full bg-zete-light-gray-100'>
+                    <div className='w-full h-full bg-zete-light-gray-100 overflow-hidden'>
                         <Alert/>
                         <Outlet/>
                     </div>

@@ -20,31 +20,35 @@ export const MainMemoList: React.FC<IsetIsCategoryOpenProps> = (props: IsetIsCat
     },[])
 
     return (
-        <div className="flex flex-col font-bold gap-1px mt-17px">
+        <div className="flex flex-col font-bold gap-2px">
             <Link
                 to="/memo"
-                className='flex justify-between items-center hover:bg-zete-light-gray-200 rounded-[5px] p-12px group'
+                className='flex justify-between items-center hover:bg-zete-light-gray-200 rounded-[5px] p-10px group'
                 onClick={()=> setIsCategoryOpen(false)}
             >
                 <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
                     <AllIcon className='mr-14px w-20px'/>
                     <span>전체메모</span>
                 </div>
-                <div className='rounded-full bg-zete-light-gray-300 text-zete-dark-100 py-3px px-8px text-12 group-hover:bg-white font-medium'>
-                    10
+                <div className='rounded-full bg-zete-light-gray-300 text-zete-dark-100 py-2px px-8px text-12 group-hover:bg-white font-medium'>
+                    <span className='relative bottom-1px'>
+                        10
+                    </span>
                 </div>
             </Link>
             <Link
                 to="/memo?search=important"
-                className='flex justify-between items-center hover:bg-zete-light-gray-200 rounded-[5px] p-12px group'
+                className='flex justify-between items-center hover:bg-zete-light-gray-200 rounded-[5px] p-10px group'
                 onClick={()=> setIsCategoryOpen(false)}
             >
                 <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
                     <StarIcon className='mr-14px w-20px'/>
                     <span>중요메모</span>
                 </div>
-                <div className='rounded-full bg-zete-light-gray-300 text-zete-dark-100 py-3px px-8px text-12 group-hover:bg-white font-medium'>
-                    10
+                <div className='rounded-full bg-zete-light-gray-300 text-zete-dark-100 py-2px px-8px text-12 group-hover:bg-white font-medium'>
+                    <span className='relative bottom-1px'>
+                        10
+                    </span>
                 </div>
             </Link>
         </div>
@@ -63,7 +67,7 @@ export const CategoryList: React.FC<IsetIsCategoryOpenProps> = (props: IsetIsCat
             <div className='flex flex-col justify-center'>
                 <button
                     type='button'
-                    className='flex w-full justify-between items-center p-12px'
+                    className='flex w-full justify-between items-center p-10px'
                     onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                 >
                     <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
@@ -71,10 +75,12 @@ export const CategoryList: React.FC<IsetIsCategoryOpenProps> = (props: IsetIsCat
                         <span>개발</span>
                     </div>
                     <div
-                        className={`rounded-full text-zete-dark-100 py-3px px-8px text-12 font-medium
+                        className={`rounded-full text-zete-dark-100 py-2px px-8px text-12 font-medium
                                     ${isCategoryOpen ? 'bg-white' : 'group-hover:bg-white bg-zete-light-gray-300'}`}
                     >
-                        2
+                        <span className='relative bottom-1px'>
+                            2
+                        </span>
                     </div>
                 </button>
                 <div

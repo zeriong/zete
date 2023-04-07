@@ -2,8 +2,7 @@
 import css from 'dom-css';
 import { Component, createElement, cloneElement } from 'react';
 
-import {isString, getScrollbarWidth, returnFalse, getInnerWidth, getInnerHeight} from '../../../../../learncha/FE_learncha/src/libs/common';
-
+import {isString, getScrollbarWidth, returnFalse, getInnerWidth, getInnerHeight} from '../../utile';
 
 import {
     containerStyleDefault,
