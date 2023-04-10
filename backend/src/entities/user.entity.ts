@@ -1,6 +1,7 @@
 import { coreEntity } from '../common/entities/core.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from "typeorm";
 import { ApiProperty } from '@nestjs/swagger';
+import { Memo } from "./memo.entity";
 
 @Entity({ name: 'user' })
 export class User extends coreEntity {
@@ -26,6 +27,12 @@ export class User extends coreEntity {
 
   /** refreshToken */
   @ApiProperty({ required: false })
-  @Column({ nullable: true, length: 255 })
+  @Column({ nullable: true, type: 'tinytext' })
   refreshToken?: string;
+
+  // /** memos */
+  // @ApiProperty({ required: false })
+  // @Column({ nullable: true })
+  // @OneToMany(() => Memo, (memo) => memo.user, { cascade: true })
+  // memos?: Memo[];
 }

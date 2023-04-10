@@ -1,16 +1,22 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, RelationId } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  RelationId,
+} from 'typeorm';
+import { User } from './user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Tag } from './memoTag.entity';
-import { User } from './user.entity';
-import { coreEntity } from "../common/entities/core.entity";
 
-@Entity({ name: 'memo' })
-export class Memo extends coreEntity {
+@Entity({ name: 'MemoCate' })
+export class MemoCate {
   /** user */
-  @ApiProperty({ type: User })
   // @ManyToOne((type) => User, (user: User) => user.memos)
+  @ApiProperty({ type: User })
   user: User;
-  @RelationId((memo: Memo) => memo.user)
+  @RelationId((memo: MemoCate) => memo.user)
   userId: number;
 
   /** memo title */

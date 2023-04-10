@@ -35,21 +35,14 @@ export const SearchIcon = (props: SVGProps<SVGSVGElement>) => (
 )
 
 export const StarIcon = (props: SVGProps<SVGSVGElement>) => (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <g clipPath="url(#clip0_10_167)">
-            <path d="M5.76879 16.3041L10 13.7585L14.2312 16.3326L13.1093 11.5148L16.828 8.28588L11.9191 7.85308L9.99431 3.32005L8.06948 7.8246L3.16059 8.2574L6.87927 11.4977L5.7574 16.3041H5.76879ZM3.82118 18.9977L5.45558 11.9704L0 7.24943L7.19248 6.62301L10 0L12.8075 6.62301L20 7.24943L14.5501 11.9761L16.1845 19.0034L10.0057 15.2733L3.82688 19.0034L3.82118 18.9977Z" fill="#4B4B4B"/>
-        </g>
-        <defs>
-            <clipPath id="clip0_10_167">
-                <rect width="20" height="19.0034" fill="white"/>
-            </clipPath>
-        </defs>
+    <svg xmlns="http://www.w3.org/2000/svg" height="26" viewBox="0 96 960 960" width="26" {...props} fill={'#4B4B4B'}>
+        <path d="M331.462 839.845 480 750.461l148.538 90.384-39.308-169.153 130.692-113.461L547.538 543 480 383.847 412.462 542l-172.384 15.231L370.77 671.077l-39.308 168.768Zm-68.46 94.613 57.307-246.766L128.85 521.77l252.613-21.922L480 267.158l98.537 232.69L831.15 521.77 639.691 687.692l57.307 246.766L480 803.537 263.002 934.458ZM480 622.154Z"/>
     </svg>
 )
 
 export const FillStarIcon = (props: SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 96 960 960" {...props}>
-        <path d="m233 976 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Z"/>
+    <svg xmlns="http://www.w3.org/2000/svg" height="26" viewBox="0 96 960 960" width="26" {...props} fill={'#4B4B4B'}>
+        <path d="m263.002 934.458 57.307-246.766L128.85 521.77l252.613-21.922L480 267.158l98.537 232.69L831.15 521.77 639.691 687.692l57.307 246.766L480 803.537 263.002 934.458Z"/>
     </svg>
 )
 

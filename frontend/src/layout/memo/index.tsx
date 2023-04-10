@@ -14,7 +14,7 @@ export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
     const dispatch = useDispatch<AppDispatch>();
-    const queryStr = useGetQueryStr()
+    const { cateStr, tagStr } = useGetQueryStr()
 
     useEffect(() => {
         dispatch(sendMyProfile());
@@ -36,12 +36,19 @@ export const MemoLayout = () => {
                                 <TagIcon strokeClassName='fill-zete-tagBlack' svgClassName='w-17px h-16px mr-10px'/>
                             </>
                             <span>
-                                {
-                                    queryStr === 'important' ? '중요메모' :
-                                        queryStr === null ? '전체메모' :
-                                            queryStr
-                                }
+                                {cateStr === 'important' ? '중요메모' :
+                                    !cateStr ? '전체메모' : cateStr}
                             </span>
+                            {
+                                tagStr && (
+                                    <div className='flex'>
+                                        <p className='mx-8px font-semibold'>
+                                            &gt;
+                                        </p>
+                                        {tagStr}
+                                    </div>
+                                )
+                            }
                         </div>
                         <div className='block md:hidden pr-16px'>
                             <SearchMemo/>

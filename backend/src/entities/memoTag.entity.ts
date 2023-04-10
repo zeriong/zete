@@ -4,8 +4,8 @@ import { Memo } from './memo.entity';
 @Entity()
 export class Tag {
   @Column()
-  name: string;
+  tagName: string;
 
   @ManyToMany(() => Memo, (memo) => memo.tags)
-  posts: Memo[];
+  Memos: Memo[];
 }

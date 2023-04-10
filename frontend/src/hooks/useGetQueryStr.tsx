@@ -1,21 +1,21 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {useSearchParams} from "react-router-dom";
 
 export const useGetQueryStr = () => {
-    const [queryStr, setQueryStr] = useState<any>('');
-    const [searchParams] = useSearchParams();
+    const [cateStr, setCateStr] = useState<any>('');
+    const [tagStr, setTagStr] = useState<any>('');
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const getQueryStr = () => {
-        const searchStr = searchParams.get('search');
-
-        if (searchStr) setQueryStr(searchStr);
-        else setQueryStr(searchStr)
+        const cate = searchParams.get('cate');
+        const tag = searchParams.get('tag');
+        setCateStr(cate);
+        setTagStr(tag);
     }
 
     useEffect(() => {
         getQueryStr()
     }, [searchParams]);
 
-    return queryStr
+    return {cateStr, tagStr, setSearchParams}
 };

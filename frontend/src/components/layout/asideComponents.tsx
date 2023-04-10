@@ -1,11 +1,7 @@
 import {Link} from "react-router-dom";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../vectors";
-import React, {Dispatch, SetStateAction, useEffect} from "react";
+import React, {Dispatch, SetStateAction} from "react";
 import {useGetQueryStr} from "../../hooks/useGetQueryStr";
-
-const fetchData = () => {
-    return null
-}
 
 interface IsetIsCategoryOpenProps {
     setIsCategoryOpen: Dispatch<SetStateAction<boolean>>;
@@ -14,17 +10,17 @@ interface IsetIsCategoryOpenProps {
 
 export const MainMemoList: React.FC<IsetIsCategoryOpenProps> = (props: IsetIsCategoryOpenProps) => {
     const { setIsCategoryOpen  } = props;
-
-    useEffect(()=>{
-       fetchData();
-    },[])
+    const { setSearchParams } = useGetQueryStr();
 
     return (
         <div className="flex flex-col font-bold gap-2px">
             <Link
                 to="/memo"
                 className='flex justify-between items-center hover:bg-zete-light-gray-200 rounded-[5px] p-10px group'
-                onClick={()=> setIsCategoryOpen(false)}
+                onClick={()=> {
+                    setIsCategoryOpen(false);
+                    setSearchParams({});
+                }}
             >
                 <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
                     <AllIcon className='mr-14px w-20px'/>
@@ -36,10 +32,13 @@ export const MainMemoList: React.FC<IsetIsCategoryOpenProps> = (props: IsetIsCat
                     </span>
                 </div>
             </Link>
-            <Link
-                to="/memo?search=important"
+            <button
+                type="button"
                 className='flex justify-between items-center hover:bg-zete-light-gray-200 rounded-[5px] p-10px group'
-                onClick={()=> setIsCategoryOpen(false)}
+                onClick={()=> {
+                    setIsCategoryOpen(false);
+                    setSearchParams({ cate: "important" });
+                }}
             >
                 <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
                     <StarIcon className='mr-14px w-20px'/>
@@ -50,14 +49,21 @@ export const MainMemoList: React.FC<IsetIsCategoryOpenProps> = (props: IsetIsCat
                         10
                     </span>
                 </div>
-            </Link>
+            </button>
         </div>
     )
 }
 
 export const CategoryList: React.FC<IsetIsCategoryOpenProps> = (props: IsetIsCategoryOpenProps) => {
     const { setIsCategoryOpen, isCategoryOpen } = props;
-    const queryStr = useGetQueryStr();
+    const { setSearchParams, tagStr } = useGetQueryStr();
+
+    const tagParamsHandler = (tagName: string) => {
+        setSearchParams((prev) => {
+            prev.set('tag', tagName)
+            return prev
+        })
+    }
 
     return (
         <div
@@ -68,7 +74,10 @@ export const CategoryList: React.FC<IsetIsCategoryOpenProps> = (props: IsetIsCat
                 <button
                     type='button'
                     className='flex w-full justify-between items-center p-10px'
-                    onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                    onClick={() => {
+                        setIsCategoryOpen(!isCategoryOpen);
+                        setSearchParams({ cate: '개발' })
+                    }}
                 >
                     <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
                         <CategoryIcon className='mr-10px'/>
@@ -87,22 +96,24 @@ export const CategoryList: React.FC<IsetIsCategoryOpenProps> = (props: IsetIsCat
                     className={`overflow-hidden font-light text-13 transition-all duration-300 
                                 ${isCategoryOpen ? 'max-h-[200px] p-12px' : 'h-[0vh] p-0'}`}
                 >
-                    <Link
-                        to='/memo?search=React'
-                        className={`flex h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
-                                    ${queryStr === 'React' && 'bg-zete-light-gray-500'}`}
+                    <button
+                        type='button'
+                        className={`flex w-full h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
+                        ${tagStr === 'React' && 'bg-zete-light-gray-500'}`}
+                        onClick={() => tagParamsHandler('React')}
                     >
                         <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>
                         <span>React</span>
-                    </Link>
-                    <Link
-                        to='/memo?search=Nodejs'
-                        className={`flex py-8px pl-16px rounded-[5px] hover:bg-zete-light-gray-500
-                                    ${queryStr === 'Nodejs' && 'bg-zete-light-gray-500'}`}
+                    </button>
+                    <button
+                        type='button'
+                        className={`flex w-full py-8px pl-16px rounded-[5px] hover:bg-zete-light-gray-500
+                        ${tagStr === 'Nodejs' && 'bg-zete-light-gray-500'}`}
+                        onClick={() => tagParamsHandler('Nodejs')}
                     >
                         <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>
                         <span>Nodejs</span>
-                    </Link>
+                    </button>
                 </div>
             </div>
         </div>
