@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useSearchParams} from "react-router-dom";
 
-export const useGetQueryStr = () => {
+export const useHandleQueryStr = () => {
     const [cateStr, setCateStr] = useState<any>('');
     const [tagStr, setTagStr] = useState<any>('');
     const [searchParams, setSearchParams] = useSearchParams();
@@ -17,5 +17,5 @@ export const useGetQueryStr = () => {
         getQueryStr()
     }, [searchParams]);
 
-    return {cateStr, tagStr, setSearchParams}
+    return {cateStr, tagStr, searchParams, setSearchParams}
 };

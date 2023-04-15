@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {sendMyProfile} from "../../store/slices/user.slice";
 import {AppDispatch, RootState} from "../../store";
@@ -7,18 +7,32 @@ import {Header} from "./header";
 import {Aside} from "./aside";
 import {Alert} from "../../components/common/alert";
 import {TagIcon} from "../../components/vectors";
-import {useGetQueryStr} from "../../hooks/useGetQueryStr";
+import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
 import {SearchMemo} from "../../components/layout/searchMemo";
 
 export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
+    const { tableArr } = useSelector((state: RootState) => (state.memo));
+    const { cateStr, tagStr } = useHandleQueryStr()
+
+    const [existCate,setExistCate] = useState(false);
+
     const dispatch = useDispatch<AppDispatch>();
-    const { cateStr, tagStr } = useGetQueryStr()
 
     useEffect(() => {
         dispatch(sendMyProfile());
     }, [dispatch])
+
+    useEffect(() => {
+        const cateList = tableArr.categories.map((cate) => cate.cateName);
+        if (cateList.find((list) => list === cateStr ||
+            cateStr === 'important' || !cateStr)) {
+            setExistCate(true);
+        } else {
+            setExistCate(false);
+        }
+    },[tagStr,cateStr, tableArr])
 
     return ( loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
         <>
@@ -35,20 +49,27 @@ export const MemoLayout = () => {
                             <>
                                 <TagIcon strokeClassName='fill-zete-tagBlack' svgClassName='w-17px h-16px mr-10px'/>
                             </>
-                            <span>
-                                {cateStr === 'important' ? '중요메모' :
-                                    !cateStr ? '전체메모' : cateStr}
-                            </span>
                             {
-                                tagStr && (
-                                    <div className='flex'>
-                                        <p className='mx-8px font-semibold'>
-                                            &gt;
-                                        </p>
-                                        {tagStr}
-                                    </div>
+                                existCate ? (
+                                    <>
+                                        <span>
+                                            {cateStr === 'important' ? '중요메모' :
+                                                !cateStr ? '전체메모' : cateStr}
+                                        </span>
+                                        <div className='flex'>
+                                            <p className='mx-8px'>
+                                                &gt;
+                                            </p>
+                                            {tagStr}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <h1 className='text-zete-placeHolder'>
+                                        카테고리가 존재하지않습니다.
+                                    </h1>
                                 )
                             }
+
                         </div>
                         <div className='block md:hidden pr-16px'>
                             <SearchMemo/>

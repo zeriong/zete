@@ -1,6 +1,6 @@
 //@ts-ignore
 import css from 'dom-css';
-import { Component, createElement, cloneElement } from 'react';
+import {Component, createElement, cloneElement, HTMLAttributes} from 'react';
 
 import {isString, getScrollbarWidth, returnFalse, getInnerWidth, getInnerHeight} from '../../utile';
 
@@ -52,6 +52,7 @@ interface Props {
     universal: Boolean;
     style: Record<string, any>;
     children: React.ReactNode;
+    className: string;
 }
 
 export default class CustomScroller extends Component<Partial<Props>, any> {
@@ -627,6 +628,7 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
             autoHeightMax,
             style,
             children,
+            className,
             ...props
         } = this.props as Props;
 

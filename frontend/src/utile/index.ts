@@ -1,4 +1,6 @@
 import css from 'dom-css';
+import {store} from "../store";
+import {SET_DATA} from "../store/slices/memo.slice";
 
 export const getCookie = (name: string) => {
     let value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
@@ -25,7 +27,6 @@ export const handleResizeHeight = (textareaRef) => {
     ref.style.height = 'auto';
     ref.style.height = ref.scrollHeight + 'px';
 }
-
 
 
 /** -------- 커스텀스크롤 function start ------- */
@@ -64,12 +65,29 @@ export const getScrollbarWidth = (cacheEnabled = true) => {
     return scrollbarWidth || 0;
 }
 
-export const isString = (maybe: string | number) => {
-    return typeof maybe === 'string';
-}
+export const isString = (maybe: string | number) => typeof maybe === 'string';
 
-export const returnFalse = () => {
-    return false;
-}
+export const returnFalse = () => false;
 
 /** -------- 커스텀스크롤 function end ------- */
+
+
+export const uniqueKey = () => {
+    const date = new Date();
+    return Number(Date.now() +
+        String(date.getDate()) +
+        String(date.getMonth()) +
+        String(Math.random()))
+}
+
+export const subUniqueKey = () => {
+    const date = new Date();
+    return Number(Date.now() +
+        String(date.getDate()) +
+        String(date.getMonth()) +
+        String(date.getFullYear() +
+            String(Math.random()))
+    )
+}
+
+export const setData = () => store.dispatch(SET_DATA());

@@ -1,16 +1,19 @@
 import {CheckIcon, FillStarIcon, PlusIcon, SearchIcon, StarIcon, StickerMemoIcon, ThreeDotMenuIcon} from "../vectors";
 import React, {useEffect, useRef, useState} from "react";
-import {useGetQueryStr} from "../../hooks/useGetQueryStr";
-import {handleResizeHeight} from "../../utile";
-import {useDispatch} from "react-redux";
+import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
+import {handleResizeHeight, setData} from "../../utile";
+import {useDispatch, useSelector} from "react-redux";
 import {SET_MEMO} from "../../store/slices/memo.slice";
+import {RootState} from "../../store";
 
 export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
     const titleTextarea = useRef<HTMLTextAreaElement>(null);
     const tagsRef = useRef([]);
 
-    const { cateStr, tagStr } = useGetQueryStr();
+    const { cateStr, tagStr, searchParams } = useHandleQueryStr();
+    const { tableArr } = useSelector((state:RootState) => state.memo)
+
     const dispatch = useDispatch();
 
     const [memoValue, setMemoValue] = useState('');
@@ -25,32 +28,45 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         handleResizeHeight(titleTextarea);
         setTitleValue(e.currentTarget.value);
     }
+
+    const handleKeyDown = (e) => {
+        if (e.shiftKey && e.key === 'Enter') {
+            const startPos = e.target.selectionStart;
+            const endPos = e.target.selectionEnd;
+            const value = e.target.value;
+            e.target.value = value.substring(0, startPos) + '\n' + value.substring(endPos, value.length);
+            e.target.selectionStart = startPos + 1;
+            e.target.selectionEnd = startPos + 1;
+            e.preventDefault();
+        } else if (e.key === 'Enter') {
+            memoTextarea.current.focus();
+            e.preventDefault();
+        }
+        handleResizeHeight(titleTextarea);
+    }
+
     const importantHandler = () => setIsImportant(!isImportant);
 
     const addMemo = () => {
         const content = memoValue.replace(/\n/g, '<br/>'); // innerHTML해주기 위함
-        const tags = tagsRef.current.filter((item)=> item !== null); // 태그가 없는경우 null item제거
-        const date = new Date()
+        const isUpdate = false
+        const tagNames = ['태그1','태그2','태그5'];
+        const categoryId = tableArr.categories.find((cate) => cate.cateName === cateStr).cateId;
 
         const newData = {
-            id: Number(Date.now() +
-                String(date.getDate()) +
-                String(date.getMonth())),
+            isUpdate,
+            categoryId,
             important: isImportant,
             title: titleValue,
             content,
-            tags, // 키와 키값이 같으므로 tags: tags, => tags,
-            cate: cateStr,
+            tagNames, // 키와 키값이 같으므로 tags: tags, => tags,
         }
 
-
-        dispatch(SET_MEMO({
-            cateStr,
-            newData,
-        }));
-
+        dispatch(SET_MEMO(newData));
+        setData();
         setMemoValue('');
         setTitleValue('');
+
         memoTextarea.current.style.height = 'auto';
         titleTextarea.current.style.height = 'auto';
     }
@@ -58,9 +74,8 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     useEffect(() => {
         if (cateStr === 'important') setIsImportant(true);
         else setIsImportant(false);
-
         if (tagStr) tagsRef.current[0] = tagStr; // 첫번째 배열에 쿼리에 적힌 테그추가
-    },[cateStr, tagStr])
+    },[searchParams])
 
     return (
         <article {...props} className='relative min-w-0 w-full browser-width-900px:min-w-[300px] flex flex-col justify-between border border-zete-light-gray-500 rounded-[8px] px-18px pb-10px pt-12px min-h-[212px] h-fit bg-zete-primary-200'>
@@ -71,14 +86,9 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                         rows={1}
                         value={titleValue}
                         onChange={titleAutoResize}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                memoTextarea.current.focus();
-                            }
-                        }}
+                        onKeyDown={handleKeyDown}
                         placeholder='제목'
-                        className='resize-none w-full pr-6px max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15'
+                        className='resize-none w-full pr-6px max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
                     />
                     {
                         cateStr === 'important' ? <FillStarIcon/> :
@@ -124,7 +134,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                         <SearchIcon className='cursor-pointer' onClick={() => console.log(memoValue)}/>
                     </div>
                     <div onClick={addMemo}>
-                        <PlusIcon className='cursor-pointer'/>
+                        <PlusIcon svgClassName='cursor-pointer'/>
                     </div>
                 </div>
             </div>

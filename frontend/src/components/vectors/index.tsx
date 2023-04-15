@@ -14,7 +14,7 @@ export const BarsMenuIcon = (props: SVGProps<SVGSVGElement>) => (
 )
 
 export const ModifyIcon = (props: SVGProps<SVGSVGElement>) => (
-    <svg width="22" height="21" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg width="22" height="22" viewBox="0 0 22 21" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <g clipPath="url(#clip0_11_234)">
             <path d="M18.0274 10.3392L19.7026 12.7196L15.1168 19.2345C15.0491 19.3247 14.9645 19.3981 14.8517 19.4601C14.7389 19.5222 14.6261 19.5504 14.502 19.5504H1.83881C1.74292 19.5504 1.65267 19.5109 1.56807 19.4263C1.4891 19.3473 1.44397 19.2571 1.44397 19.1555V6.278C1.44397 6.18211 1.48346 6.09186 1.56807 6.00725C1.65267 5.92264 1.73728 5.88316 1.83881 5.88316H8.63011L10.0741 4.43916H1.83881C1.3368 4.43916 0.908113 4.61966 0.547114 4.98066C0.186115 5.34166 0.00561523 5.77599 0.00561523 6.27236V19.1555C0.00561523 19.6575 0.186115 20.0862 0.547114 20.4472C0.908113 20.8082 1.34244 20.9887 1.83881 20.9887H14.2538C14.7333 20.9887 15.1676 20.8703 15.5624 20.6334C15.9573 20.3965 16.2957 20.0862 16.5777 19.6914L21.5076 12.7083L19.0822 9.27881L18.033 10.328L18.0274 10.3392Z" fill="#4B4B4B"/>
             <path d="M14.4005 3.03465L15.3199 3.93715L7.43435 11.7945V14.0056H9.61727L17.5423 6.09751L18.4335 6.98308L10.1588 15.2804H6.15393V11.2812L14.4005 3.03465Z" fill="#4B4B4B"/>
@@ -97,8 +97,12 @@ export const CategoryIcon = (props: SVGProps<SVGSVGElement>) => (
         </defs>
     </svg>
 )
-
-export const TagIcon = ({svgClassName, strokeClassName}: {svgClassName:string, strokeClassName:string}) => (
+export const FillCategoryIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 96 960 960" width="27" {...props}>
+        <path d="M840 576 666 822q-11 16-28.5 25t-37.5 9H200q-33 0-56.5-23.5T120 776V376q0-33 23.5-56.5T200 296h400q20 0 37.5 9t28.5 25l174 246Z"/>
+    </svg>
+)
+export const TagIcon = ({svgClassName, strokeClassName}: {svgClassName?:string, strokeClassName?:string}) => (
     <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg" className={svgClassName}>
         <g clipPath="url(#clip0_14_239)">
             <path d="M2.96774 16L4.05677 11.68H0L0.299355 10.5084H4.34581L5.60516 5.48645H1.03226L1.33161 4.31484H5.89419L6.96774 0H8.11355L7.04 4.32H11.6903L12.7639 0H13.9097L12.8361 4.32H16.8929L16.6039 5.49161H12.5471L11.2877 10.5135H15.8606L15.5716 11.6852H10.9987L9.92516 16.0052H8.76387L9.8529 11.6852H5.20258L4.12903 16.0052H2.96774V16ZM5.49161 10.5135H10.1419L11.4013 5.49161H6.75097L5.49161 10.5135Z" className={strokeClassName}/>
@@ -139,8 +143,23 @@ export const ThreeDotMenuIcon = (props: SVGProps<SVGSVGElement>) => (
     </svg>
 )
 
-export const PlusIcon = (props: SVGProps<SVGSVGElement>) => (
-    <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <path d="M9.16296 20V10.837H0V9.15556H9.16296V0H10.8444V9.16296H20.0074V10.8444H10.8444V20.0074H9.16296V20Z" fill="#4B4B4B"/>
+export const PlusIcon = ({svgClassName, strokeClassName}: {svgClassName?:string, strokeClassName?:string}) => (
+    <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" className={svgClassName}>
+        <path d="M9.16296 20V10.837H0V9.15556H9.16296V0H10.8444V9.16296H20.0074V10.8444H10.8444V20.0074H9.16296V20Z" fill="#4B4B4B" className={strokeClassName}/>
+    </svg>
+)
+export const CatePlusIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 96 960 960" width="24" {...props}>
+        <path d="M434.5 861.5v-240h-240v-91h240v-240h91v240h240v91h-240v240h-91Z"/>
+    </svg>
+)
+export const CloseIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20" {...props}>
+        <path d="m256 856-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+    </svg>
+)
+export const DeleteIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20" {...props}>
+        <path d="M292.309 915.999q-30.308 0-51.308-21t-21-51.308V336h-40v-59.999H360v-35.384h240v35.384h179.999V336h-40v507.691q0 30.308-21 51.308t-51.308 21H292.309ZM376.155 776h59.999V416h-59.999v360Zm147.691 0h59.999V416h-59.999v360Z"/>
     </svg>
 )

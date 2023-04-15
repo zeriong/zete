@@ -6,11 +6,16 @@ import {SET_SHOW_MENU, TOGGLE_SHOW_MENU} from "../../store/slices/changedMenu.sl
 import {ModifyIcon} from "../../components/vectors";
 import {CategoryList, MainMemoList} from "../../components/layout/asideComponents";
 import CustomScroller from "../../components/customScroller";
+import {CateModifyModal} from "../../modals/cateModifyModal";
+import {uniqueKey} from "../../utile";
 
 export const Aside = () => {
     const dispatch = useDispatch();
     const { alerts } = useSelector((state: RootState) => state.alert);
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
+
+    const data = useSelector((state: RootState) => state.memo.data);
+    const tableArr = useSelector((state: RootState) => state.memo.tableArr);
 
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
@@ -35,7 +40,7 @@ export const Aside = () => {
         <>
             <section
                 className={`${showMenu ? "opacity-50 visible" : "opacity-0 invisible"}
-                    z-10 w-full h-full left-0 top-0 fixed bg-black opacity-0 hidden max-md:block ease-in-out duration-300`}
+                z-10 w-full h-full left-0 top-0 fixed bg-black opacity-0 hidden max-md:block ease-in-out duration-300`}
                 onClick={toggleMenu}
             />
             <nav
@@ -43,28 +48,32 @@ export const Aside = () => {
                 fixed w-asideWidth bg-white z-20 ease-in-out duration-300 left-0 pt-headerHeight h-full overflow-auto scroll-hidden border-r border-zete-light-gray-400`}
             >
                 <CustomScroller>
-                    <div className="flex flex-col h-full w-full min-h-[820px] p-14px text-zete-dark-500 font-light text-14">
+                    <div className="flex flex-col h-full w-full min-h-[600px] p-14px text-zete-dark-500 font-light text-14">
                         <>
-                            <MainMemoList setIsCategoryOpen={setIsCategoryOpen}/>
+                            <MainMemoList tableArr={tableArr}/>
                         </>
                         <p className='text-zete-dark-300 text-11 font-light pb-14px pt-17px pl-12px'>
                             카테고리
                         </p>
+                        <ul className='grid gap-4px'>
+                            {
+                                data && tableArr &&
+                                tableArr.categories.map((cate, idx) => {
+                                    const matchData = data.filter(data => data['cateId'] === cate.cateId);
+                                    return (
+                                        <CategoryList
+                                            key={idx}
+                                            idx={idx}
+                                            matchData={matchData}
+                                            cate={cate}
+                                        />
+                                    )
+                                })
+                            }
+                        </ul>
                         <>
-                            <CategoryList
-                                setIsCategoryOpen={setIsCategoryOpen}
-                                isCategoryOpen={isCategoryOpen}
-                            />
+                            <CateModifyModal/>
                         </>
-                        <button
-                            type='button'
-                            className='flex w-full justify-between items-center px-10px py-8px rounded-[5px] mt-2px h-42px'
-                        >
-                            <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
-                                <ModifyIcon className='mr-10px'/>
-                                <span>카테고리 수정</span>
-                            </div>
-                        </button>
                         <button
                             className="fixed bg-black text-white bottom-0 right-0 p-2"
                             type="button"
