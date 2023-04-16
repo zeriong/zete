@@ -30,6 +30,7 @@ export const memoSlice = createSlice({
     reducers: {
         SET_CATE: (state: MemoData, action: PayloadAction<{cateName:string}>) => {
             const { cateName } = action.payload;
+            if (!cateName) return
             const memoIds = state.tableArr.categories.map((cate) => cate.cateId) || [];
             const makeId = memoIds.length > 0 ? Math.max(...memoIds) + 1 : 1;
             state.tableArr['categories'].push({
@@ -39,8 +40,18 @@ export const memoSlice = createSlice({
             saveMemoState(state);
         },
         DELETE_CATE: (state: MemoData, action: PayloadAction<number>) => {
+            const target = state.tableArr.cateMemos.filter(cateMemo => cateMemo.cateId === action.payload);
+            const currentCateTags = state.tableArr.cateTags.filter(cateTags => cateTags.cateId === action.payload)
+            const memoId = target.map(val => val.memoId);
+
+            if (memoId.length !== 0) {
+                state.tableArr.memos = state.tableArr.memos.filter(memos => !memoId.some(memoId => memoId === memos.memoId))
+            }
+
             state.tableArr.categories = state.tableArr.categories.filter(cate => cate.cateId !== action.payload);
-            state.tableArr.cateMemos = state.tableArr.cateMemos.filter(match => match.cateId !== action.payload);
+            state.tableArr.cateMemos = state.tableArr.cateMemos.filter(cateMemo => cateMemo.cateId !== action.payload);
+            state.tableArr.cateTags = state.tableArr.cateTags.filter(cateTags => cateTags.cateId !== action.payload);
+            state.tableArr.tags = state.tableArr.tags.filter(cateTags => !currentCateTags.some(current => current.tagId === cateTags.tagId));
             saveMemoState(state);
         },
         SET_MEMO: (state: MemoData, action: PayloadAction<SetMemoPayload>) => {
@@ -53,7 +64,7 @@ export const memoSlice = createSlice({
             if (memoToUpdate && isUpdate) {  // 업데이트인경우 //
                 memoToUpdate['title'] = title;
                 memoToUpdate['content'] = content;
-                memoToUpdate['important'] = important;
+                memoToUpdate['important'] = Boolean(important);
             } else {
                 const memoIds = memos.map((memo) => memo.memoId) || [];  // 추가인경우 //
                 const makeId = memoIds.length > 0 ? Math.max(...memoIds) + 1 : 1;
@@ -69,23 +80,14 @@ export const memoSlice = createSlice({
             }
 
             // set tags
-            const existTags = [...state.tableArr['tags']]; // 이미 존재한다면 존재하는 태그배열을 가져옴
-            const excludeTags = existTags.filter((exist) => tagNames.some(tag => tag === exist.tagName));
-            const excludeNames = excludeTags.map((exist) => exist.tagName);
-            let tagNamesSet = tagNames.filter((name) => !excludeNames.some(tag => tag === name))
-
-            console.log('이거슨 existTags',JSON.stringify(existTags))
-            console.log('이거슨 excludeTags',JSON.stringify(excludeTags))
-            console.log('이거슨 tagNamesSet',tagNamesSet)
-            console.log('비교해보자 tagNamesSet',tagNames,excludeNames)
-            if (excludeNames === tagNamesSet) {
-                tagNamesSet = [];
-            }
-            if (excludeNames.length === 0) {
-                tagNamesSet = tagNames;
-                console.log('들어와부르스')
-                console.log('들어와부르스 tagNamesSet은', tagNamesSet)
-            }
+            const existTags = [...state.tableArr['tags']]; // tags
+            const getTags = existTags.filter(exist => tagNames.some(tag => tag === exist.tagName)); //name이 일치하는 데이터들을가져온다. (일치하지 않는 데이터는 반드시추가대상)
+            const sameCateTagsId = state.tableArr['cateTags'].filter(exist => exist.cateId === categoryId); //현재 카테고리id에 일치하는 cateTags 데이터
+            const existCateTags = existTags.filter(tags => sameCateTagsId.some(id => id.tagId === tags.tagId)) //현재카테고리기준 모든 tags를 가져옴
+            const existCateNames = existCateTags.filter(tags => getTags.some(name => name.tagName === tags.tagName)) //이름으로 중복체크해서 카테고리기준으로 이름이 안겹치도록
+            const mustBeAddTags = getTags.filter(tags => !existCateNames.some(exist => exist.tagName === tags.tagName)).map(tag => tag.tagName) || []
+            const tagNamesFilter = tagNames.filter(name => !existTags.some(val => val.tagName === name))  //받아온 name을 전체name에서 검색해서 일치하지 않는 것을 가져온다.
+            let tagNamesSet = [...tagNamesFilter, ...mustBeAddTags];
 
             const newTags = tagNamesSet.map((newTagName, idx) => {
                     const memoIds = state.tableArr['tags']?.map((tag) => tag.tagId); // new id를 만들기 위해 선언
@@ -113,14 +115,14 @@ export const memoSlice = createSlice({
 
             // set cateMemos
             const cateMemos = state.tableArr['cateMemos'] || [];
-            const cateTarget = cateMemos.find((cateMemo) => cateMemo.cateId === categoryId);
-            const memoTarget = cateMemos.find((cateMemo) => cateMemo.memoId === memoToUpdate.memoId);
+            const cateMemos_cateTarget = cateMemos.find((cateMemo) => cateMemo.cateId === categoryId);
+            const cateMemos_memoTarget = cateMemos.find((cateMemo) => cateMemo.memoId === memoToUpdate.memoId);
 
             let newCateMemos = [];
 
-            if (!cateTarget || !memoTarget) {
+            if (!cateMemos_cateTarget || !cateMemos_memoTarget) {
                 newCateMemos.push(...cateMemos, {cateId: categoryId, memoId: memoToUpdate.memoId});
-            } else if (memoTarget.cateId !== categoryId) {
+            } else if (cateMemos_memoTarget.cateId !== categoryId) {
                 const deleteTarget = cateMemos.filter((cateMemo) => cateMemo.memoId !== memoToUpdate.memoId);
                 newCateMemos.push(...deleteTarget, {cateId: categoryId, memoId: memoToUpdate.memoId});
             } else {
@@ -135,11 +137,11 @@ export const memoSlice = createSlice({
 
             let newCateTags = [];
 
-            if (!cateTags_cateTarget || !cateTags_tagTarget) {
+            if (!cateTags_cateTarget || !cateTags_tagTarget || !cateMemos_memoTarget) {
                 newCateTags.push(...cateTags, ...tagIds);
-            } else if (memoTarget.cateId !== categoryId) {
+            } else if (cateMemos_memoTarget.cateId !== categoryId) {
                 const newCateTagsWithoutOldData = cateTags.filter((cateTag) => {
-                    const isSameCategory = memoTarget.cateId === cateTag.cateId;
+                    const isSameCategory = cateMemos_memoTarget.cateId === cateTag.cateId;
                     const isOldData = tagIds.some((tagId) => tagId.tagId === cateTag.tagId);
 
                     return !(isSameCategory && isOldData);

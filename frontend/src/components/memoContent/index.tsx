@@ -1,4 +1,4 @@
-import {CheckIcon, FillStarIcon, PlusIcon, SearchIcon, StarIcon, StickerMemoIcon, ThreeDotMenuIcon} from "../vectors";
+import {CheckIcon, FillStarIcon, PlusIcon, SearchIcon, StarIcon, StickerMemoIcon} from "../vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
 import {handleResizeHeight, setData} from "../../utile";
@@ -19,6 +19,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const [memoValue, setMemoValue] = useState('');
     const [titleValue, setTitleValue] = useState('');
     const [isImportant, setIsImportant] = useState(false);
+    const [tagNames, setTagNames] = useState<string[]>([]);
 
     const memoAutoResize = (e) => {
         handleResizeHeight(memoTextarea);
@@ -48,9 +49,12 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const importantHandler = () => setIsImportant(!isImportant);
 
     const addMemo = () => {
+        if (!titleValue && !memoValue) {
+            return alert('제목이나 내용을 입력해주세요.')
+        }
+
         const content = memoValue.replace(/\n/g, '<br/>'); // innerHTML해주기 위함
         const isUpdate = false
-        const tagNames = ['태그1','태그2','태그5'];
         const categoryId = tableArr.categories.find((cate) => cate.cateName === cateStr).cateId;
 
         const newData = {
@@ -74,8 +78,12 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     useEffect(() => {
         if (cateStr === 'important') setIsImportant(true);
         else setIsImportant(false);
-        if (tagStr) tagsRef.current[0] = tagStr; // 첫번째 배열에 쿼리에 적힌 테그추가
-    },[searchParams])
+        if (tagStr) {
+            tagsRef.current[0] = tagStr;
+            setTagNames([tagStr])
+        } // 첫번째 배열에 쿼리에 적힌 테그추가
+        if (!tagStr) setTagNames([]);
+    },[tagStr, cateStr])
 
     return (
         <article {...props} className='relative min-w-0 w-full browser-width-900px:min-w-[300px] flex flex-col justify-between border border-zete-light-gray-500 rounded-[8px] px-18px pb-10px pt-12px min-h-[212px] h-fit bg-zete-primary-200'>
@@ -115,14 +123,18 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
             <div>
                 <div className='flex w-full border-b border-zete-memo-border pb-8px'>
                     {
-                        (cateStr === 'important') ? '' :
-                            cateStr === null ? '' :
-                                !tagStr ? '' :
-                                    <div className='flex items-center px-9px py-1px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                        tagNames.map((val, idx) => {
+                            console.log(val)
+                            return (
+                                <div className='flex items-center px-9px py-1px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                         <span className='font-light text-11 text-zete-dark-400'>
-                                            {tagStr}
+                                            {val}
                                         </span>
-                                    </div>
+                                </div>
+                            )
+                        })
+
+
                     }
                 </div>
                 <div className='flex justify-between items-center pt-10px'>

@@ -1,10 +1,10 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
-export interface IChangedMenuState {
+export interface ChangedMenuState {
     showMenu: boolean;
 }
 
-const initChangedMenuState: IChangedMenuState = {
+const initChangedMenuState: ChangedMenuState = {
     showMenu: true,
 }
 
@@ -12,10 +12,10 @@ export const changedMenuSlice = createSlice({
     name: 'changedMenu',
     initialState: initChangedMenuState,
     reducers: {
-        TOGGLE_SHOW_MENU: (state: IChangedMenuState) => {
+        TOGGLE_SHOW_MENU: (state: ChangedMenuState) => {
             state.showMenu = !state.showMenu;
         },
-        SET_SHOW_MENU: (state: IChangedMenuState, action: PayloadAction<boolean>) => {
+        SET_SHOW_MENU: (state: ChangedMenuState, action: PayloadAction<boolean>) => {
             state.showMenu = action.payload;
         },
     },

@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../vectors";
-import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
+import React, {Dispatch, SetStateAction, useEffect, useMemo, useState} from "react";
 import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
 import {Category, Data, TableArr} from "../../store/slices/constants";
 
@@ -8,8 +8,8 @@ import {Category, Data, TableArr} from "../../store/slices/constants";
 interface SetCateProps {
     matchData?: Data[];
     tableArr?: TableArr;
+    data?: Data[];
     cate?: Category;
-    idx?: number;
 }
 
 export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
@@ -60,7 +60,7 @@ export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
 }
 
 export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
-    const { matchData, cate } = props;
+    const { matchData, cate, tableArr } = props;
     const { setSearchParams, tagStr, cateStr } = useHandleQueryStr();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -77,10 +77,18 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
             setIsOpen(true);
         } else { setIsOpen(false) }
     },[cateStr])
+    
+    const currentTags = useMemo(() => {
+        const cateTags = tableArr.cateTags.filter(cateTags => cateTags.cateId === cate.cateId);
+
+        return tableArr.tags
+            .filter(tags =>  cateTags.some(cateTags => cateTags.tagId === tags.tagId))
+            .map(tags =>  tags.tagName);
+    },[matchData])
 
     return (
         <>
-            {matchData &&
+            {matchData && (
                 <div
                     className={`font-bold group rounded-[5px] hover:bg-zete-light-gray-200
                     ${isOpen ? 'bg-zete-light-gray-200' : 'bg-white'}`}
@@ -108,47 +116,54 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
                                 </span>
                             </div>
                         </button>
-                        {
-                            matchData['tags'] ? matchData['tags'].map((val) => {
-                                return (
-                                    <div
-                                        className={`overflow-hidden font-light text-13 transition-all duration-300 
-                                        ${tagStr === val.tagName ? 'max-h-[200px] p-12px' : 'h-[0vh] p-0'}`}
-                                    >
+                        <div className={`${isOpen ? 'px-12px pb-12px' : 'p-0'}`}>
+                            {
+                                currentTags && (
+                                    (currentTags.length !== 0) ? (
+                                        currentTags.map((tagName, idx) => {
+                                            return (
+                                                <div
+                                                    key={idx}
+                                                    className={`overflow-hidden font-light text-13 transition-all duration-300 
+                                                    ${isOpen ? 'max-h-[200px] mt-6px' : 'h-[0vh] p-0 m-0'}`}
+                                                >
+                                                    <button
+                                                        type='button'
+                                                        className={`flex w-full h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
+                                                        ${tagStr === tagName && 'bg-zete-light-gray-500'}`}
+                                                        onClick={() => tagParamsHandler(tagName)}
+                                                    >
+                                                        <>
+                                                            <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>
+                                                        </>
+                                                        <span>
+                                                            {tagName}
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            )
+                                        })
+                                    ) : (
                                         <button
-                                            type='button'
-                                            className={`flex w-full h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
-                                            ${tagStr === val.tagName && 'bg-zete-light-gray-500'}`}
-                                            onClick={() => tagParamsHandler(val.tagName)}
+                                            className={`flex overflow-hidden items-center font-light text-13 transition-all duration-300 cursor-default 
+                                            ${isOpen ? 'max-h-[200px] p-12px' : 'h-[0vh] p-0'}`}
                                         >
-                                            <>
-                                                <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>
-                                            </>
-                                            <span>
-                                                {val.tagName}
-                                            </span>
+                                            <div className='flex w-full h-fit py-8px justify-center rounded-[5px] mb-1px'>
+                                                <>
+                                                    <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-100'/>
+                                                </>
+                                                <span className='font-normal text-zete-scroll-gray'>
+                                                    메모에 태그를 추가해주세요
+                                                </span>
+                                            </div>
                                         </button>
-                                    </div>
-                                )}
-                            ) : (
-                                <button
-                                    className={`flex overflow-hidden items-center font-light text-13 transition-all duration-300 cursor-default 
-                                    ${isOpen ? 'max-h-[200px] p-12px' : 'h-[0vh] p-0'}`}
-                                >
-                                    <div className='flex w-full h-fit py-8px justify-center rounded-[5px] mb-1px'>
-                                        <>
-                                            <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-100'/>
-                                        </>
-                                        <span className='font-normal text-zete-scroll-gray'>
-                                            메모에 태그를 추가해주세요
-                                        </span>
-                                    </div>
-                                </button>
-                            )
-                        }
+                                    )
+                                )
+                            }
+                        </div>
                     </div>
                 </div>
-            }
+            )}
         </>
     )
 }

@@ -1,4 +1,4 @@
-import React, {memo, useEffect, useState} from "react";
+import React, {memo, useEffect, useMemo, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {AddMemo} from "../../components/memoContent";
@@ -9,24 +9,47 @@ import * as DOMPurify from "dompurify";
 import {FillStarIcon, StarIcon, ThreeDotMenuIcon} from "../../components/vectors";
 import {setData, subUniqueKey} from "../../utile";
 import {DELETE_MEMO} from "../../store/slices/memo.slice";
+import {all} from "axios";
+import {useResize} from "../../hooks/useResize";
 
 export const MemoMain = () => {
+    const currentCate = useRef<any[]>(null)
+
     const [masonryCols,setMasonryCols] = useState({})
     const [existCate,setExistCate] = useState(false);
 
     const { loading } = useSelector((state: RootState) => (state.user));
     const { data, tableArr } = useSelector((state: RootState) => (state.memo));
     const { cateStr, tagStr } = useHandleQueryStr();
+    
+    const resize = useResize();
 
     const dispatch = useDispatch();
 
+    const currentData = useMemo(() => {
+        if (data[0]) {
+            const allMemos = data.map(val => val.memos);
+            const currentCate = data.filter(data => data.cateName === cateStr).map(data => data.memos);
+            const importantMemos = allMemos.flatMap(memos => memos.filter((memo => memo.important)))
+            console.log('메모안에 데이타',importantMemos)
+
+            if (!cateStr && !tagStr) {
+                return allMemos.flat()
+            } else if (cateStr === 'important') {
+                return importantMemos.flat()
+            } else if (cateStr && !tagStr) {
+                return currentCate.flat()
+            }
+        }
+    },[data, cateStr, tagStr])
+
     const convertCols = (n:number) => {
-        if (!data || !data['memos']) return
+        if (!currentData) return
         if (cateStr === 'important' || !cateStr ) {
-            if (n > data['memos'].length) return data['memos'].length;
+            if (n > currentData.length) return currentData.length;
             else return n;
         } else if ( cateStr ) {
-            if (n > data['memos'].length+1) return data['memos'].length+1;
+            if (n > currentData.length+1) return currentData.length+1;
             else return n;
         }
     }
@@ -48,7 +71,7 @@ export const MemoMain = () => {
             767: convertCols(2),
             610: convertCols(1),
         })
-    },[data])
+    },[data, resize, cateStr, tagStr])
 
     useEffect(() => {
         const cateList = tableArr.categories.map((cate) => cate.cateName);
@@ -77,14 +100,15 @@ export const MemoMain = () => {
                                 </div>
                             ))
                         }
-                        {data['memos'] &&
-                            data['memos']?.map((val) => {
+                        {currentData &&
+                            currentData?.map((val) => {
                                 let cleanContent = DOMPurify.sanitize(val.content);
+                                console.log('우효~')
                                 return (
                                     <div key={val.memoId} className='mb-16px browser-width-900px:mb-30px flex'>
                                         <article
                                             className='relative min-w-0 w-full browser-width-900px:min-w-[300px] flex flex-col justify-between border
-                                        border-zete-light-gray-500 rounded-[8px] p-20px min-h-[212px] bg-zete-primary-200'
+                                            border-zete-light-gray-500 rounded-[8px] p-20px min-h-[212px] bg-zete-primary-200'
                                         >
                                             <div className='flex flex-col h-full w-full'>
                                                 <div className='w-full flex justify-between mb-20px'>
@@ -100,20 +124,20 @@ export const MemoMain = () => {
                                                     />
                                                 </div>
                                                 <div className='flex w-full items-center pt-16px'>
-                                                    <div className='flex w-full gap-8px overflow-x-auto'>
-                                                        {val.tags.map((val, idx) => {
-                                                            return (
-                                                                <div
-                                                                    key={idx}
-                                                                    className='flex items-center px-9px py-1px rounded-[4px] bg-black bg-opacity-10 cursor-default'
-                                                                >
-                                                                <span className='font-light text-11 text-zete-dark-400'>
-                                                                    {val}
-                                                                </span>
-                                                                </div>
-                                                            )
-                                                        })}
-                                                    </div>
+                                                    {/*<div className='flex w-full gap-8px overflow-x-auto'>*/}
+                                                    {/*    {val.tags && val.tags.map((val, idx) => {*/}
+                                                    {/*        return (*/}
+                                                    {/*            <div*/}
+                                                    {/*                key={idx}*/}
+                                                    {/*                className='flex items-center px-9px py-1px rounded-[4px] bg-black bg-opacity-10 cursor-default'*/}
+                                                    {/*            >*/}
+                                                    {/*            <span className='font-light text-11 text-zete-dark-400'>*/}
+                                                    {/*                {val}*/}
+                                                    {/*            </span>*/}
+                                                    {/*            </div>*/}
+                                                    {/*        )*/}
+                                                    {/*    })}*/}
+                                                    {/*</div>*/}
                                                     <div className='flex items-center pl-2px h-24px w-24px' onClick={()=> deleteMemo(val.memoId)}>
                                                         <ThreeDotMenuIcon/>
                                                     </div>

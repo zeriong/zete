@@ -14,10 +14,7 @@ export const Aside = () => {
     const { alerts } = useSelector((state: RootState) => state.alert);
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
 
-    const data = useSelector((state: RootState) => state.memo.data);
-    const tableArr = useSelector((state: RootState) => state.memo.tableArr);
-
-    const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+    const { data, tableArr } = useSelector((state: RootState) => state.memo);
 
     useEffect(() => {
         const handleResize = () => {
@@ -45,7 +42,7 @@ export const Aside = () => {
             />
             <nav
                 className={`${showMenu ? "left-0" : "-left-asideWidth"}
-                fixed w-asideWidth bg-white z-20 ease-in-out duration-300 left-0 pt-headerHeight h-full overflow-auto scroll-hidden border-r border-zete-light-gray-400`}
+                fixed w-asideWidth bg-white z-20 ease-in-out duration-300 pt-headerHeight h-full overflow-auto scroll-hidden border-r border-zete-light-gray-400`}
             >
                 <CustomScroller>
                     <div className="flex flex-col h-full w-full min-h-[600px] p-14px text-zete-dark-500 font-light text-14">
@@ -63,8 +60,8 @@ export const Aside = () => {
                                     return (
                                         <CategoryList
                                             key={idx}
-                                            idx={idx}
                                             matchData={matchData}
+                                            tableArr={tableArr}
                                             cate={cate}
                                         />
                                     )

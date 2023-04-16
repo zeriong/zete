@@ -26,8 +26,7 @@ export const MemoLayout = () => {
 
     useEffect(() => {
         const cateList = tableArr.categories.map((cate) => cate.cateName);
-        if (cateList.find((list) => list === cateStr ||
-            cateStr === 'important' || !cateStr)) {
+        if (cateList.find((list) => list === cateStr)) {
             setExistCate(true);
         } else {
             setExistCate(false);
@@ -56,13 +55,22 @@ export const MemoLayout = () => {
                                             {cateStr === 'important' ? '중요메모' :
                                                 !cateStr ? '전체메모' : cateStr}
                                         </span>
-                                        <div className='flex'>
-                                            <p className='mx-8px'>
-                                                &gt;
-                                            </p>
-                                            {tagStr}
-                                        </div>
+                                        {
+                                            tagStr && (
+                                                <div className='flex'>
+                                                    <p className='mx-8px'>
+                                                        &gt;
+                                                    </p>
+                                                    {tagStr}
+                                                </div>
+                                            )
+                                        }
                                     </>
+                                ) : (cateStr === 'important' || !cateStr) ? (
+                                    <span>
+                                        {cateStr === 'important' ? '중요메모' :
+                                            !cateStr ? '전체메모' : cateStr}
+                                    </span>
                                 ) : (
                                     <h1 className='text-zete-placeHolder'>
                                         카테고리가 존재하지않습니다.
