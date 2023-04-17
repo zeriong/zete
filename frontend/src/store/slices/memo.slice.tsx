@@ -105,13 +105,27 @@ export const memoSlice = createSlice({
             const memoTagsUpdateTarget = memoTags.filter((memoTag) => memoTag.memoId === memoIdToUpdate); //업데이트시 받는 아이디로 존재체크
             const memoTagsDeleteTarget = memoTagsUpdateTarget.filter((memoTag) => !allTags.find((tag) => tag.tagId === memoTag.tagId));
             const memoTagsAddTarget = allTags.filter((tag) => !memoTags.find((memoTag) => memoTag.memoId === memoToUpdate.memoId && memoTag.tagId === tag.tagId));
-            const newMemoTags = [
-                ...memoTags.filter((memoTag) => !memoTagsDeleteTarget.includes(memoTag)),
-                ...memoTagsAddTarget.map((tag) => ({
-                memoId: memoToUpdate.memoId,
-                tagId: tag.tagId,
-                })),
-            ];
+            let newMemoTags = [];
+
+            //업데이트인경우
+            if (memoIdToUpdate && tagNames.length !== 0) {
+                newMemoTags = [
+                    ...memoTags.filter((memoTag) => !memoTagsDeleteTarget.includes(memoTag)),
+                    ...memoTagsAddTarget.map((tag) => ({
+                        memoId: memoToUpdate.memoId,
+                        tagId: tag.tagId,
+                    })),
+                ];
+            }
+            // 업데이트이지만 모든 태그 제거했을 경우
+            if (memoIdToUpdate && tagNames.length === 0) {
+                newMemoTags = [...memoTags.filter((memoTag) => memoTag.memoId !== memoIdToUpdate)]
+            }
+            //
+            if (tagNames.length === 0) {
+                newMemoTags = [];
+            }
+
 
             // set cateMemos
             const cateMemos = state.tableArr['cateMemos'] || [];
@@ -168,9 +182,12 @@ export const memoSlice = createSlice({
         },
         DELETE_MEMO: (state: MemoData, action: PayloadAction<number>) => {
             const memoId = action.payload;
+            const deleteTagsMemos = state.tableArr.memoTags.filter((memoTag) => memoTag.memoId !== memoId)
+
             state.tableArr.memos = state.tableArr.memos.filter((memo) => memo.memoId !== memoId);
-            state.tableArr.memoTags = state.tableArr.memoTags.filter((memoTag) => memoTag.memoId !== memoId);
+            state.tableArr.memoTags = deleteTagsMemos;
             state.tableArr.cateMemos = state.tableArr.cateMemos.filter((cateMemo) => cateMemo.memoId !== memoId);
+            state.tableArr.tags = state.tableArr.tags.filter(tags => deleteTagsMemos.some(delCate => delCate.tagId === tags.tagId));
         },
         UPDATE_CATE: (state: MemoData, action: PayloadAction<Category[]>) => {
             const newCategories = action.payload;

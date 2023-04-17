@@ -27,6 +27,12 @@ export const handleResizeHeight = (textareaRef) => {
     ref.style.height = 'auto';
     ref.style.height = ref.scrollHeight + 'px';
 }
+export const handleInputChange = (inputRef) => {
+    const input = inputRef.current;
+    input.style.width = '50px';
+    input.style.width = `${input.scrollWidth}px`;
+    input.style.whiteSpace = 'nowrap'; // 추가
+};
 
 
 /** -------- 커스텀스크롤 function start ------- */
