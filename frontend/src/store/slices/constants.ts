@@ -53,7 +53,6 @@ export interface SetMemoPayload {
     content: string;
     important: boolean;
     tagNames: string[];
-    isUpdate: boolean; // 수정인지 추가인지 여부
     memoIdToUpdate?: number; // 수정할 메모의 ID (수정할 때만 사용)
 }
 

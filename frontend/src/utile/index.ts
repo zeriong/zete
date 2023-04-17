@@ -24,8 +24,10 @@ export const existToken = () => {
 
 export const handleResizeHeight = (textareaRef) => {
     const ref = textareaRef.current;
-    ref.style.height = 'auto';
-    ref.style.height = ref.scrollHeight + 'px';
+    if (ref) {
+        ref.style.height = 'auto';
+        ref.style.height = ref.scrollHeight + 'px';
+    }
 }
 export const handleInputChange = (inputRef) => {
     const input = inputRef.current;

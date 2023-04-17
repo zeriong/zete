@@ -146,7 +146,7 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
                                     ) : (
                                         <button
                                             className={`flex overflow-hidden items-center font-light text-13 transition-all duration-300 cursor-default 
-                                            ${isOpen ? 'max-h-[200px] p-12px' : 'h-[0vh] p-0'}`}
+                                            ${isOpen ? 'max-h-[200px] px-12px' : 'h-[0vh] p-0'}`}
                                         >
                                             <div className='flex w-full h-fit py-8px justify-center rounded-[5px] mb-1px'>
                                                 <>

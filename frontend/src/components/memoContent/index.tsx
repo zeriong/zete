@@ -63,13 +63,11 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         }
 
         const content = memoValue.replace(/\n/g, '<br/>'); // innerHTML해주기 위함
-        const isUpdate = false
         const categoryId = tableArr.categories.find((cate) => cate.cateName === cateStr).cateId;
 
         console.log('이게뭐야',tagNames)
         
         const newData = {
-            isUpdate,
             categoryId,
             important: isImportant,
             title: titleValue,
@@ -158,7 +156,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                             tagNames.map((name, idx) => {
                                 return name === tagStr ? (
                                     <div key={uniqueKey()} className='relative flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
-                                        <span className='font-light text-11 text-zete-dark-400'>
+                                        <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
                                             {name}
                                         </span>
                                     </div>

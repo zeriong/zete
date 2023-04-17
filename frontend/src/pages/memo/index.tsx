@@ -11,14 +11,16 @@ import {setData, subUniqueKey} from "../../utile";
 import {DELETE_MEMO} from "../../store/slices/memo.slice";
 import {useResize} from "../../hooks/useResize";
 import {useHorizontalScroll} from "../../hooks/useHorizontalScroll";
+import {MemoModifyModal} from "../../modals/memoModifyModal";
 
 export const MemoMain = () => {
-    const [masonryCols,setMasonryCols] = useState({})
-    const [existCate,setExistCate] = useState(false);
+    const [masonryCols,setMasonryCols] = useState<{}>({})
+    const [existCate,setExistCate] = useState<boolean>(false);
+    const [currentMemoId,setCurrentMemoId] = useState<number>(0);
 
     const { loading } = useSelector((state: RootState) => (state.user));
     const { data, tableArr } = useSelector((state: RootState) => (state.memo));
-    const { cateStr, tagStr } = useHandleQueryStr();
+    const { cateStr, tagStr, searchParams, setSearchParams } = useHandleQueryStr();
     const horizonScroll = useHorizontalScroll();
     
     const resize = useResize();
@@ -55,6 +57,12 @@ export const MemoMain = () => {
     const deleteMemo = (memoId: number) => {
         dispatch(DELETE_MEMO(memoId));
         setData();
+    }
+
+    const memoModifier = (memoId) => {
+        setCurrentMemoId(memoId)
+        searchParams.set('modal', 'memoModify');
+        setSearchParams(searchParams);
     }
 
     useEffect(()=> {
@@ -102,7 +110,11 @@ export const MemoMain = () => {
                             currentData?.map((val) => {
                                 let cleanContent = DOMPurify.sanitize(val.content);
                                 return (
-                                    <div key={val.memoId} className='mb-16px browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'>
+                                    <div
+                                        key={val.memoId}
+                                        className='mb-16px browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
+                                        onClick={() => memoModifier(val.memoId)}
+                                    >
                                         <article
                                             className='relative min-w-0 w-full browser-width-900px:w-[300px] flex flex-col justify-between border
                                             border-zete-light-gray-500 rounded-[8px] p-20px min-h-[212px] bg-zete-primary-200'
@@ -144,6 +156,9 @@ export const MemoMain = () => {
                                 )
                         })}
                     </Masonry>
+                    <>
+                        <MemoModifyModal memoId={currentMemoId}/>
+                    </>
                 </section>
             </CustomScroller>
         )
