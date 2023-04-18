@@ -14,7 +14,7 @@ import {handleInputChange, handleResizeHeight, setData, uniqueKey} from "../util
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../store";
 import {useHorizontalScroll} from "../hooks/useHorizontalScroll";
-import {SET_MEMO} from "../store/slices/memo.slice";
+import {UPDATE_MEMO} from "../store/slices/memo.slice";
 
 export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
@@ -77,21 +77,17 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
 
         const content = memoValue.replace(/\n/g, '<br/>'); // innerHTML해주기 위함
 
-        console.log('이게뭐야',tagNames)
-
         const newData = {
             categoryId,
             important: isImportant,
             title: titleValue,
             content,
             tagNames, // 키와 키값이 같으므로 tags: tags, => tags,
-            memoIdToUpdate: memoId,
+            memoId,
         }
 
-        dispatch(SET_MEMO(newData));
+        dispatch(UPDATE_MEMO(newData));
         setData();
-        setMemoValue('');
-        setTitleValue('');
     }
 
     const addTags = (e: React.FormEvent<HTMLFormElement>) => {
@@ -125,6 +121,8 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                 const currentMemoVal = currentData[0]?.content.replace(/<br\/>/g, '\n');
                 setMemoValue(currentMemoVal);
                 setTitleValue(currentData[0].title);
+                setIsImportant(currentData[0].important);
+                setTagNames(currentData[0].tags.map(tag => tag.tagName))
             }
         }
 
@@ -158,6 +156,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                     <div
                         className="close-modal-background
                         flex min-h-full items-center justify-center p-4 text-center"
+                        onClick={memoModifier}
                     >
                         <Transition.Child
                             as={Fragment}
@@ -261,9 +260,12 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                         console.log(memoId)
                                                     }}/>
                                                 </div>
-                                                <div onClick={memoModifier}>
-                                                    <PlusIcon svgClassName='cursor-pointer'/>
-                                                </div>
+                                                <button
+                                                    onClick={memoModifier}
+                                                    className='font-light py-2px px-10px'
+                                                >
+                                                    완료
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

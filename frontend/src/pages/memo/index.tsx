@@ -28,18 +28,19 @@ export const MemoMain = () => {
     const dispatch = useDispatch();
 
     const currentData = useMemo(() => {
-        if (data[0]) {
-            const allMemos = data.map(val => val.memos);
-            const currentCate = data.filter(data => data.cateName === cateStr).map(data => data.memos);
-            const importantMemos = allMemos.flatMap(memos => memos.filter((memo => memo.important)))
+        const allMemos = data.map(val => val.memos);
+        const currentCate = data.filter(data => data.cateName === cateStr).map(data => data.memos);
+        const importantMemos = allMemos.flatMap(memos => memos.filter((memo => memo.important)))
+        const tagFilterMemos = currentCate.flatMap(cate => cate.filter(memo => memo.tags.some(tag => tag.tagName === tagStr)))
 
-            if (!cateStr && !tagStr) {
-                return allMemos.flat()
-            } else if (cateStr === 'important') {
-                return importantMemos.flat()
-            } else if (cateStr && !tagStr) {
-                return currentCate.flat()
-            }
+        if (!cateStr && !tagStr) {
+            return allMemos.flat()
+        } else if (cateStr === 'important') {
+            return importantMemos.flat()
+        } else if (cateStr && !tagStr) {
+            return currentCate.flat()
+        } else {
+            return tagFilterMemos.flat()
         }
     },[data, cateStr, tagStr])
 

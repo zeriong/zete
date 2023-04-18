@@ -53,7 +53,15 @@ export interface SetMemoPayload {
     content: string;
     important: boolean;
     tagNames: string[];
-    memoIdToUpdate?: number; // 수정할 메모의 ID (수정할 때만 사용)
+}
+
+export interface ModifyMemoPayload {
+    memoId: number;
+    categoryId: number;
+    title: string;
+    content: string;
+    important: boolean;
+    tagNames: string[];
 }
 
 export interface MemoData {

@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
 import {handleInputChange, handleResizeHeight, setData, uniqueKey} from "../../utile";
 import {useDispatch, useSelector} from "react-redux";
-import {SET_MEMO} from "../../store/slices/memo.slice";
+import {ADD_MEMO} from "../../store/slices/memo.slice";
 import {RootState} from "../../store";
 import {useHorizontalScroll} from "../../hooks/useHorizontalScroll";
 
@@ -75,7 +75,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
             tagNames, // 키와 키값이 같으므로 tags: tags, => tags,
         }
 
-        dispatch(SET_MEMO(newData));
+        dispatch(ADD_MEMO(newData));
         setData();
         setMemoValue('');
         setTitleValue('');
