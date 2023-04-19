@@ -1,8 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {Category, initState, Memo, MemoData, ModifyMemoPayload, SetMemoPayload} from "./constants";
-import {tab} from "@testing-library/user-event/dist/tab";
-
-
+import {Category, initState, MemoData, ModifyMemoPayload, SetMemoPayload} from "./constants";
 
 // 로컬스토리지 임시저장
 const loadMemoState = (): MemoData => {
@@ -29,16 +26,27 @@ export const memoSlice = createSlice({
     name: 'memo',
     initialState: loadMemoState(),
     reducers: {
-        SET_CATE: (state: MemoData, action: PayloadAction<{cateName:string}>) => {
+        ADD_CATE: (state: MemoData, action: PayloadAction<{cateName:string}>) => {
             const { cateName } = action.payload;
             if (!cateName) return
+
+            const allCate = state.tableArr.categories;
             const cateIds = state.tableArr.categories.map((cate) => cate.cateId) || [];
             const makeId = cateIds.length > 0 ? Math.max(...cateIds) + 1 : 1;
-            state.tableArr['categories'].push({
-                cateId: makeId,
-                cateName,
-            });
-            saveMemoState(state);
+            const newState = {
+                tableArr: {
+                    ...state.tableArr,
+                    categories:[
+                        ...allCate,
+                        {cateName: cateName, cateId: makeId}
+                    ].sort((a, b) => a.cateName > b.cateName ? 1 : -1)
+                },
+                data: state.data
+            }
+
+            saveMemoState(newState);
+
+            return newState;
         },
         DELETE_CATE: (state: MemoData, action: PayloadAction<number>) => {
             const target = state.tableArr.cateMemos.filter(cateMemo => cateMemo.cateId === action.payload);
@@ -49,7 +57,7 @@ export const memoSlice = createSlice({
                 state.tableArr.memos = state.tableArr.memos.filter(memos => !memoId.some(memoId => memoId === memos.memoId))
             }
 
-            state.tableArr.categories = state.tableArr.categories.filter(cate => cate.cateId !== action.payload);
+            state.tableArr.categories = state.tableArr.categories.filter(cate => cate.cateId !== action.payload).sort((a, b) => a.cateName > b.cateName ? 1 : -1);
             state.tableArr.cateMemos = state.tableArr.cateMemos.filter(cateMemo => cateMemo.cateId !== action.payload);
             state.tableArr.cateTags = state.tableArr.cateTags.filter(cateTags => cateTags.cateId !== action.payload);
             state.tableArr.tags = state.tableArr.tags.filter(cateTags => !currentCateTags.some(current => current.tagId === cateTags.tagId));
@@ -60,9 +68,9 @@ export const memoSlice = createSlice({
             const { categoryId, title, content, important, tagNames } = action.payload;
 
             // add memos
-            let memos = table.memos || [];
+            let memos = table.memos;
 
-            const memoIds = memos.map((memo) => memo.memoId) || [];  // 추가인경우 //
+            const memoIds = memos.map((memo) => memo.memoId) || [];
             const newMemoId = memoIds.length > 0 ? Math.max(...memoIds) + 1 : 1;
             const newMemo = {
                 memoId: newMemoId,
@@ -232,7 +240,9 @@ export const memoSlice = createSlice({
                 },
                 data: state.data
             }
+
             saveMemoState(newState)
+
             return newState
         },
         DELETE_MEMO: (state: MemoData, action: PayloadAction<number>) => {
@@ -254,12 +264,27 @@ export const memoSlice = createSlice({
                         return { ...category, cateName: matchingCategory.cateName };
                     }
                     return category;
-                })
+                }).sort((a, b) => a.cateName > b.cateName ? 1 : -1)
             };
+
             const newState = { ...state, tableArr: newTableArr }
             saveMemoState(newState);
 
             return newState;
+        },
+        UPDATE_A_CATE: (state: MemoData, action: PayloadAction<Category>) => {
+            const existCate = state.tableArr.categories.filter(cate => cate.cateId !== action.payload.cateId);
+            const newTableArr = {
+                ...state.tableArr,
+                categories: [
+                    ...existCate,
+                    action.payload
+                ].sort((a, b) => a.cateName > b.cateName ? 1 : -1)
+            }
+            const newState = { ...state, tableArr: newTableArr}
+            saveMemoState(newState);
+
+            return newState
         },
         SET_DATA: (state: MemoData) => {
             const { categories, memos, tags, memoTags, cateMemos } = state.tableArr;
@@ -294,8 +319,23 @@ export const memoSlice = createSlice({
             saveMemoState(newState);
 
             return newState
-        }
+        },
+        CHANGE_IMPORTANT: (state: MemoData, action: PayloadAction<number>) => {
+            const memoId = action.payload
+            state.tableArr.memos = state.tableArr.memos.map(memos => {
+                let modifyMemo = memos
+
+                if (memos.memoId === memoId) {
+                    modifyMemo = {
+                        ...memos,
+                        important: memos.important !== true
+                    }
+                }
+
+                return modifyMemo
+            })
+        },
     },
 });
 
-export const { SET_DATA, SET_CATE, ADD_MEMO, UPDATE_CATE, DELETE_CATE, DELETE_MEMO, UPDATE_MEMO } = memoSlice.actions;
+export const { SET_DATA, ADD_CATE, ADD_MEMO, UPDATE_CATE, DELETE_CATE, DELETE_MEMO, UPDATE_MEMO, UPDATE_A_CATE,CHANGE_IMPORTANT } = memoSlice.actions;

@@ -1,52 +1,91 @@
-import React, {Fragment, useEffect, useState} from "react";
+import React, {Fragment, useEffect, useRef, useState} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from "../components/vectors";
 import {useDispatch, useSelector} from "react-redux";
-import {DELETE_CATE, SET_CATE} from "../store/slices/memo.slice";
+import {DELETE_CATE, ADD_CATE, UPDATE_A_CATE, UPDATE_CATE} from "../store/slices/memo.slice";
 import {RootState} from "../store";
 import CustomScroller from "../components/customScroller";
 import {setData} from "../utile";
+import {Category} from "../store/slices/constants";
 
 export const CateModifyModal = () => {
-    const [isShow, setIsShow] = useState(false);
-    const [isAgreeShow, setIsAgreeShow] = useState(false);
-    const [cateValue, setCateValue] = useState('');
-    const [getCateId, setGetCateId] = useState(0);
-
-    const dispatch = useDispatch();
+    const deleteButtonRef = useRef(null)
 
     const { tableArr } = useSelector((state: RootState) => state.memo);
 
-    const cateValChange = (e: React.ChangeEvent<HTMLInputElement>) => setCateValue(e.currentTarget.value);
+    const categories = tableArr.categories
+
+    const [isShow, setIsShow] = useState(false);
+    const [newCateListNames, setNewCateListNames] = useState<string[]>(categories.map(cate => cate.cateName));
+    const [newCateList, setNewCateList] = useState<Category[]>(categories);
+    const [addCateValue, setAddCateValue] = useState('');
+    const [getCateId, setGetCateId] = useState(0);
+    const [isAgreeShow, setIsAgreeShow] = useState(false);
+
+    const dispatch = useDispatch();
+
+    const addCateValChange = (e) => setAddCateValue(e.target.value);
+
     const handleDelete = () => {
         setIsAgreeShow(false);
         deleteCate(getCateId);
     }
 
-    const deleteCate = (memoId: number) => {
-        dispatch(DELETE_CATE(memoId));
+    const deleteCate = (cateId: number) => {
+        dispatch(DELETE_CATE(cateId));
         setData();
     }
 
     const addCate = (e: any) => {
-        const cateList = tableArr.categories.map((cate) => cate.cateName);
         e.preventDefault();
-        if (cateList.find((list) => list === cateValue)) {
-            return alert('중복된 카테고리');
-        }
-        dispatch(SET_CATE({ cateName: cateValue }));
-        setData();
+        if (categories.some(cate => cate.cateName === addCateValue)) return alert('새 카테고리 이름이 기존 카테고리 이름과 중복됩니다.')
 
-        setCateValue('');
+        dispatch(ADD_CATE({ cateName: addCateValue }));
+        setData();
+        setAddCateValue('');
+    }
+
+    const handleUpdateName = (idx, event) => {
+        const newNames = [...newCateListNames];
+        newNames[idx] = event.target.value;
+        setNewCateListNames(newNames);
+    }
+
+    const updateCate = () => {
+        if (newCateListNames.some(name => name === '')) return alert('비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.');
+        if (newCateListNames.length !== new Set(newCateListNames).size) return alert('중복된 카테고리가 존재합니다.????')
+
+        setIsShow(false);
+        dispatch(UPDATE_CATE(newCateList));
+        setData();
+    }
+
+    const updateOneCate = (target: {cateId:number, val:string, event: React.FormEvent<HTMLFormElement>}) => {
+        target.event.preventDefault();
+        if (newCateListNames.some(name => name === '')) return alert('비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.');
+        if (categories.some(cate => cate.cateName === target.val)) return alert('중복된 카테고리가 존재합니다.')
+
+        dispatch(UPDATE_A_CATE({cateId:target.cateId, cateName:target.val}));
+        target.event.currentTarget.blur();
+        target.event.preventDefault();
     }
 
     useEffect(() => {
-    },[])
+        setNewCateList(categories);
+        setNewCateListNames(categories.map(cate => cate.cateName));
+    },[tableArr])
+
+    useEffect(() => {
+        const reBuildNewCate = tableArr.categories.map((cate, idx) => ({cateId: cate.cateId, cateName:newCateListNames[idx]}))
+        setNewCateList(reBuildNewCate)
+    },[newCateListNames])
 
     return (
         <>
             <button
-                onClick={() => setIsShow(true)}
+                onClick={() => {
+                    setIsShow(true);
+                }}
                 type='button'
                 className='flex w-full justify-between items-center px-10px py-8px rounded-[5px] mt-4px h-42px'
             >
@@ -59,7 +98,14 @@ export const CateModifyModal = () => {
                 </div>
             </button>
             <Transition appear show={isShow} as={Fragment}>
-                <Dialog as="div" className="relative z-30" onClose={() => setIsShow(false)}>
+                <Dialog
+                    as="div"
+                    className="relative z-30"
+                    onClose={() => {
+                        setAddCateValue('');
+                        updateCate();
+                    }}
+                >
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -75,9 +121,6 @@ export const CateModifyModal = () => {
                         <div
                             className="close-modal-background
                             flex min-h-full items-center justify-center p-4 text-center"
-                            onClick={() => {
-                                setCateValue('');
-                            }}
                         >
                             <Transition.Child
                                 as={Fragment}
@@ -106,8 +149,8 @@ export const CateModifyModal = () => {
                                                         <>
                                                             <input
                                                                 placeholder='새 카테고리 만들기'
-                                                                onChange={cateValChange}
-                                                                value={cateValue}
+                                                                onChange={addCateValChange}
+                                                                value={addCateValue}
                                                                 className='placeholder:text-zete-dark-300 placeholder:font-thin pb-5px border-b border-zete-memo-border text-zete-dark-300 w-full'
                                                             />
                                                         </>
@@ -115,37 +158,41 @@ export const CateModifyModal = () => {
                                                             <CatePlusIcon className='fill-zete-dark-100'/>
                                                         </button>
                                                     </form>
-                                                    <form
-                                                        onSubmit={(e)=> {
-                                                            e.preventDefault()
-                                                        }}
-                                                        className='py-20px'
-                                                    >
-                                                        <ul className='text-zete-dark-200 grid gap-16px'>
-                                                            {tableArr['categories']?.map((val,idx) => {
-                                                                return (
-                                                                    <li key={idx} className='flex'>
+                                                    <ul className='text-zete-dark-200 grid gap-16px py-20px'>
+                                                        {newCateListNames?.map((val,idx) => {
+                                                            const cateId = newCateList[idx].cateId;
+                                                            return (
+                                                                <li key={idx}>
+                                                                    <form
+                                                                        onSubmit={(event) => {
+                                                                            updateOneCate({event, val, cateId});
+                                                                        }}
+                                                                        className='flex items-center'
+                                                                    >
                                                                         <>
-                                                                            <FillCategoryIcon className='relative -left-3px fill-zete-dark-100 mr-10px'/>
+                                                                            <FillCategoryIcon className='relative -left-3px fill-zete-dark-100 mr-10px' onClick={() => console.log(newCateListNames)}/>
                                                                         </>
-                                                                        <p className='font-medium w-full'>
-                                                                            {val.cateName}
-                                                                        </p>
+                                                                        <input
+                                                                            placeholder='수정할 태그를 입력해주세요.'
+                                                                            value={val}
+                                                                            onChange={(event) => handleUpdateName(idx, event)}
+                                                                            className='font-medium w-full flex items-center'
+                                                                        />
                                                                         <button
                                                                             type='button'
                                                                             className='relative group p-6px rounded-full hover:bg-zete-light-gray-200 -right-2px'
                                                                             onClick={() => {
-                                                                                setGetCateId(val.cateId);
+                                                                                setGetCateId(cateId);
                                                                                 setIsAgreeShow(true);
                                                                             }}
                                                                         >
                                                                             <DeleteIcon className='fill-zete-dark-100 group-hover:fill-black'/>
                                                                         </button>
-                                                                    </li>
-                                                                )
-                                                            })}
-                                                        </ul>
-                                                    </form>
+                                                                    </form>
+                                                                </li>
+                                                            )
+                                                        })}
+                                                    </ul>
                                                 </div>
                                             </div>
                                         </CustomScroller>
@@ -154,8 +201,9 @@ export const CateModifyModal = () => {
                                         <button
                                             type='button'
                                             onClick={(e) => {
-                                                setIsShow(false);
+                                                if (categories.some(cate => cate.cateName === addCateValue)) return alert('새 카테고리 이름이 기존 카테고리 이름과 중복됩니다.')
                                                 addCate(e);
+                                                updateCate();
                                             }}
                                             className='text-15 font-normal text-zete-dark-500 py-8px px-22px hover:bg-zete-light-gray-200 rounded-[4px]'
                                         >
@@ -169,7 +217,14 @@ export const CateModifyModal = () => {
                 </Dialog>
             </Transition>
             <Transition appear show={isAgreeShow} as={Fragment}>
-                <Dialog as="div" className="relative z-40" onClose={() => setIsAgreeShow(false)}>
+                <Dialog
+                    as="div"
+                    static
+                    className="relative z-40"
+                    onClose={() => setIsAgreeShow(false)}
+                    open={isAgreeShow}
+                    initialFocus={deleteButtonRef}
+                >
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -184,7 +239,7 @@ export const CateModifyModal = () => {
                     <div className="fixed inset-0 overflow-y-auto">
                         <div
                             className="close-modal-background
-                            flex min-h-full items-center justify-center p-4 text-center"
+                                            flex min-h-full items-center justify-center p-4 text-center"
                         >
                             <Transition.Child
                                 as={Fragment}
@@ -215,6 +270,7 @@ export const CateModifyModal = () => {
                                             취소
                                         </button>
                                         <button
+                                            ref={deleteButtonRef}
                                             type='button'
                                             onClick={handleDelete}
                                             className='text-15 font-normal text-blue-500 py-6px px-20px hover:bg-zete-light-gray-200 rounded-[4px]'

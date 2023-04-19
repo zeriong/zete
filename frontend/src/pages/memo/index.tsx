@@ -8,7 +8,7 @@ import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
 import * as DOMPurify from "dompurify";
 import {FillStarIcon, StarIcon, ThreeDotMenuIcon} from "../../components/vectors";
 import {setData, subUniqueKey} from "../../utile";
-import {DELETE_MEMO} from "../../store/slices/memo.slice";
+import {CHANGE_IMPORTANT, DELETE_MEMO} from "../../store/slices/memo.slice";
 import {useResize} from "../../hooks/useResize";
 import {useHorizontalScroll} from "../../hooks/useHorizontalScroll";
 import {MemoModifyModal} from "../../modals/memoModifyModal";
@@ -66,6 +66,12 @@ export const MemoMain = () => {
         setSearchParams(searchParams);
     }
 
+    const importantModifier = (memoId:number) => {
+        dispatch(CHANGE_IMPORTANT(memoId));
+        setData();
+    };
+
+
     useEffect(()=> {
         setMasonryCols({
             default: convertCols(7),
@@ -111,48 +117,70 @@ export const MemoMain = () => {
                             currentData?.map((val) => {
                                 let cleanContent = DOMPurify.sanitize(val.content);
                                 return (
-                                    <div
-                                        key={val.memoId}
-                                        className='mb-16px browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
-                                        onClick={() => memoModifier(val.memoId)}
-                                    >
-                                        <article
-                                            className='relative min-w-0 w-full browser-width-900px:w-[300px] flex flex-col justify-between border
-                                            border-zete-light-gray-500 rounded-[8px] p-20px min-h-[212px] bg-zete-primary-200'
+                                    <div className='relative'>
+                                        <div
+                                            key={val.memoId}
+                                            className='mb-16px browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
+                                            onClick={() => memoModifier(val.memoId)}
                                         >
-                                            <div className='flex flex-col h-full w-full'>
-                                                <div className='w-full flex justify-between mb-20px'>
-                                                    <p className='text-zete-gray-500 font-light'>
-                                                        {val.title}
-                                                    </p>
-                                                    {val.important ? <FillStarIcon/> : <StarIcon/>}
-                                                </div>
-                                                <div className='items-end h-full w-full line-clamp-[14]'>
-                                                    <p
-                                                        className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
-                                                        dangerouslySetInnerHTML={{__html: cleanContent}}
-                                                    />
-                                                </div>
-                                                <div className='flex w-full items-center pt-16px'>
-                                                    <div ref={horizonScroll} className='flex w-full h-full relative py-4px overflow-y-hidden memo-custom-vertical-scroll'>
-                                                        {
-                                                            val.tags.map((val, idx) => {
-                                                                return (
-                                                                    <div key={idx} className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                                            <article
+                                                className='relative min-w-0 w-full browser-width-900px:w-[300px] flex flex-col justify-between border
+                                            border-zete-light-gray-500 rounded-[8px] p-20px min-h-[212px] bg-zete-primary-200'
+                                            >
+                                                <div className='flex flex-col h-full w-full'>
+                                                    <div className='w-full mb-20px pr-30px'>
+                                                        <p className='text-zete-gray-500 font-light text-start'>
+                                                            {val.title}
+                                                        </p>
+                                                    </div>
+                                                    <div className='items-end h-full w-full line-clamp-[14]'>
+                                                        <p
+                                                            className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
+                                                            dangerouslySetInnerHTML={{__html: cleanContent}}
+                                                        />
+                                                    </div>
+                                                    <div className='flex w-full items-center pt-16px pr-26px'>
+                                                        <div ref={horizonScroll} className='flex w-full h-full relative py-4px overflow-y-hidden memo-custom-vertical-scroll'>
+                                                            {
+                                                                val.tags.map((val, idx) => {
+                                                                    return (
+                                                                        <div key={idx} className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                                                         <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
                                                                             {val.tagName}
                                                                         </span>
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-                                                    <div className='flex items-center ml-2px pl-2px h-24px w-24px' onClick={()=> deleteMemo(val.memoId)}>
-                                                        <ThreeDotMenuIcon className='fill-zete-dark-200 cursor-pointer'/>
+                                                                        </div>
+                                                                    )
+                                                                })
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </article>
+                                            <button
+                                                type='button'
+                                                className='absolute bottom-21px right-21px hover:bg-black hover:bg-opacity-10 p-1px rounded-full'
+                                            >
+                                                <ThreeDotMenuIcon className='fill-zete-dark-200 cursor-pointer'/>
+                                            </button>
+                                            <div className='일단 숨겨둠 hidden'>
+                                                <button
+                                                    type='button'
+                                                    className='flex items-center ml-2px pl-2px h-24px w-24px text-zete-dark-400 '
+                                                    onClick={()=> deleteMemo(val.memoId)}
+                                                >
+                                                    삭제버튼
+                                                </button>
                                             </div>
-                                        </article>
+                                        </div>
+                                        <button
+                                            type='button'
+                                            className='absolute top-18px right-20px'
+                                            onClick={() => {
+                                                importantModifier(val.memoId);
+                                            }}
+                                        >
+                                            {val.important ? <FillStarIcon/> : <StarIcon/>}
+                                        </button>
                                     </div>
                                 )
                         })}

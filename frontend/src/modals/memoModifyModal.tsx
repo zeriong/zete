@@ -140,7 +140,14 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
 
     return (
         <Transition appear show={isShow} as={Fragment}>
-            <Dialog as="div" className="relative z-40" onClose={closeModal}>
+            <Dialog
+                as="div"
+                className="relative z-40"
+                onClose={() => {
+                    closeModal();
+                    memoModifier();
+                }}
+            >
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -156,7 +163,6 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                     <div
                         className="close-modal-background
                         flex min-h-full items-center justify-center p-4 text-center"
-                        onClick={memoModifier}
                     >
                         <Transition.Child
                             as={Fragment}
@@ -255,17 +261,8 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                         <StickerMemoIcon className='cursor-pointer'/>
                                                     </div>
                                                     <CheckIcon className='cursor-pointer'/>
-                                                    <SearchIcon className='cursor-pointer' onClick={() => {
-                                                        console.log(tagNames)
-                                                        console.log(memoId)
-                                                    }}/>
+                                                    <SearchIcon className='cursor-pointer'/>
                                                 </div>
-                                                <button
-                                                    onClick={memoModifier}
-                                                    className='font-light py-2px px-10px'
-                                                >
-                                                    완료
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
