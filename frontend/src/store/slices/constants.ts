@@ -1,5 +1,5 @@
 export interface Category {
-    cateId:number;
+    cateId:number|'undefined';
     cateName:string;
 }
 export interface Memo {
@@ -17,11 +17,11 @@ export interface MemoTag {
     tagId:number;
 }
 export interface CateTag {
-    cateId:number;
+    cateId:number|'undefined';
     tagId:number;
 }
 export interface CateMemo {
-    cateId:number;
+    cateId:number|'undefined';
     memoId:number;
 }
 export interface TableArr {
@@ -42,13 +42,13 @@ export interface Memos {
 }
 
 export interface Data {
-    cateId?: number;
+    cateId?: number|'undefined';
     cateName?: string;
     memos?: Memos[];
 }
 
-export interface SetMemoPayload {
-    categoryId: number;
+export interface addMemoPayload {
+    categoryId: number|'undefined';
     title: string;
     content: string;
     important: boolean;
@@ -57,7 +57,7 @@ export interface SetMemoPayload {
 
 export interface ModifyMemoPayload {
     memoId: number;
-    categoryId: number;
+    categoryId: number|'undefined';
     title: string;
     content: string;
     important: boolean;

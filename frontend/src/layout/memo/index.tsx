@@ -14,7 +14,7 @@ export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
     const { tableArr } = useSelector((state: RootState) => (state.memo));
-    const { cateStr, tagStr } = useHandleQueryStr()
+    const { cateStr, tagStr, menuStr } = useHandleQueryStr()
 
     const [existCate,setExistCate] = useState(false);
 
@@ -52,8 +52,8 @@ export const MemoLayout = () => {
                                 existCate ? (
                                     <>
                                         <span>
-                                            {cateStr === 'important' ? '중요메모' :
-                                                !cateStr ? '전체메모' : cateStr}
+                                            {menuStr ? '중요메모' :
+                                                (!cateStr && !menuStr) ? '전체메모' : cateStr}
                                         </span>
                                         {
                                             tagStr && (
@@ -66,10 +66,10 @@ export const MemoLayout = () => {
                                             )
                                         }
                                     </>
-                                ) : (cateStr === 'important' || !cateStr) ? (
+                                ) : (menuStr || (!cateStr && !menuStr)) ? (
                                     <span>
-                                        {cateStr === 'important' ? '중요메모' :
-                                            !cateStr ? '전체메모' : cateStr}
+                                        {menuStr ? '중요메모' :
+                                            (!cateStr && !menuStr) ? '전체메모' : cateStr}
                                     </span>
                                 ) : (
                                     <h1 className='text-zete-placeHolder'>

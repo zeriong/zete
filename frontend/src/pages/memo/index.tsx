@@ -1,4 +1,4 @@
-import React, {memo, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {AddMemo} from "../../components/memoContent";
@@ -6,24 +6,24 @@ import Masonry from "react-masonry-css";
 import CustomScroller from "../../components/customScroller";
 import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
 import * as DOMPurify from "dompurify";
-import {FillStarIcon, StarIcon, ThreeDotMenuIcon} from "../../components/vectors";
+import {FillStarIcon, StarIcon} from "../../components/vectors";
 import {setData, subUniqueKey} from "../../utile";
-import {CHANGE_IMPORTANT, DELETE_MEMO} from "../../store/slices/memo.slice";
+import {CHANGE_IMPORTANT} from "../../store/slices/memo.slice";
 import {useResize} from "../../hooks/useResize";
 import {useHorizontalScroll} from "../../hooks/useHorizontalScroll";
 import {MemoModifyModal} from "../../modals/memoModifyModal";
 import {SavedMemoMenuPopov} from "../../popovers/savedMemoMenuPopov";
 
 export const MemoMain = () => {
+    const masonryColsRef = useRef(null)
     const [masonryCols,setMasonryCols] = useState<{}>({})
-    const [existCate,setExistCate] = useState<boolean>(false);
     const [currentMemoId,setCurrentMemoId] = useState<number>(0);
 
     const { loading } = useSelector((state: RootState) => (state.user));
-    const { data, tableArr } = useSelector((state: RootState) => (state.memo));
-    const { cateStr, tagStr, searchParams, setSearchParams } = useHandleQueryStr();
+    const { data } = useSelector((state: RootState) => (state.memo));
+    const { menuStr, cateStr, tagStr, searchParams, setSearchParams } = useHandleQueryStr();
     const horizonScroll = useHorizontalScroll();
-    
+
     const resize = useResize();
 
     const dispatch = useDispatch();
@@ -34,26 +34,38 @@ export const MemoMain = () => {
         const importantMemos = allMemos.flatMap(memos => memos.filter((memo => memo.important)))
         const tagFilterMemos = currentCate.flatMap(cate => cate.filter(memo => memo.tags.some(tag => tag.tagName === tagStr)))
 
-        if (!cateStr && !tagStr) {
+        if (!cateStr && !tagStr && !menuStr) {
             return allMemos.flat()
-        } else if (cateStr === 'important') {
+        }
+        if (menuStr) {
             return importantMemos.flat()
-        } else if (cateStr && !tagStr) {
+        }
+        if (cateStr && !tagStr) {
             return currentCate.flat()
-        } else {
+        }
+        if (tagStr) {
             return tagFilterMemos.flat()
         }
-    },[data, cateStr, tagStr])
+    },[data, cateStr, tagStr, menuStr])
+
+    const masonryCallBack = useCallback(() => {
+        masonryColsRef.current = {
+            default: convertCols(7),
+            2544: convertCols(6),
+            2222: convertCols(5),
+            1888: convertCols(4),
+            1566: convertCols(3),
+            1234: convertCols(2),
+            900: convertCols(1),
+            767: convertCols(2),
+            610: convertCols(1),
+        }
+    },[data, resize, searchParams])
 
     const convertCols = (n:number) => {
         if (!currentData) return
-        if (cateStr === 'important' || !cateStr ) {
-            if (n > currentData.length) return currentData.length;
-            else return n;
-        } else if ( cateStr ) {
-            if (n > currentData.length+1) return currentData.length+1;
-            else return n;
-        }
+        if (n > currentData.length+1) return currentData.length+1;
+        else return n;
     }
 
     const memoModifier = (memoId) => {
@@ -67,29 +79,13 @@ export const MemoMain = () => {
         setData();
     };
 
-
     useEffect(()=> {
-        setMasonryCols({
-            default: convertCols(7),
-            2544: convertCols(6),
-            2222: convertCols(5),
-            1888: convertCols(4),
-            1566: convertCols(3),
-            1234: convertCols(2),
-            900: convertCols(1),
-            767: convertCols(2),
-            610: convertCols(1),
-        })
-    },[data, resize, cateStr, tagStr])
-
+        masonryCallBack();
+    },[masonryCallBack])
+    
     useEffect(() => {
-        const cateList = tableArr.categories.map((cate) => cate.cateName);
-        if (cateList.find((list) => list === cateStr)) {
-            setExistCate(true);
-        } else {
-            setExistCate(false);
-        }
-    },[tagStr,cateStr, tableArr])
+        setMasonryCols(masonryColsRef.current);
+    },[])
 
     return (
         loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
@@ -101,21 +97,18 @@ export const MemoMain = () => {
                         className='my-masonry-grid flex gap-x-16px browser-width-900px:gap-x-30px w-full h-full browser-width-900px:w-auto'
                         columnClassName='my-masonry-grid_column'
                     >
-                        {existCate && (
-                            cateStr !== 'important' &&
-                            cateStr && (
-                                <div className='mb-16px browser-width-900px:mb-30px'>
-                                    <AddMemo/>
-                                </div>
-                            ))
-                        }
+                        <div className='mb-16px browser-width-900px:mb-30px'>
+                            <AddMemo/>
+                        </div>
                         {currentData &&
                             currentData?.map((val) => {
                                 let cleanContent = DOMPurify.sanitize(val.content);
                                 return (
-                                    <div className='relative'>
+                                    <div
+                                        key={val.memoId}
+                                        className='relative'
+                                    >
                                         <div
-                                            key={val.memoId}
                                             className='mb-16px browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
                                             onClick={() => memoModifier(val.memoId)}
                                         >
@@ -141,9 +134,9 @@ export const MemoMain = () => {
                                                                 val.tags.map((val, idx) => {
                                                                     return (
                                                                         <div key={idx} className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
-                                                                        <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
-                                                                            {val.tagName}
-                                                                        </span>
+                                                                            <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
+                                                                                {val.tagName}
+                                                                            </span>
                                                                         </div>
                                                                     )
                                                                 })

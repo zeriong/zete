@@ -13,7 +13,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const tagsInput = useRef<HTMLInputElement>(null);
     const tagsRef = useRef([]);
 
-    const { cateStr, tagStr } = useHandleQueryStr();
+    const { cateStr, tagStr, menuStr } = useHandleQueryStr();
     const { tableArr } = useSelector((state:RootState) => state.memo)
 
     const dispatch = useDispatch();
@@ -24,6 +24,8 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const [tagValue, setTagValue] = useState<string>('');
     const [isImportant, setIsImportant] = useState<boolean>(false);
     const [tagNames, setTagNames] = useState<string[]>([]);
+    const [selectedCateId, setSelectedCateId] = useState<number|'undefined'>('undefined');
+    const [selectedCateName, setSelectedCateName] = useState<string>('');
 
     const memoAutoResize = (e) => {
         handleResizeHeight(memoTextarea);
@@ -63,9 +65,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         }
 
         const content = memoValue.replace(/\n/g, '<br/>'); // innerHTML해주기 위함
-        const categoryId = tableArr.categories.find((cate) => cate.cateName === cateStr).cateId;
-
-        console.log('이게뭐야',tagNames)
+        const categoryId = selectedCateId;
         
         const newData = {
             categoryId,
@@ -95,20 +95,53 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         }
     }
 
+    const handleSelectChange = (event) => {
+        if (event.target.value === '전체메모') {
+            setSelectedCateName('전체메모');
+            setSelectedCateId('undefined');
+            return
+        }
+        const selectedCate = tableArr.categories.filter(cate => cate.cateName === event.target.value);
+        setSelectedCateId(selectedCate[0].cateId);
+        setSelectedCateName(selectedCate[0].cateName);
+    }
+
     const deleteTag = (name) => {
         const filter = tagNames.filter(tagName => tagName !== name);
         setTagNames(filter)
     }
 
     useEffect(() => {
-        if (cateStr === 'important') setIsImportant(true);
-        else setIsImportant(false);
         if (tagStr) {
             tagsRef.current[0] = tagStr;
             setTagNames([tagStr])
         } // 첫번째 배열에 쿼리에 적힌 테그추가
         if (!tagStr) setTagNames([]);
-    },[tagStr, cateStr])
+    },[tagStr])
+
+    useEffect(() => {
+        let newSelectedCateId: number|'undefined' = 'undefined';
+        let newSelectedCateName: string = '전체메모';
+
+        if (menuStr) setIsImportant(true);
+        else setIsImportant(false);
+
+        if (cateStr) {
+            const defaultSelectedCate = tableArr.categories.filter(cate => cate.cateName === cateStr)[0];
+            if (defaultSelectedCate) {
+                newSelectedCateId = defaultSelectedCate.cateId;
+                newSelectedCateName = defaultSelectedCate.cateName;
+            }
+        }
+
+        if ((!cateStr && !menuStr) || menuStr) {
+            newSelectedCateId = 'undefined';
+            newSelectedCateName = '전체메모';
+        }
+
+        setSelectedCateName(newSelectedCateName);
+        setSelectedCateId(newSelectedCateId);
+    },[cateStr, menuStr])
 
     return (
         <article
@@ -129,7 +162,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                         className='resize-none w-full pr-6px max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
                     />
                         {
-                            cateStr === 'important' ? <FillStarIcon/> :
+                            menuStr ? <FillStarIcon/> :
                                 isImportant ? (
                                     <FillStarIcon onClick={importantHandler}/>
                                 ) : (
@@ -155,7 +188,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                         {
                             tagNames.map((name, idx) => {
                                 return name === tagStr ? (
-                                    <div key={uniqueKey()} className='relative flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                                    <div key={uniqueKey() + idx} className='relative flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                         <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
                                             {name}
                                         </span>
@@ -175,7 +208,22 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                                 )
                             })
                         }
-                        <div className='h-full w-full flex text-zete-dark-400'>
+                        <div className='h-full w-full text-zete-dark-400'>
+                            <select
+                                value={selectedCateName}
+                                onChange={handleSelectChange}
+                            >
+                                <option>전체메모</option>
+                                {
+                                    tableArr.categories.map((cate, idx) => {
+                                        return (
+                                            <option key={uniqueKey() + idx}>
+                                                {cate.cateName}
+                                            </option>
+                                        )
+                                    })
+                                }
+                            </select>
                             <form
                                 className='relative flex items-center text-zete-dark-400 text-12'
                                 onSubmit={addTags}

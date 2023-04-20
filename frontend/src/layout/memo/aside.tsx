@@ -1,13 +1,11 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {SET_ALERT} from "../../store/slices/alert.slice";
 import {RootState} from "../../store";
 import {SET_SHOW_MENU, TOGGLE_SHOW_MENU} from "../../store/slices/changedMenu.slice";
-import {ModifyIcon} from "../../components/vectors";
 import {CategoryList, MainMemoList} from "../../components/layout/asideComponents";
 import CustomScroller from "../../components/customScroller";
 import {CateModifyModal} from "../../modals/cateModifyModal";
-import {uniqueKey} from "../../utile";
 
 export const Aside = () => {
     const dispatch = useDispatch();
@@ -56,7 +54,7 @@ export const Aside = () => {
                             {
                                 data && tableArr &&
                                 tableArr.categories.map((cate, idx) => {
-                                    const matchData = data.filter(data => data['cateId'] === cate.cateId);
+                                    const matchData = data.filter(data => data.cateId === cate.cateId);
                                     return (
                                         <CategoryList
                                             key={idx}

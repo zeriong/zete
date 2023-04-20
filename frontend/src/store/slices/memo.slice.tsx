@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {Category, initState, MemoData, ModifyMemoPayload, SetMemoPayload} from "./constants";
+import {Category, initState, MemoData, ModifyMemoPayload, addMemoPayload} from "./constants";
 
 // 로컬스토리지 임시저장
 const loadMemoState = (): MemoData => {
@@ -30,9 +30,9 @@ export const memoSlice = createSlice({
             const { cateName } = action.payload;
             if (!cateName) return
 
-            const allCate = state.tableArr.categories;
-            const cateIds = state.tableArr.categories.map((cate) => cate.cateId) || [];
-            const makeId = cateIds.length > 0 ? Math.max(...cateIds) + 1 : 1;
+            const allCate = state.tableArr.categories.filter(cate => cate.cateId !== 'undefined');
+            const cateIds = allCate.map(cate => cate.cateId);
+            const makeId = cateIds.length > 0 ? Math.max( Number(...cateIds) ) + 1 : 1;
             const newState = {
                 tableArr: {
                     ...state.tableArr,
@@ -48,7 +48,7 @@ export const memoSlice = createSlice({
 
             return newState;
         },
-        DELETE_CATE: (state: MemoData, action: PayloadAction<number>) => {
+        DELETE_CATE: (state: MemoData, action: PayloadAction<number|'undefined'>) => {
             const target = state.tableArr.cateMemos.filter(cateMemo => cateMemo.cateId === action.payload);
             const currentCateTags = state.tableArr.cateTags.filter(cateTags => cateTags.cateId === action.payload)
             const memoId = target.map(val => val.memoId);
@@ -63,7 +63,7 @@ export const memoSlice = createSlice({
             state.tableArr.tags = state.tableArr.tags.filter(cateTags => !currentCateTags.some(current => current.tagId === cateTags.tagId));
             saveMemoState(state);
         },
-        ADD_MEMO: (state: MemoData, action: PayloadAction<SetMemoPayload>) => {
+        ADD_MEMO: (state: MemoData, action: PayloadAction<addMemoPayload>) => {
             const { ...table } = state.tableArr;
             const { categoryId, title, content, important, tagNames } = action.payload;
 
@@ -116,7 +116,7 @@ export const memoSlice = createSlice({
             if (tagNames.length !== 0) {
                 newMemoTags = [
                     ...table.memoTags,
-                    ...tagNames.map((tagName, idx) => {
+                    ...tagNames.map((tagName) => {
                         const currentCateTags = newCateTags.filter(cateTag => cateTag.cateId === categoryId);
                         const addTagNames = newTags.filter(tags => currentCateTags.some(match => match.tagId === tags.tagId));
                         const targetTagId = addTagNames.filter(current => tagName === current.tagName).map(id => id.tagId);
@@ -288,30 +288,34 @@ export const memoSlice = createSlice({
         },
         SET_DATA: (state: MemoData) => {
             const { categories, memos, tags, memoTags, cateMemos } = state.tableArr;
-            const newData = categories.map(cate => ({
-                cateId: cate.cateId,
-                cateName: cate.cateName,
-                memos: cateMemos
-                    .filter(cateMemos => cateMemos.cateId === cate.cateId) //cate에 해당하는 memoId색인
-                    .map(cateMemos =>
-                        memos.filter(memo => memo.memoId === cateMemos.memoId) //memos에서 해당 cate에 존재하는 data
-                            .map((memo) => {
-                                const existMemoTags = memoTags.some(memoTag => memoTag.memoId === memo.memoId);
-                                const memoTagsTarget = memoTags.filter(memoTag => memoTag.memoId === memo.memoId);
-                                const addTags = tags.filter(tags => memoTagsTarget.some(target => target.tagId === tags.tagId))
+            const newData = cateMemos.map((cate) => {
+                const existMemoInCate = categories.some(category => cate.cateId === category.cateId);
+                let setCateName = undefined;
 
-                                return (
-                                    {
+                if (existMemoInCate) {
+                    setCateName = categories.filter(category => category.cateId === cate.cateId)[0].cateName;
+                }
+
+                return {
+                    cateId: cate.cateId,
+                    cateName: setCateName,
+                    memos: memos.filter(memo => memo.memoId === cate.memoId) //memos에서 해당 cate에 존재하는 data
+                                .map((memo) => {
+                                    const existMemoTags = memoTags.some(memoTag => memoTag.memoId === memo.memoId);
+                                    const memoTagsTarget = memoTags.filter(memoTag => memoTag.memoId === memo.memoId);
+                                    const addTags = tags.filter(tags => memoTagsTarget.some(target => target.tagId === tags.tagId))
+
+                                    return {
                                         memoId: memo.memoId,
                                         title: memo.title,
                                         content: memo.content,
                                         tags: existMemoTags ? addTags : [],
                                         important: memo.important,
                                     }
-                                )}
-                            )
-                    ).flat()
-            }))
+                                }).flat()
+                }
+
+            })
             const newState = {
                 ...state,
                 data: newData

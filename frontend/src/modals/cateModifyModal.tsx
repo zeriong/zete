@@ -19,7 +19,7 @@ export const CateModifyModal = () => {
     const [newCateListNames, setNewCateListNames] = useState<string[]>(categories.map(cate => cate.cateName));
     const [newCateList, setNewCateList] = useState<Category[]>(categories);
     const [addCateValue, setAddCateValue] = useState('');
-    const [getCateId, setGetCateId] = useState(0);
+    const [getCateId, setGetCateId] = useState<number|'undefined'>(0);
     const [isAgreeShow, setIsAgreeShow] = useState(false);
 
     const dispatch = useDispatch();
@@ -31,7 +31,7 @@ export const CateModifyModal = () => {
         deleteCate(getCateId);
     }
 
-    const deleteCate = (cateId: number) => {
+    const deleteCate = (cateId: number|'undefined') => {
         dispatch(DELETE_CATE(cateId));
         setData();
     }
@@ -60,7 +60,7 @@ export const CateModifyModal = () => {
         setData();
     }
 
-    const updateOneCate = (target: {cateId:number, val:string, event: React.FormEvent<HTMLFormElement>}) => {
+    const updateOneCate = (target: {cateId:number|'undefined', val:string, event: React.FormEvent<HTMLFormElement>}) => {
         target.event.preventDefault();
         if (newCateListNames.some(name => name === '')) return alert('비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.');
         if (categories.some(cate => cate.cateName === target.val)) return alert('중복된 카테고리가 존재합니다.')

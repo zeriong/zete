@@ -24,18 +24,19 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
 
     const { searchParams, setSearchParams } = useHandleQueryStr();
     const { data, tableArr } = useSelector((state:RootState) => state.memo);
-    const { cateStr, tagStr } = useHandleQueryStr();
+    const { cateStr, tagStr, menuStr } = useHandleQueryStr();
 
     const dispatch = useDispatch();
     const horizonScroll = useHorizontalScroll();
 
     const [isShow, setIsShow] = useState<boolean>(false);
-    const [categoryId, setCategoryId] = useState<number>(0);
     const [memoValue, setMemoValue] = useState<string>('');
     const [titleValue, setTitleValue] = useState<string>('');
     const [tagValue, setTagValue] = useState<string>('');
     const [isImportant, setIsImportant] = useState<boolean>(false);
     const [tagNames, setTagNames] = useState<string[]>([]);
+    const [selectedCateId, setSelectedCateId] = useState<number|'undefined'>('undefined');
+    const [selectedCateName, setSelectedCateName] = useState<string>('');
 
     const closeModal = () => {
         if (searchParams.get('modal') === 'memoModify') {
@@ -76,6 +77,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         }
 
         const content = memoValue.replace(/\n/g, '<br/>'); // innerHTML해주기 위함
+        const categoryId = selectedCateId
 
         const newData = {
             categoryId,
@@ -106,6 +108,41 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         setTagNames(filter)
     }
 
+    const handleSelectChange = (event) => {
+        if (event.target.value === '전체메모') {
+            setSelectedCateName('전체메모');
+            setSelectedCateId('undefined');
+            return
+        }
+        const selectedCate = tableArr.categories.filter(cate => cate.cateName === event.target.value);
+        setSelectedCateId(selectedCate[0].cateId);
+        setSelectedCateName(selectedCate[0].cateName);
+    }
+
+    useEffect(() => {
+        let newSelectedCateId: number|'undefined' = 'undefined';
+        let newSelectedCateName: string = '전체메모';
+
+        if (menuStr) setIsImportant(true);
+        else setIsImportant(false);
+
+        if (cateStr) {
+            const defaultSelectedCate = tableArr.categories.filter(cate => cate.cateName === cateStr)[0];
+            if (defaultSelectedCate) {
+                newSelectedCateId = defaultSelectedCate.cateId;
+                newSelectedCateName = defaultSelectedCate.cateName;
+            }
+        }
+
+        if ((!cateStr && !menuStr) || menuStr) {
+            newSelectedCateId = 'undefined';
+            newSelectedCateName = '전체메모';
+        }
+
+        setSelectedCateName(newSelectedCateName);
+        setSelectedCateId(newSelectedCateId);
+    },[cateStr, menuStr])
+
     useEffect(() => {
         if (searchParams.get("modal") === "memoModify") {
             setIsShow(true);
@@ -116,7 +153,6 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         if (tableArr?.cateMemos) {
             const cateMemo = tableArr.cateMemos.find(cateMemo => cateMemo.memoId === memoId);
             if (cateMemo) {
-                setCategoryId(cateMemo.cateId);
                 const currentData = data?.map(data => data.memos).flat().filter(data => data.memoId === memoId);
                 const currentMemoVal = currentData[0]?.content.replace(/<br\/>/g, '\n');
                 setMemoValue(currentMemoVal);
@@ -129,7 +165,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     }, [searchParams])
 
     useEffect(() => {
-        if (cateStr === 'important') setIsImportant(true);
+        if (menuStr) setIsImportant(true);
         else setIsImportant(false);
         if (tagStr) {
             tagsRef.current[0] = tagStr;
@@ -191,7 +227,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                     className='resize-none w-full pr-6px max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
                                                 />
                                                 {
-                                                    cateStr === 'important' ? <FillStarIcon/> :
+                                                    menuStr ? <FillStarIcon/> :
                                                         isImportant ? (
                                                             <FillStarIcon onClick={importantHandler}/>
                                                         ) : (
@@ -217,7 +253,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                 {
                                                     tagNames.map((name, idx) => {
                                                         return name === tagStr ? (
-                                                            <div key={uniqueKey()} className='relative flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                                                            <div key={uniqueKey() + idx} className='relative flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                                                 <span className='font-light text-11 text-zete-dark-400'>
                                                                     {name}
                                                                 </span>
@@ -237,7 +273,22 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                         )
                                                     })
                                                 }
-                                                <div className='h-full w-full flex text-zete-dark-400'>
+                                                <div className='h-full w-full text-zete-dark-400'>
+                                                    <select
+                                                        value={selectedCateName}
+                                                        onChange={handleSelectChange}
+                                                    >
+                                                        <option>전체메모</option>
+                                                        {
+                                                            tableArr.categories.map((cate, idx) => {
+                                                                return (
+                                                                    <option key={uniqueKey() + idx}>
+                                                                        {cate.cateName}
+                                                                    </option>
+                                                                )
+                                                            })
+                                                        }
+                                                    </select>
                                                     <form
                                                         className='relative flex items-center text-zete-dark-400 text-12'
                                                         onSubmit={addTags}
