@@ -156,3 +156,8 @@ export const DeleteIcon = (props: SVGProps<SVGSVGElement>) => (
         <path d="M292.309 915.999q-30.308 0-51.308-21t-21-51.308V336h-40v-59.999H360v-35.384h240v35.384h179.999V336h-40v507.691q0 30.308-21 51.308t-51.308 21H292.309ZM376.155 776h59.999V416h-59.999v360Zm147.691 0h59.999V416h-59.999v360Z"/>
     </svg>
 )
+export const EditIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 96 960 960" width="24" {...props}>
+        <path d="M200 856h56l345-345-56-56-345 345v56Zm572-403L602 285l56-56q23-23 56.5-23t56.5 23l56 56q23 23 24 55.5T829 396l-57 57Zm-58 59L290 936H120V766l424-424 170 170Zm-141-29-28-28 56 56-28-28Z"/>
+    </svg>
+)

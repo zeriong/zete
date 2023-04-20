@@ -12,6 +12,7 @@ import {CHANGE_IMPORTANT, DELETE_MEMO} from "../../store/slices/memo.slice";
 import {useResize} from "../../hooks/useResize";
 import {useHorizontalScroll} from "../../hooks/useHorizontalScroll";
 import {MemoModifyModal} from "../../modals/memoModifyModal";
+import {SavedMemoMenuPopov} from "../../popovers/savedMemoMenuPopov";
 
 export const MemoMain = () => {
     const [masonryCols,setMasonryCols] = useState<{}>({})
@@ -53,11 +54,6 @@ export const MemoMain = () => {
             if (n > currentData.length+1) return currentData.length+1;
             else return n;
         }
-    }
-
-    const deleteMemo = (memoId: number) => {
-        dispatch(DELETE_MEMO(memoId));
-        setData();
     }
 
     const memoModifier = (memoId) => {
@@ -156,20 +152,8 @@ export const MemoMain = () => {
                                                     </div>
                                                 </div>
                                             </article>
-                                            <button
-                                                type='button'
-                                                className='absolute bottom-21px right-21px hover:bg-black hover:bg-opacity-10 p-1px rounded-full'
-                                            >
-                                                <ThreeDotMenuIcon className='fill-zete-dark-200 cursor-pointer'/>
-                                            </button>
-                                            <div className='일단 숨겨둠 hidden'>
-                                                <button
-                                                    type='button'
-                                                    className='flex items-center ml-2px pl-2px h-24px w-24px text-zete-dark-400 '
-                                                    onClick={()=> deleteMemo(val.memoId)}
-                                                >
-                                                    삭제버튼
-                                                </button>
+                                            <div className='absolute bottom-16px right-21px '>
+                                                <SavedMemoMenuPopov memoId={val.memoId}/>
                                             </div>
                                         </div>
                                         <button
