@@ -1,7 +1,9 @@
 import { coreEntity } from '../common/entities/core.entity';
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, JoinTable, OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Memo } from "./memo.entity";
+import { Categories } from './categories.entity';
+import { Memos } from './memos.entity';
+import { Tags } from './tags.entity';
 
 @Entity({ name: 'user' })
 export class User extends coreEntity {
@@ -30,9 +32,15 @@ export class User extends coreEntity {
   @Column({ nullable: true, type: 'tinytext' })
   refreshToken?: string;
 
-  // /** memos */
-  // @ApiProperty({ required: false })
-  // @Column({ nullable: true })
-  // @OneToMany(() => Memo, (memo) => memo.user, { cascade: true })
-  // memos?: Memo[];
+  @ApiProperty({ type: Categories })
+  @OneToMany(() => Categories, (categories) => categories.user)
+  categories: Categories[];
+
+  @ApiProperty({ type: Memos })
+  @OneToMany(() => Memos, (memos) => memos.user)
+  memos: Memos[];
+
+  @ApiProperty({ type: Tags })
+  @OneToMany(() => Tags, (tags) => tags.user)
+  tags: Tags[];
 }

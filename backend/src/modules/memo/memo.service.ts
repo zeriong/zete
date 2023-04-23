@@ -8,14 +8,14 @@
 // import { UserDataOutput } from '../user/dtos/userData.dto';
 // import * as Validator from 'class-validator';
 // import { UpdateAccountDto } from '../user/dtos/updateAccount.dto';
-// import { Memo } from '../../entities/memo.entity';
+// import { Memos } from '../../entities/memo.entity';
 // import { MemoCate } from '../../entities/memoCategory.entity';
 //
 // @Injectable()
 // export class MemoService {
 //   constructor(
-//     @InjectRepository(Memo)
-//     private readonly memoRepository: Repository<Memo>,
+//     @InjectRepository(Memos)
+//     private readonly memoRepository: Repository<Memos>,
 //
 //     @InjectRepository(MemoCate)
 //     private readonly memoCateRepository: Repository<MemoCate>,

@@ -6,6 +6,9 @@ import { User } from './entities/user.entity';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { OpenAiModule } from './modules/openAi/openAi.module';
+import { Categories } from './entities/categories.entity';
+import { Tags } from './entities/tags.entity';
+import { Memos } from './entities/memos.entity';
 
 @Module({
   imports: [
@@ -41,7 +44,7 @@ import { OpenAiModule } from './modules/openAi/openAi.module';
       synchronize: process.env.NODE_ENV !== 'production',
       //logging: process.env.NODE_ENV !== 'production',
       logging: false,
-      entities: [User],
+      entities: [User, Categories, Memos, Tags],
     }),
     /*
     ServeStaticModule.forRoot({

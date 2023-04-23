@@ -32,7 +32,6 @@ export interface TableArr {
     cateMemos: CateMemo[];  // joinData
     cateTags: CateTag[];  // joinData
 }
-
 export interface Memos {
     memoId: number;
     title: string;
@@ -46,7 +45,6 @@ export interface Data {
     cateName?: string;
     memos?: Memos[];
 }
-
 export interface addMemoPayload {
     categoryId: number|'undefined';
     title: string;
@@ -54,7 +52,6 @@ export interface addMemoPayload {
     important: boolean;
     tagNames: string[];
 }
-
 export interface ModifyMemoPayload {
     memoId: number;
     categoryId: number|'undefined';
@@ -63,12 +60,10 @@ export interface ModifyMemoPayload {
     important: boolean;
     tagNames: string[];
 }
-
 export interface MemoData {
     tableArr: TableArr,
     data: Data[],
 }
-
 export const initState:MemoData = {
     tableArr: {
         categories: [],
