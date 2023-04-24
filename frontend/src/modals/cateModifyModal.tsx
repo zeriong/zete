@@ -53,7 +53,7 @@ export const CateModifyModal = () => {
 
     const updateCate = () => {
         if (newCateListNames.some(name => name === '')) return alert('비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.');
-        if (newCateListNames.length !== new Set(newCateListNames).size) return alert('중복된 카테고리가 존재합니다.????')
+        if (newCateListNames.length !== new Set(newCateListNames).size) return alert('중복된 카테고리가 존재합니다.')
 
         setIsShow(false);
         dispatch(UPDATE_CATE(newCateList));

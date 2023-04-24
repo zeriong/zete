@@ -1,12 +1,4 @@
-import {
-  Entity,
-  Column,
-  ManyToMany,
-  JoinTable,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, RelationId } from 'typeorm';
 import { Memos } from './memos.entity';
 import { coreEntity } from '../common/entities/core.entity';
 import { Categories } from './categories.entity';
@@ -25,11 +17,17 @@ export class Tags extends coreEntity {
 
   @ApiProperty({ type: Promise<Memos> })
   @ManyToOne(() => Memos, (memo) => memo.tags)
-  @JoinColumn({ name: 'memoId' })
   memos: Memos;
 
+  @ApiProperty({ type: Number })
+  @RelationId((tags: Tags) => tags.memos)
+  memoId: number;
+
   @ApiProperty({ type: Promise<Categories> })
-  @ManyToOne(() => Categories, (categories) => categories.tags)
-  @JoinColumn({ name: 'cateId' })
-  categories: Categories;
+  @ManyToOne(() => Categories, (cate) => cate.tags)
+  cate: Categories;
+
+  @ApiProperty({ type: Number })
+  @RelationId((tags: Tags) => tags.cate)
+  cateId: number;
 }

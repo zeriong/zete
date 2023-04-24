@@ -13,6 +13,15 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Categories } from './categories';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Memos } from './memos';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Tags } from './tags';
 
 /**
  * 
@@ -68,5 +77,23 @@ export interface User {
      * @memberof User
      */
     'refreshToken'?: string;
+    /**
+     * 
+     * @type {Categories}
+     * @memberof User
+     */
+    'cate': Categories;
+    /**
+     * 
+     * @type {Memos}
+     * @memberof User
+     */
+    'memos': Memos;
+    /**
+     * 
+     * @type {Tags}
+     * @memberof User
+     */
+    'tags': Tags;
 }
 

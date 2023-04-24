@@ -30,7 +30,7 @@ export class UserService {
         };
       }
       /** 계정생성 */
-      const user = await this.userRepository.save(
+      await this.userRepository.save(
         this.userRepository.create({
           email: input.email,
           password: await bcrypt.hash(input.password, 10),
@@ -126,7 +126,11 @@ export class UserService {
       });
 
       if (thisEmail != updateData.email && emailExists) {
-        return { success: false, error: '중복된 이메일입니다.', target: 'email' };
+        return {
+          success: false,
+          error: '중복된 이메일입니다.',
+          target: 'email',
+        };
       }
       if (thisEmail != updateData.email && mobileExists) {
         return { success: false, error: '중복된 휴대폰입니다.' };

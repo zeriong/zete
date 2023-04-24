@@ -142,6 +142,95 @@ paths:
                 $ref: "#/components/schemas/CoreOutput"
       tags:
         - Auth
+  /memo/createMemo:
+    post:
+      operationId: createMemo
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMemoInputDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - Memo
+  /memo/createCate:
+    post:
+      operationId: createCate
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCateDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCateOutputDto"
+      tags:
+        - Memo
+  /memo/sendContentData:
+    post:
+      operationId: sendContentData
+      parameters: []
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SendContentDataOutputDto"
+      tags:
+        - Memo
+  /memo/updateOneCate:
+    post:
+      operationId: updateOneCate
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOneCateInputDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - Memo
+  /memo/updateManyCate:
+    post:
+      operationId: updateManyCate
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateManyCateInputDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - Memo
   /openAi/createCompletion:
     post:
       operationId: createCompletion
@@ -175,6 +264,104 @@ components:
       bearerFormat: JWT
       type: http
   schemas:
+    Promise:
+      type: object
+      properties: {}
+    Tags:
+      type: object
+      properties:
+        id:
+          type: number
+        createAt:
+          format: date-time
+          type: string
+        updateAt:
+          format: date-time
+          type: string
+        tagName:
+          type: string
+        user:
+          $ref: "#/components/schemas/Promise"
+        memos:
+          $ref: "#/components/schemas/Promise"
+        memoId:
+          type: number
+        cate:
+          $ref: "#/components/schemas/Promise"
+        cateId:
+          type: number
+      required:
+        - id
+        - createAt
+        - updateAt
+        - tagName
+        - user
+        - memos
+        - memoId
+        - cate
+        - cateId
+    Memos:
+      type: object
+      properties:
+        id:
+          type: number
+        createAt:
+          format: date-time
+          type: string
+        updateAt:
+          format: date-time
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        important:
+          type: boolean
+        user:
+          $ref: "#/components/schemas/Promise"
+        cate:
+          $ref: "#/components/schemas/Promise"
+        cateId:
+          type: number
+        tags:
+          $ref: "#/components/schemas/Tags"
+      required:
+        - id
+        - createAt
+        - updateAt
+        - important
+        - user
+        - cate
+        - cateId
+        - tags
+    Categories:
+      type: object
+      properties:
+        id:
+          type: number
+        createAt:
+          format: date-time
+          type: string
+        updateAt:
+          format: date-time
+          type: string
+        cateName:
+          type: string
+          nullable: true
+        user:
+          $ref: "#/components/schemas/Promise"
+        memos:
+          $ref: "#/components/schemas/Memos"
+        tags:
+          $ref: "#/components/schemas/Tags"
+      required:
+        - id
+        - createAt
+        - updateAt
+        - cateName
+        - user
+        - memos
+        - tags
     User:
       type: object
       properties:
@@ -196,6 +383,12 @@ components:
           type: string
         refreshToken:
           type: string
+        cate:
+          $ref: "#/components/schemas/Categories"
+        memos:
+          $ref: "#/components/schemas/Memos"
+        tags:
+          $ref: "#/components/schemas/Tags"
       required:
         - id
         - createAt
@@ -204,6 +397,9 @@ components:
         - password
         - name
         - mobile
+        - cate
+        - memos
+        - tags
     CreateAccountDto:
       type: object
       properties:
@@ -226,6 +422,8 @@ components:
         error:
           type: string
         target:
+          type: string
+        message:
           type: string
         success:
           type: boolean
@@ -263,6 +461,8 @@ components:
           type: string
         target:
           type: string
+        message:
+          type: string
         success:
           type: boolean
         user:
@@ -278,19 +478,113 @@ components:
           type: string
         target:
           type: string
+        message:
+          type: string
         success:
           type: boolean
         accessToken:
           type: string
       required:
         - success
+    CreateMemoInputDto:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        important:
+          type: boolean
+        tags:
+          type: string
+      required:
+        - title
+        - content
+        - important
+    CreateCateDto:
+      type: object
+      properties:
+        cateName:
+          type: string
+      required:
+        - cateName
+    CreateCateOutputDto:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        message:
+          type: string
+        success:
+          type: boolean
+        cate:
+          $ref: "#/components/schemas/Categories"
+      required:
+        - success
+    SendContentDataOutputDto:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        message:
+          type: string
+        success:
+          type: boolean
+        cate:
+          $ref: "#/components/schemas/Categories"
+        memos:
+          $ref: "#/components/schemas/Memos"
+        tags:
+          $ref: "#/components/schemas/Tags"
+      required:
+        - success
+    UpdateOneCateInputDto:
+      type: object
+      properties:
+        cateName:
+          type: string
+        cateId:
+          type: number
+      required:
+        - cateName
+        - cateId
+    IUpdateManyCateInput:
+      type: object
+      properties:
+        cateId:
+          type: number
+        cateName:
+          type: string
+      required:
+        - cateId
+        - cateName
+    UpdateManyCateInputDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/IUpdateManyCateInput"
+      required:
+        - data
+    CreateCompletionInputObj:
+      type: object
+      properties:
+        role:
+          type: string
+        content:
+          type: string
+      required:
+        - role
+        - content
     CreateCompletionInputDto:
       type: object
       properties:
-        question:
-          type: string
+        data:
+          $ref: "#/components/schemas/CreateCompletionInputObj"
       required:
-        - question
-    Promise:
-      type: object
-      properties: {}
+        - data

@@ -1,41 +1,38 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToOne,
-  OneToMany,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Tags } from './tags.entity';
 import { User } from './user.entity';
 import { coreEntity } from '../common/entities/core.entity';
 import { Categories } from './categories.entity';
+import { JoinColumn } from "typeorm/browser";
 
 @Entity({ name: 'memos' })
 export class Memos extends coreEntity {
-  /** memo title */
   @ApiProperty({ required: false })
   @Column({ type: 'tinytext' }) //tinytext: 	255
-  title?: string;
+  title: string;
 
-  /** memo content */
   @ApiProperty({ required: false })
   @Column({ type: 'text' }) //text: 	65,535
-  content?: string;
+  content: string;
 
-  /** user */
+  @ApiProperty({ type: Boolean })
+  @Column({ type: 'text' }) //text: 	65,535
+  important: boolean;
+
   @ApiProperty({ type: Promise<User> })
   @ManyToOne(() => User, (user) => user.memos)
   user: User;
 
   @ApiProperty({ type: Promise<Categories> })
-  @ManyToOne(() => Categories, (categories) => categories.memos)
-  @JoinColumn({ name: 'cateId' })
-  categories: Categories;
+  @ManyToOne(() => Categories, (cate) => cate.memos)
+  cate: Categories;
+
+  @ApiProperty({ type: Number })
+  @RelationId((memo: Memos) => memo.cate)
+  cateId: number;
 
   @ApiProperty({ type: Tags })
   @OneToMany(() => Tags, (tags) => tags.memos, { cascade: true })
-  @JoinColumn({ name: 'memoId' })
   tags: Tags[];
 }

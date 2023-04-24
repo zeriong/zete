@@ -3,12 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { OpenAiModule } from './modules/openAi/openAi.module';
 import { Categories } from './entities/categories.entity';
 import { Tags } from './entities/tags.entity';
 import { Memos } from './entities/memos.entity';
+import { UserModule } from './modules/user/user.module';
+import { MemoModule } from './modules/memo/memo.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { Memos } from './entities/memos.entity';
     */
     UserModule,
     AuthModule,
+    MemoModule,
     OpenAiModule,
   ],
   controllers: [],

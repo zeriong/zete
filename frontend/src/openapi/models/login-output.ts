@@ -37,6 +37,12 @@ export interface LoginOutput {
     'target'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof LoginOutput
+     */
+    'message'?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof LoginOutput
      */

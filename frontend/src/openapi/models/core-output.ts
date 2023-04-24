@@ -34,6 +34,12 @@ export interface CoreOutput {
     'target'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof CoreOutput
+     */
+    'message'?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof CoreOutput
      */

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { User } from './user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { coreEntity } from '../common/entities/core.entity';
@@ -7,21 +7,19 @@ import { Tags } from './tags.entity';
 
 @Entity({ name: 'categories' })
 export class Categories extends coreEntity {
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   @Column({ type: 'tinytext' }) //tinytext: 	255
   cateName: string;
 
   @ApiProperty({ type: Promise<User> })
-  @ManyToOne(() => User, (user) => user.categories)
+  @ManyToOne(() => User, (user) => user.cate)
   user: User;
 
   @ApiProperty({ type: Memos })
-  @OneToMany(() => Memos, (memos) => memos.categories)
-  @JoinColumn({ name: 'cateId' })
+  @OneToMany(() => Memos, (memos) => memos.cate)
   memos: Memos[];
 
   @ApiProperty({ type: Tags })
-  @OneToMany(() => Tags, (tags) => tags.categories)
-  @JoinColumn({ name: 'cateId' })
+  @OneToMany(() => Tags, (tags) => tags.cate)
   tags: Tags[];
 }

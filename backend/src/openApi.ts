@@ -17,14 +17,14 @@ export const useOpenApi = (app) => {
 
       // made openapi.yaml from openApi library
       fileGeneratorOptions: {
-        enabled: process.env.NODE_ENV === 'production',
+        enabled: process.env.NODE_ENV !== 'production',
         outputFilePath: './openapi.yaml', // or ./openapi.json
       },
 
       // openapi.yaml output to frontend
 
       clientGeneratorOptions: {
-        enabled: process.env.NODE_ENV === 'production',
+        enabled: process.env.NODE_ENV !== 'production',
         type: 'typescript-axios', //typescript-axios
         outputFolderPath: '../frontend/src/openapi',
         additionalProperties:

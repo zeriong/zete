@@ -1,7 +1,7 @@
 import {store} from "../store";
 import axios, {AxiosRequestConfig} from "axios";
 import {sendRefreshAccessToken, SET_LOGOUT} from "../store/slices/auth.slice";
-import {AuthApiFactory, OpenAiApiFactory, UserApiFactory} from "../openapi";
+import {AuthApiFactory, MemoApiFactory, OpenAiApiFactory, UserApiFactory} from "../openapi";
 
 const API_URL = "http://localhost:4000";
 export const REFRESH_TOKEN_PATH = "/auth/refresh";
@@ -18,6 +18,7 @@ export const Api = () => {
     return {
         user: UserApiFactory(null,'',instance),
         auth: AuthApiFactory(null,'',instance),
+        memo: MemoApiFactory(null, '',instance),
         AI: OpenAiApiFactory(null,'',instance),
     }
 }

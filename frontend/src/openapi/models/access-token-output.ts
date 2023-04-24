@@ -34,6 +34,12 @@ export interface AccessTokenOutput {
     'target'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof AccessTokenOutput
+     */
+    'message'?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof AccessTokenOutput
      */
