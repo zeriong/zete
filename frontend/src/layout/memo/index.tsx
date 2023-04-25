@@ -15,7 +15,7 @@ import {Api} from "../../utile/api";
 export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
-    const { tableArr } = useSelector((state: RootState) => (state.memo));
+    // const { tableData } = useSelector((state: RootState) => (state.memo));
     const { cateStr, tagStr, menuStr } = useHandleQueryStr()
 
     const [existCate,setExistCate] = useState(false);
@@ -26,17 +26,17 @@ export const MemoLayout = () => {
         dispatch(sendMyProfile());
     }, [dispatch])
 
-    useEffect(() => {
-        const cateList = tableArr.categories.map((cate) => cate.cateName);
-        if (cateList.find((list) => list === cateStr)) {
-            setExistCate(true);
-        } else {
-            setExistCate(false);
-        }
-    },[tagStr,cateStr, tableArr])
+    // useEffect(() => {
+    //     const cateList = tableData.categories.map((cate) => cate.cateName);
+    //     if (cateList.find((list) => list === cateStr)) {
+    //         setExistCate(true);
+    //     } else {
+    //         setExistCate(false);
+    //     }
+    // },[tagStr,cateStr, tableData])
 
     const dummy = {
-        cateName: 'd',
+        cateId: null,
         title: 'd',
         content: '오우야',
         important: true,
@@ -47,12 +47,10 @@ export const MemoLayout = () => {
         cateName: 'd'
     }
 
-    const testButton = () => {
-        // Api().memo.createMemo({
-        //     ...dummy
-        // })
-        //     .then(res => console.log(res))
-        //     .catch(e => console.log(e))
+    const createMemoTest = () => {
+        Api().memo.createMemo({...dummy})
+            .then(res => console.log(res))
+            .catch(e => console.log(e))
     }
 
     const [testVal, setTestVal] = useState('');
@@ -84,6 +82,13 @@ export const MemoLayout = () => {
             .catch(e => console.log(e))
     }
 
+    const cateDeleteTest = () => {
+        Api().memo.deleteCate({
+            cateId: 25
+        }).then(res => console.log(res))
+            .catch(e => console.log(e))
+    }
+
     return ( loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
         <>
             <Header/>
@@ -96,29 +101,35 @@ export const MemoLayout = () => {
                 <div className='w-full h-full flex relative pt-headerHeight transform'>
                     <header className="flex fixed top-0 h-headerHeight items-center justify-between w-full z-30 ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 pl-16px md:pl-20px">
                         <div className='flex items-center'>
-                            <button
-                                type='button'
-                                className='fixed left-1/2 top-1/2 bg-blue-500 text-black p-30px -translate-y-1/2 -translate-x-1/2'
-                                onClick={cateUpdateTest}
-                            >
-                                Test Button
-                            </button>
-                            <form
-                                className='fixed left-1/2 top-1/4 bg-blue-500 text-black p-30px -translate-y-1/2 -translate-x-1/2'
-                                onSubmit={testSubmit}
-                            >
-                                <input placeholder='여기에 입력해라' value={testVal} onChange={(e) => setTestVal(e.target.value)} className='text-20 border'/>
-                            </form>
-                            <div className='fixed left-1/2 bg-gray-400'>
-                                Test Area
-                                {resData && resData?.map((cate, idx) => {
-                                    return (
-                                        <li key={idx}>
-                                            {cate.cateName}
-                                        </li>
-                                    )
-                                })}
-                            </div>
+                            <>
+                                {/*테스트 테스트 테스트 테스트테스트 테스트테스트 테스트테스트 테스트*/}
+
+                                <button
+                                    type='button'
+                                    className='fixed left-1/2 top-1/2 bg-blue-500 text-black p-30px -translate-y-1/2 -translate-x-1/2'
+                                    onClick={createMemoTest}
+                                >
+                                    Test Button
+                                </button>
+                                <form
+                                    className='fixed left-1/2 top-1/4 bg-blue-500 text-black p-30px -translate-y-1/2 -translate-x-1/2'
+                                    onSubmit={testSubmit}
+                                >
+                                    <input placeholder='여기에 입력해라' value={testVal} onChange={(e) => setTestVal(e.target.value)} className='text-20 border'/>
+                                </form>
+                                <div className='fixed left-1/2 bg-gray-400'>
+                                    Test Area
+                                    {resData && resData?.map((cate, idx) => {
+                                        return (
+                                            <li key={idx}>
+                                                {cate.cateName}
+                                            </li>
+                                        )
+                                    })}
+                                </div>
+
+                                {/*테스트 테스트 테스트 테스트테스트 테스트테스트 테스트테스트 테스트*/}
+                            </>
                             <>
                                 <TagIcon strokeClassName='fill-zete-tagBlack' svgClassName='w-17px h-16px mr-10px'/>
                             </>

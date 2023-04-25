@@ -2,18 +2,19 @@ import {Link} from "react-router-dom";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../vectors";
 import React, {useEffect, useMemo, useState} from "react";
 import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
-import {Category, Data, TableArr} from "../../store/slices/constants";
+import {Category, Data, TableData} from "../../store/slices/constants";
+import {match} from "assert";
 
 
 interface SetCateProps {
     matchData?: Data[];
-    tableArr?: TableArr;
+    tableData?: TableData;
     data?: Data[];
     cate?: Category;
 }
 
 export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
-    const { tableArr } = props;
+    const { tableData } = props;
     const { cateStr, menuStr } = useHandleQueryStr()
 
     const [selected, setSelected] = useState(1);
@@ -28,7 +29,7 @@ export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
     return (
         <div className="flex flex-col font-bold gap-4px">
             {
-                tableArr &&
+                tableData &&
                 <>
                     <Link
                         to={{pathname: '/memo'}}
@@ -46,7 +47,7 @@ export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
                             ${selected === 1 ? 'bg-white' : 'bg-zete-light-gray-300'}`}
                         >
                             <span className='relative bottom-1px'>
-                                {tableArr.memos.length}
+                                {tableData.memos.length}
                             </span>
                         </div>
                     </Link>
@@ -67,7 +68,7 @@ export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
                             ${selected === 2 ? 'bg-white' : 'bg-zete-light-gray-300'}`}
                         >
                             <span className='relative bottom-1px'>
-                                {tableArr.memos.filter(memo => memo.important === true).length}
+                                {tableData.memos.filter(memo => memo.important === true).length}
                             </span>
                         </div>
                     </Link>
@@ -78,18 +79,10 @@ export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
 }
 
 export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
-    const { matchData, cate, tableArr } = props;
+    const { matchData, cate, tableData } = props;
     const { setSearchParams, tagStr, cateStr } = useHandleQueryStr();
 
     const [isOpen, setIsOpen] = useState(false);
-
-    const currentTags = useMemo(() => {
-        const cateTags = tableArr.cateTags.filter(cateTags => cateTags.cateId === cate.cateId);
-
-        return tableArr.tags
-            .filter(tags =>  cateTags.some(cateTags => cateTags.tagId === tags.tagId))
-            .map(tags =>  tags.tagName);
-    },[matchData])
 
     const tagParamsHandler = (tagName: string) => {
         setSearchParams((prev) => {
@@ -98,11 +91,22 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
         });
     }
 
+    const currentTags = useMemo(() => {
+        const findTags = tableData.tags
+            .filter(tags => tags.cateId === cate.cateId)
+            .map(tags => tags.tagName);
+        const setTags = new Set(...findTags);
+
+        return Array.from(setTags)
+    },[matchData])
+
     useEffect(() => {
         if (cateStr === cate.cateName) {
             setIsOpen(true);
         } else { setIsOpen(false) }
     },[cateStr])
+
+    console.log('호ㅇ오오오오잇',currentTags)
 
     return (
         <div
@@ -126,10 +130,9 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
                     <div
                         className={`rounded-full text-zete-dark-100 py-2px px-8px text-12 font-medium
                         ${isOpen ? 'bg-white' : 'group-hover:bg-white bg-zete-light-gray-300'}`}
-                        onClick={() => console.log(matchData)}
                     >
                         <span className='relative bottom-1px'>
-                            {matchData?.length}
+                            {tableData.memos.filter(memos => memos.cateId === cate.cateId).length}
                         </span>
                     </div>
                 </button>

@@ -11,10 +11,10 @@ import {
   CreateCateDto,
   CreateCateOutputDto,
   UpdateManyCateInputDto,
-  UpdateOneCateInputDto,
+  CateInputDto,
+  CateIdInputDto,
 } from './dtos/cate.dto';
 import { SendContentDataOutputDto } from './dtos/sendContentData.dto';
-import { raw } from 'express';
 
 @Injectable()
 export class MemoService {
@@ -31,6 +31,7 @@ export class MemoService {
 
   async sendContentData(user: User): Promise<SendContentDataOutputDto> {
     try {
+      console.log(user);
       const cate = await this.categoriesRepository
         .createQueryBuilder('categories')
         .where('categories.userId = :userId', { userId: user.id })
@@ -38,17 +39,20 @@ export class MemoService {
 
       const tags = await this.tagsRepository
         .createQueryBuilder('tags')
-        .where('categories.userId = :userId', { userId: user.id })
+        .where('tags.userId = :userId', { userId: user.id })
         .getMany();
 
       const memos = await this.memoRepository
         .createQueryBuilder('memos')
-        .where('categories.userId = :userId', { userId: user.id })
+        .where('memos.userId = :userId', { userId: user.id })
         .getMany();
 
       return { success: true, cate, tags, memos };
     } catch (e) {
-      return { success: false, error: '데이터를 받아오지 못했습니다.' };
+      return {
+        success: false,
+        error: `데이터를 받아오지 못했습니다. error: ${e}`,
+      };
     }
   }
 
@@ -57,7 +61,9 @@ export class MemoService {
     user: User,
   ): Promise<CreateCateOutputDto> {
     try {
-      if (input.cateName === '') return { success: false };
+      if (input.cateName === '') {
+        return { success: false, error: '카테고리명을 입력해주세요' };
+      }
 
       //중복 검증
       const exists = await this.categoriesRepository.findOne({
@@ -67,12 +73,11 @@ export class MemoService {
       if (exists) {
         return {
           success: false,
-          target: 'cate',
           error: `중복된 카테고리입니다.`,
         };
       }
 
-      await this.categoriesRepository.save(
+      const saveCate = await this.categoriesRepository.save(
         this.categoriesRepository.create({ cateName: input.cateName, user }),
       );
 
@@ -81,30 +86,38 @@ export class MemoService {
         .where('categories.userId = :userId', { userId: user.id }) //조회조건
         .getMany(); //해당 조건 모든데이터 반환
 
-      return { success: true, cate };
+      return {
+        success: true,
+        message: '새 카테고리가 생성되었습니다',
+        savedCate: { cateName: saveCate.cateName, cateId: saveCate.id },
+      };
     } catch (e) {
-      return { success: false, error: e };
+      return { success: false, error: `${e}` };
     }
   }
 
-  async updateOneCate(input: UpdateOneCateInputDto): Promise<CoreOutput> {
+  async updateOneCate(input: CateInputDto): Promise<CoreOutput> {
     try {
       // 프론트에서도 빈문자열 필터링++
       if (input.cateName === '') {
-        return { success: true, message: '공백은 추가할 수 없습니다.' };
+        return {
+          success: false,
+          error: '비어있는 카테고리를 삭제하거나 수정할 이름을 입력하세요.',
+        };
       }
-      // where조건엔 맞지만 andWhere조건이 맞지않는경우 false값 반환
-      const nonChange = await this.categoriesRepository
+      // where조건엔 맞지만 andWhere조건이 맞지않는경우 false
+      const existName = await this.categoriesRepository
         .createQueryBuilder('categories')
-        .where('categories.id = :cateId', { cateId: input.cateId })
+        .where('categories.id != :cateId', { cateId: input.cateId })
         .andWhere('categories.cateName = :cateName', {
           cateName: input.cateName,
-        });
+        })
+        .getOne();
 
-      if (nonChange) {
+      if (existName) {
         return {
-          success: true,
-          message: '변경사항 없음',
+          success: false,
+          error: '중복된 카테고리가 존재합니다ㅇㅇ',
         };
       }
 
@@ -114,7 +127,7 @@ export class MemoService {
 
       return { success: true, message: 'cate 업데이트완료' };
     } catch (e) {
-      return { success: false, error: e };
+      return { success: false, error: `${e}` };
     }
   }
 
@@ -123,29 +136,30 @@ export class MemoService {
       console.log(input);
       console.log('스탭1');
       // 프론트에서도 빈문자열 필터링++
-      // const empty = input.cate.filter((cate) => cate.cateName === '');
-      console.log('스탭2');
-      // if (empty.length !== 0) {
-      //   return {
-      //     success: false,
-      //     error: '카테고리에 빈문자열은 추가할 수 없습니다.',
-      //   };
-      // }
-      //
-      // input[0].map(async (cate) => {
-      //   const exist = await this.categoriesRepository
-      //     .createQueryBuilder('categories')
-      //     .where('categories.id = :cateId', { cateId: cate.cateId })
-      //     .andWhere('categories.cateName = :cateName', {
-      //       cateName: cate.cateName,
-      //     });
-      //
-      //   if (exist) return;
-      //
-      //   return this.categoriesRepository.update(cate.cateId, {
-      //     cateName: cate.cateName,
-      //   });
-      // });
+      const empty = input.data.filter((cate) => cate.cateName === '');
+
+      if (empty.length !== 0) {
+        return {
+          success: false,
+          error: '카테고리에 빈문자열은 추가할 수 없습니다.',
+        };
+      }
+
+      input.data.map(async (cate) => {
+        const exist = await this.categoriesRepository
+          .createQueryBuilder('categories')
+          .where('categories.id = :cateId', { cateId: cate.cateId })
+          .andWhere('categories.cateName = :cateName', {
+            cateName: cate.cateName,
+          })
+          .getOne();
+
+        if (exist) return;
+
+        return this.categoriesRepository.update(cate.cateId, {
+          cateName: cate.cateName,
+        });
+      });
 
       return { success: true, message: 'cate 업데이트완료' };
     } catch (e) {
@@ -153,32 +167,45 @@ export class MemoService {
     }
   }
 
+  async deleteCate(input: CateIdInputDto): Promise<CoreOutput> {
+    try {
+      await this.categoriesRepository.delete(input.cateId);
+      return { success: true, message: '해당 카테고리가 삭제되었습니다.' };
+    } catch (e) {
+      return { success: false, error: `${e}` };
+    }
+  }
+
   async createMemo(input: CreateMemoInputDto, user: User): Promise<CoreOutput> {
     try {
-      await this.memoRepository.save(
+      const saveMemo = await this.memoRepository.save(
         this.memoRepository.create({
           title: input.title,
           content: input.content,
           important: input.important,
-          cate: { id: 1 },
+          cate: { id: input.cateId },
           user,
         }),
       );
 
       if (input.tags.length !== 0) {
-        await Promise.all(
-          input.tags.map((tag) => {
-            this.tagsRepository.save(
-              this.tagsRepository.create({ tagName: tag, user }),
-            );
-          }),
-        );
+        input.tags.map((tag) => {
+          this.tagsRepository.save(
+            this.tagsRepository.create({
+              tagName: tag,
+              user,
+              memos: { id: saveMemo.id },
+              cate: { id: input.cateId },
+            }),
+          );
+        });
       }
+
       return { success: true };
     } catch (e) {
       return {
         success: false,
-        error: e,
+        error: `${e}`,
       };
     }
   }

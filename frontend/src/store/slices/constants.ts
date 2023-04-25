@@ -1,36 +1,24 @@
 export interface Category {
-    cateId:number|'undefined';
+    cateId:number;
     cateName:string;
 }
 export interface Memo {
+    cateId:number;
     memoId:number;
     title:string;
     content:string;
     important:boolean;
 }
 export interface Tag {
+    memoId:number;
+    cateId:number;
     tagId:number;
     tagName:string;
 }
-export interface MemoTag {
-    memoId:number;
-    tagId:number;
-}
-export interface CateTag {
-    cateId:number|'undefined';
-    tagId:number;
-}
-export interface CateMemo {
-    cateId:number|'undefined';
-    memoId:number;
-}
-export interface TableArr {
+export interface TableData {
     categories: Category[];
     memos: Memo[];
     tags: Tag[];
-    memoTags: MemoTag[];  // joinData
-    cateMemos: CateMemo[];  // joinData
-    cateTags: CateTag[];  // joinData
 }
 export interface Memos {
     memoId: number;
@@ -41,12 +29,11 @@ export interface Memos {
 }
 
 export interface Data {
-    cateId?: number|'undefined';
-    cateName?: string;
+    cateId?: number;
     memos?: Memos[];
 }
 export interface addMemoPayload {
-    categoryId: number|'undefined';
+    categoryId: number;
     title: string;
     content: string;
     important: boolean;
@@ -54,24 +41,21 @@ export interface addMemoPayload {
 }
 export interface ModifyMemoPayload {
     memoId: number;
-    categoryId: number|'undefined';
+    categoryId: number;
     title: string;
     content: string;
     important: boolean;
     tagNames: string[];
 }
 export interface MemoData {
-    tableArr: TableArr,
+    tableData: TableData,
     data: Data[],
 }
-export const initState:MemoData = {
-    tableArr: {
+export const memoSliceInitState:MemoData = {
+    tableData: {
         categories: [],
         memos: [],
         tags: [],
-        memoTags: [],
-        cateMemos: [],
-        cateTags: [],
     },
     data: [],
 }

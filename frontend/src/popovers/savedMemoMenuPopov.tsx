@@ -1,8 +1,8 @@
 import {Dialog, Popover, Transition} from "@headlessui/react";
 import React, {Fragment, useRef, useState} from "react";
 import {DeleteIcon, EditIcon, ThreeDotMenuIcon} from "../components/vectors";
-import {DELETE_MEMO} from "../store/slices/memo.slice";
-import {setData} from "../utile";
+// import {DELETE_MEMO} from "../store/slices/memo.slice";
+// import {setData} from "../utile";
 import {useDispatch} from "react-redux";
 
 export const SavedMemoMenuPopov = ({ memoId }: { memoId: number }) => {
@@ -20,8 +20,8 @@ export const SavedMemoMenuPopov = ({ memoId }: { memoId: number }) => {
     const deleteMemo = (event) => {
         event.stopPropagation();
         setDelAgree(true);
-        dispatch(DELETE_MEMO(memoId));
-        setData();
+        // dispatch(DELETE_MEMO(memoId));
+        // setData();
     }
 
     return (

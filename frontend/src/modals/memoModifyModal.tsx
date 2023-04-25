@@ -10,11 +10,10 @@ import {
     StarIcon,
     StickerMemoIcon
 } from "../components/vectors";
-import {handleInputChange, handleResizeHeight, setData, uniqueKey} from "../utile";
+import {handleInputChange, handleResizeHeight, uniqueKey} from "../utile";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../store";
 import {useHorizontalScroll} from "../hooks/useHorizontalScroll";
-import {UPDATE_MEMO} from "../store/slices/memo.slice";
 
 export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
@@ -23,7 +22,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const tagsRef = useRef([]);
 
     const { searchParams, setSearchParams } = useHandleQueryStr();
-    const { data, tableArr } = useSelector((state:RootState) => state.memo);
+    const { data } = useSelector((state:RootState) => state.memo);
     const { cateStr, tagStr, menuStr } = useHandleQueryStr();
 
     const dispatch = useDispatch();
@@ -88,8 +87,8 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             memoId,
         }
 
-        dispatch(UPDATE_MEMO(newData));
-        setData();
+        // dispatch(UPDATE_MEMO(newData));
+        // setData();
     }
 
     const addTags = (e: React.FormEvent<HTMLFormElement>) => {
@@ -114,9 +113,9 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             setSelectedCateId('undefined');
             return
         }
-        const selectedCate = tableArr.categories.filter(cate => cate.cateName === event.target.value);
-        setSelectedCateId(selectedCate[0].cateId);
-        setSelectedCateName(selectedCate[0].cateName);
+        // const selectedCate = tableData.categories.filter(cate => cate.cateName === event.target.value);
+        // setSelectedCateId(selectedCate[0].cateId);
+        // setSelectedCateName(selectedCate[0].cateName);
     }
 
     useEffect(() => {
@@ -127,11 +126,11 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         else setIsImportant(false);
 
         if (cateStr) {
-            const defaultSelectedCate = tableArr.categories.filter(cate => cate.cateName === cateStr)[0];
-            if (defaultSelectedCate) {
-                newSelectedCateId = defaultSelectedCate.cateId;
-                newSelectedCateName = defaultSelectedCate.cateName;
-            }
+            // const defaultSelectedCate = tableData.categories.filter(cate => cate.cateName === cateStr)[0];
+            // if (defaultSelectedCate) {
+            //     newSelectedCateId = defaultSelectedCate.cateId;
+            //     newSelectedCateName = defaultSelectedCate.cateName;
+            // }
         }
 
         if ((!cateStr && !menuStr) || menuStr) {
@@ -150,17 +149,17 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             setIsShow(false);
         }
 
-        if (tableArr?.cateMemos) {
-            const cateMemo = tableArr.cateMemos.find(cateMemo => cateMemo.memoId === memoId);
-            if (cateMemo) {
-                const currentData = data?.map(data => data.memos).flat().filter(data => data.memoId === memoId);
-                const currentMemoVal = currentData[0]?.content.replace(/<br\/>/g, '\n');
-                setMemoValue(currentMemoVal);
-                setTitleValue(currentData[0].title);
-                setIsImportant(currentData[0].important);
-                setTagNames(currentData[0].tags.map(tag => tag.tagName))
-            }
-        }
+        // if (tableData?.cateMemos) {
+        //     const cateMemo = tableData.cateMemos.find(cateMemo => cateMemo.memoId === memoId);
+        //     if (cateMemo) {
+        //         const currentData = data?.map(data => data.memos).flat().filter(data => data.memoId === memoId);
+        //         const currentMemoVal = currentData[0]?.content.replace(/<br\/>/g, '\n');
+        //         setMemoValue(currentMemoVal);
+        //         setTitleValue(currentData[0].title);
+        //         setIsImportant(currentData[0].important);
+        //         setTagNames(currentData[0].tags.map(tag => tag.tagName))
+        //     }
+        // }
 
     }, [searchParams])
 
@@ -280,13 +279,13 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                     >
                                                         <option>전체메모</option>
                                                         {
-                                                            tableArr.categories.map((cate, idx) => {
-                                                                return (
-                                                                    <option key={uniqueKey() + idx}>
-                                                                        {cate.cateName}
-                                                                    </option>
-                                                                )
-                                                            })
+                                                            // tableData.categories.map((cate, idx) => {
+                                                            //     return (
+                                                            //         <option key={uniqueKey() + idx}>
+                                                            //             {cate.cateName}
+                                                            //         </option>
+                                                            //     )
+                                                            // })
                                                         }
                                                     </select>
                                                     <form

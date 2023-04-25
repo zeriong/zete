@@ -4,7 +4,6 @@ import { Tags } from './tags.entity';
 import { User } from './user.entity';
 import { coreEntity } from '../common/entities/core.entity';
 import { Categories } from './categories.entity';
-import { JoinColumn } from "typeorm/browser";
 
 @Entity({ name: 'memos' })
 export class Memos extends coreEntity {
@@ -24,11 +23,11 @@ export class Memos extends coreEntity {
   @ManyToOne(() => User, (user) => user.memos)
   user: User;
 
-  @ApiProperty({ type: Promise<Categories> })
+  @ApiProperty({ nullable: true, type: Promise<Categories> })
   @ManyToOne(() => Categories, (cate) => cate.memos)
   cate: Categories;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({ nullable: true, type: Number })
   @RelationId((memo: Memos) => memo.cate)
   cateId: number;
 

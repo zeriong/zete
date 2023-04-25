@@ -202,7 +202,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateOneCateInputDto"
+              $ref: "#/components/schemas/CateInputDto"
       responses:
         default:
           description: ""
@@ -222,6 +222,25 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UpdateManyCateInputDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - Memo
+  /memo:
+    delete:
+      operationId: deleteCate
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CateIdInputDto"
       responses:
         default:
           description: ""
@@ -320,9 +339,12 @@ components:
         user:
           $ref: "#/components/schemas/Promise"
         cate:
-          $ref: "#/components/schemas/Promise"
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/Promise"
         cateId:
           type: number
+          nullable: true
         tags:
           $ref: "#/components/schemas/Tags"
       required:
@@ -489,6 +511,9 @@ components:
     CreateMemoInputDto:
       type: object
       properties:
+        cateId:
+          type: number
+          nullable: true
         title:
           type: string
         content:
@@ -496,8 +521,11 @@ components:
         important:
           type: boolean
         tags:
-          type: string
+          type: array
+          items:
+            type: string
       required:
+        - cateId
         - title
         - content
         - important
@@ -507,6 +535,16 @@ components:
         cateName:
           type: string
       required:
+        - cateName
+    CateInputDto:
+      type: object
+      properties:
+        cateId:
+          type: number
+        cateName:
+          type: string
+      required:
+        - cateId
         - cateName
     CreateCateOutputDto:
       type: object
@@ -521,8 +559,11 @@ components:
           type: boolean
         cate:
           $ref: "#/components/schemas/Categories"
+        savedCate:
+          $ref: "#/components/schemas/CateInputDto"
       required:
         - success
+        - savedCate
     SendContentDataOutputDto:
       type: object
       properties:
@@ -542,35 +583,23 @@ components:
           $ref: "#/components/schemas/Tags"
       required:
         - success
-    UpdateOneCateInputDto:
-      type: object
-      properties:
-        cateName:
-          type: string
-        cateId:
-          type: number
-      required:
-        - cateName
-        - cateId
-    IUpdateManyCateInput:
-      type: object
-      properties:
-        cateId:
-          type: number
-        cateName:
-          type: string
-      required:
-        - cateId
-        - cateName
     UpdateManyCateInputDto:
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/IUpdateManyCateInput"
+            $ref: "#/components/schemas/CateInputDto"
       required:
         - data
+    CateIdInputDto:
+      type: object
+      properties:
+        cateId:
+          type: number
+          nullable: true
+      required:
+        - cateId
     CreateCompletionInputObj:
       type: object
       properties:

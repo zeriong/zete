@@ -12,7 +12,7 @@ export const Aside = () => {
     const { alerts } = useSelector((state: RootState) => state.alert);
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
 
-    const { data, tableArr } = useSelector((state: RootState) => state.memo);
+    const { data, tableData } = useSelector((state: RootState) => state.memo);
 
     useEffect(() => {
         const handleResize = () => {
@@ -45,21 +45,21 @@ export const Aside = () => {
                 <CustomScroller>
                     <div className="flex flex-col h-full w-full min-h-[600px] p-14px text-zete-dark-500 font-light text-14">
                         <>
-                            <MainMemoList tableArr={tableArr}/>
+                            <MainMemoList tableData={tableData}/>
                         </>
                         <p className='text-zete-dark-300 text-11 font-light pb-14px pt-17px pl-12px'>
                             카테고리
                         </p>
                         <ul className='grid gap-4px'>
                             {
-                                data && tableArr &&
-                                tableArr.categories.map((cate, idx) => {
-                                    const matchData = data.filter(data => data.cateId === cate.cateId);
+                                data && tableData &&
+                                tableData.categories.map((cate, idx) => {
+                                    const matchData = data.filter(data => data[0].cateId === cate.cateId);
                                     return (
                                         <CategoryList
                                             key={idx}
                                             matchData={matchData}
-                                            tableArr={tableArr}
+                                            tableData={tableData}
                                             cate={cate}
                                         />
                                     )

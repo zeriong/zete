@@ -1,9 +1,8 @@
 import {CheckIcon, CloseIcon, FillStarIcon, PlusIcon, SearchIcon, StarIcon, StickerMemoIcon} from "../vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
-import {handleInputChange, handleResizeHeight, setData, uniqueKey} from "../../utile";
+import {handleInputChange, handleResizeHeight, uniqueKey} from "../../utile";
 import {useDispatch, useSelector} from "react-redux";
-import {ADD_MEMO} from "../../store/slices/memo.slice";
 import {RootState} from "../../store";
 import {useHorizontalScroll} from "../../hooks/useHorizontalScroll";
 
@@ -14,7 +13,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const tagsRef = useRef([]);
 
     const { cateStr, tagStr, menuStr } = useHandleQueryStr();
-    const { tableArr } = useSelector((state:RootState) => state.memo)
+    // const { tableData } = useSelector((state:RootState) => state.memo)
 
     const dispatch = useDispatch();
     const horizonScroll = useHorizontalScroll();
@@ -75,8 +74,8 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
             tagNames, // 키와 키값이 같으므로 tags: tags, => tags,
         }
 
-        dispatch(ADD_MEMO(newData));
-        setData();
+        // dispatch(ADD_MEMO(newData));
+        // setData();
         setMemoValue('');
         setTitleValue('');
 
@@ -101,9 +100,9 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
             setSelectedCateId('undefined');
             return
         }
-        const selectedCate = tableArr.categories.filter(cate => cate.cateName === event.target.value);
-        setSelectedCateId(selectedCate[0].cateId);
-        setSelectedCateName(selectedCate[0].cateName);
+        // const selectedCate = tableData.categories.filter(cate => cate.cateName === event.target.value);
+        // setSelectedCateId(selectedCate[0].cateId);
+        // setSelectedCateName(selectedCate[0].cateName);
     }
 
     const deleteTag = (name) => {
@@ -127,11 +126,11 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         else setIsImportant(false);
 
         if (cateStr) {
-            const defaultSelectedCate = tableArr.categories.filter(cate => cate.cateName === cateStr)[0];
-            if (defaultSelectedCate) {
-                newSelectedCateId = defaultSelectedCate.cateId;
-                newSelectedCateName = defaultSelectedCate.cateName;
-            }
+            // const defaultSelectedCate = tableData.categories.filter(cate => cate.cateName === cateStr)[0];
+            // if (defaultSelectedCate) {
+            //     newSelectedCateId = defaultSelectedCate.cateId;
+            //     newSelectedCateName = defaultSelectedCate.cateName;
+            // }
         }
 
         if ((!cateStr && !menuStr) || menuStr) {
@@ -215,13 +214,13 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                             >
                                 <option>전체메모</option>
                                 {
-                                    tableArr.categories.map((cate, idx) => {
-                                        return (
-                                            <option key={uniqueKey() + idx}>
-                                                {cate.cateName}
-                                            </option>
-                                        )
-                                    })
+                                    // tableData.categories.map((cate, idx) => {
+                                    //     return (
+                                    //         <option key={uniqueKey() + idx}>
+                                    //             {cate.cateName}
+                                    //         </option>
+                                    //     )
+                                    // })
                                 }
                             </select>
                             <form
