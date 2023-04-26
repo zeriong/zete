@@ -95,18 +95,15 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
         const findTags = tableData.tags
             .filter(tags => tags.cateId === cate.cateId)
             .map(tags => tags.tagName);
-        const setTags = new Set(...findTags);
 
-        return Array.from(setTags)
-    },[matchData])
+        return findTags.filter((value, index) => findTags.indexOf(value) === index);
+    },[matchData, tableData])
 
     useEffect(() => {
         if (cateStr === cate.cateName) {
             setIsOpen(true);
         } else { setIsOpen(false) }
     },[cateStr])
-
-    console.log('호ㅇ오오오오잇',currentTags)
 
     return (
         <div
@@ -119,10 +116,10 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
                     className='flex w-full justify-between items-center p-10px hover:bg-zete-light-gray-200 rounded-[5px]'
                     onClick={() => setSearchParams({ cate: cate.cateName })}
                 >
-                    <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
-                        <>
-                            <CategoryIcon className='mr-10px'/>
-                        </>
+                    <div className='flex justify-start w-full font-light transition-all duration-150'>
+                        <div className='flex items-start h-full'>
+                            <CategoryIcon className='mr-10px mt-4px min-w-[21px]'/>
+                        </div>
                         <span>
                             {cate.cateName}
                         </span>

@@ -33,11 +33,12 @@ export interface Data {
     memos?: Memos[];
 }
 export interface addMemoPayload {
-    categoryId: number;
+    memoId?: number;
+    cateId?: number;
     title: string;
     content: string;
     important: boolean;
-    tagNames: string[];
+    tags: Tag[];
 }
 export interface ModifyMemoPayload {
     memoId: number;

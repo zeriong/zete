@@ -12,14 +12,14 @@ export class Categories extends coreEntity {
   cateName: string;
 
   @ApiProperty({ type: Promise<User> })
-  @ManyToOne(() => User, (user) => user.cate)
+  @ManyToOne(() => User, (user) => user.cate, { onDelete: 'CASCADE' })
   user: User;
 
   @ApiProperty({ type: Memos })
-  @OneToMany(() => Memos, (memos) => memos.cate)
+  @OneToMany(() => Memos, (memos) => memos.cate, { cascade: true })
   memos: Memos[];
 
   @ApiProperty({ type: Tags })
-  @OneToMany(() => Tags, (tags) => tags.cate)
+  @OneToMany(() => Tags, (tags) => tags.cate, { cascade: true })
   tags: Tags[];
 }

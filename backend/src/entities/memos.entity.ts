@@ -20,11 +20,11 @@ export class Memos extends coreEntity {
   important: boolean;
 
   @ApiProperty({ type: Promise<User> })
-  @ManyToOne(() => User, (user) => user.memos)
+  @ManyToOne(() => User, (user) => user.memos, { onDelete: 'CASCADE' })
   user: User;
 
   @ApiProperty({ nullable: true, type: Promise<Categories> })
-  @ManyToOne(() => Categories, (cate) => cate.memos)
+  @ManyToOne(() => Categories, (cate) => cate.memos, { onDelete: 'CASCADE' })
   cate: Categories;
 
   @ApiProperty({ nullable: true, type: Number })

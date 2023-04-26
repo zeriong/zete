@@ -12,11 +12,11 @@ export class Tags extends coreEntity {
   tagName: string;
 
   @ApiProperty({ type: Promise<User> })
-  @ManyToOne(() => User, (user) => user.tags)
+  @ManyToOne(() => User, (user) => user.tags, { onDelete: 'CASCADE' })
   user: User;
 
   @ApiProperty({ type: Promise<Memos> })
-  @ManyToOne(() => Memos, (memo) => memo.tags)
+  @ManyToOne(() => Memos, (memo) => memo.tags, { onDelete: 'CASCADE' })
   memos: Memos;
 
   @ApiProperty({ type: Number })
@@ -24,7 +24,7 @@ export class Tags extends coreEntity {
   memoId: number;
 
   @ApiProperty({ type: Promise<Categories> })
-  @ManyToOne(() => Categories, (cate) => cate.tags)
+  @ManyToOne(() => Categories, (cate) => cate.tags, { onDelete: 'CASCADE' })
   cate: Categories;
 
   @ApiProperty({ type: Number })

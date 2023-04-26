@@ -16,7 +16,7 @@ export class CateInputDto {
   cateName: string;
 }
 
-export class CreateCateDto {
+export class CreateCateInputDto {
   @ApiProperty()
   @Validator.MaxLength(255, {
     message: '카테고리 제목은 최대 255자 까지 가능합니다.',
@@ -33,16 +33,14 @@ export class CateIdInputDto {
 
 export class CreateCateOutputDto extends CoreOutput {
   @ApiProperty({ type: Categories, required: false })
-  @Validator.IsArray()
   cate?: Categories[];
 
   @ApiProperty({ type: CateInputDto })
-  @Validator.IsOptional()
   savedCate?: CateInputDto;
 }
 
 export class UpdateManyCateInputDto {
   @ApiProperty({ type: [CateInputDto] })
-  @Validator.IsArray()
+  @Validator.IsArray({ message: '잘못된 형식입니다.' })
   data: Array<CateInputDto>;
 }

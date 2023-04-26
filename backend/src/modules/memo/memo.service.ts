@@ -4,11 +4,15 @@ import { Repository } from 'typeorm';
 import { Categories } from '../../entities/categories.entity';
 import { Tags } from '../../entities/tags.entity';
 import { Memos } from '../../entities/memos.entity';
-import { CreateMemoInputDto } from './dtos/memo.dto';
+import {
+  CreateMemoInputDto,
+  CreateMemoOutDto,
+  MemoIdInputDto,
+} from './dtos/memo.dto';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
 import { User } from '../../entities/user.entity';
 import {
-  CreateCateDto,
+  CreateCateInputDto,
   CreateCateOutputDto,
   UpdateManyCateInputDto,
   CateInputDto,
@@ -57,12 +61,12 @@ export class MemoService {
   }
 
   async createCate(
-    input: CreateCateDto,
+    input: CreateCateInputDto,
     user: User,
   ): Promise<CreateCateOutputDto> {
     try {
       if (input.cateName === '') {
-        return { success: false, error: '카테고리명을 입력해주세요' };
+        return { success: true };
       }
 
       //중복 검증
@@ -82,7 +86,7 @@ export class MemoService {
       );
 
       const cate = await this.categoriesRepository
-        .createQueryBuilder('categories') //이 후에 SQL쿼리언어처럼 DB에서 데이터조회 가능
+        .createQueryBuilder('categories') //이 후에 SQL 쿼리로 데이터조회 가능
         .where('categories.userId = :userId', { userId: user.id }) //조회조건
         .getMany(); //해당 조건 모든데이터 반환
 
@@ -133,15 +137,13 @@ export class MemoService {
 
   async updateManyCate(input: UpdateManyCateInputDto): Promise<CoreOutput> {
     try {
-      console.log(input);
-      console.log('스탭1');
       // 프론트에서도 빈문자열 필터링++
       const empty = input.data.filter((cate) => cate.cateName === '');
 
       if (empty.length !== 0) {
         return {
           success: false,
-          error: '카테고리에 빈문자열은 추가할 수 없습니다.',
+          error: '비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.',
         };
       }
 
@@ -176,7 +178,10 @@ export class MemoService {
     }
   }
 
-  async createMemo(input: CreateMemoInputDto, user: User): Promise<CoreOutput> {
+  async createMemo(
+    input: CreateMemoInputDto,
+    user: User,
+  ): Promise<CreateMemoOutDto> {
     try {
       const saveMemo = await this.memoRepository.save(
         this.memoRepository.create({
@@ -188,20 +193,41 @@ export class MemoService {
         }),
       );
 
-      if (input.tags.length !== 0) {
-        input.tags.map((tag) => {
-          this.tagsRepository.save(
-            this.tagsRepository.create({
-              tagName: tag,
-              user,
-              memos: { id: saveMemo.id },
-              cate: { id: input.cateId },
-            }),
-          );
-        });
-      }
+      let newTags = [];
 
-      return { success: true };
+      if (input.tags.length !== 0) {
+        newTags = await Promise.all(
+          input.tags.map(async (tag) => {
+            return await this.tagsRepository.save(
+              this.tagsRepository.create({
+                tagName: tag,
+                user,
+                memos: { id: saveMemo.id },
+                cate: { id: input.cateId },
+              }),
+            );
+          }),
+        );
+      }
+      return { success: true, newMemoId: saveMemo.id, newTags };
+    } catch (e) {
+      return {
+        success: false,
+        error: `${e}`,
+      };
+    }
+  }
+  async changeImportant(input: MemoIdInputDto): Promise<CoreOutput> {
+    try {
+      const targetMemo = await this.memoRepository.findOneOrFail({
+        where: { id: input.memoId },
+      });
+
+      targetMemo.important = !targetMemo.important;
+
+      await this.memoRepository.save(targetMemo);
+
+      return { success: true, message: 'changed important' };
     } catch (e) {
       return {
         success: false,

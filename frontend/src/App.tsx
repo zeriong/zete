@@ -37,7 +37,7 @@ function App() {
                             title: memos.title,
                             content: memos.content,
                             cateId: memos.cateId,
-                            important: Boolean(memos.important),
+                            important: Boolean(JSON.parse(memos.important)),
                         }}),
                 }
                 dispatch(SET_TABLE_DATA(table));
@@ -48,19 +48,10 @@ function App() {
 
     return (
         <>
-            {loading? <div className="flex h-full items-center justify-center">로딩중...</div>: <>
+            {loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>
+            ) : (
                 <Index/>
-                <button
-                    type='button'
-                    className='fixed p-30px top-[20%] left-[20%] bg-black text-white z-50'
-                    onClick={() => {
-                        console.log(tableData)
-                        console.log(data)
-                    }}
-                >
-                    test
-                </button>
-            </>}
+            )}
         </>
     );
 }

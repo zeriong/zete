@@ -4,7 +4,7 @@ import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from "../compone
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../store";
 import CustomScroller from "../components/customScroller";
-import {ADD_CATE, UPDATE_ONE_CATE} from "../store/slices/memo.slice";
+import {ADD_CATE, DELETE_CATE, UPDATE_MANY_CATE, UPDATE_ONE_CATE} from "../store/slices/memo.slice";
 import {setData} from "../utile";
 import {Api} from "../utile/api";
 import {Category} from "../store/slices/constants";
@@ -19,8 +19,9 @@ export const CateModifyModal = () => {
     const [isShow, setIsShow] = useState(false);
     const [newCateListNames, setNewCateListNames] = useState<string[]>(categories.map(cate => cate.cateName));
     const [newCateList, setNewCateList] = useState<Category[]>(categories);
-    const [addCateValue, setAddCateValue] = useState('');
-    const [isAgreeShow, setIsAgreeShow] = useState(false);
+    const [addCateValue, setAddCateValue] = useState<string>('');
+    const [isAgreeShow, setIsAgreeShow] = useState<boolean>(false);
+    const [getCateId, setGetCateId] = useState<number>(0);
 
     const dispatch = useDispatch();
 
@@ -42,15 +43,22 @@ export const CateModifyModal = () => {
             .catch(e => console.log(e))
     }
 
-    // const handleDelete = () => {
-    //     setIsAgreeShow(false);
-    //     deleteCate(getCateId);
-    // }
+    const handleDelete = () => {
+        Api().memo.deleteCate({ cateId: getCateId })
+            .then((res) => {
+                if (res.data.success) {
+                    setIsAgreeShow(false);
+                    deleteCate(getCateId);
+                } else {
+                    alert(res.data.error);
+                }})
+            .catch(e => console.log(e))
+    }
 
-    // const deleteCate = (cateId: number|'undefined') => {
-    //     dispatch(DELETE_CATE(cateId));
-    //     setData();
-    // }
+    const deleteCate = (cateId: number) => {
+        dispatch(DELETE_CATE(cateId));
+        setData();
+    }
 
     const handleUpdateName = (idx, event) => {
         const newNames = [...newCateListNames];
@@ -58,13 +66,21 @@ export const CateModifyModal = () => {
         setNewCateListNames(newNames);
     }
 
-    const updateCate = () => {
-        // if (newCateListNames.some(name => name === '')) return alert('비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.');
-        // if (newCateListNames.length !== new Set(newCateListNames).size) return alert('중복된 카테고리가 존재합니다.')
-        //
-        // setIsShow(false);
-        // dispatch(UPDATE_CATE(newCateList));
-        //     setData();
+    const updateManyCate = () => {
+        if (newCateListNames.some(name => name === '')) return alert('비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.');
+        if (newCateListNames.length !== new Set(newCateListNames).size) return alert('중복된 카테고리가 존재합니다.')
+        console.log('뉴케이트리스트',newCateList)
+        Api().memo.updateManyCate({data: newCateList})
+            .then((res) => {
+                if (res.data.success) {
+                    setIsShow(false);
+                    dispatch(UPDATE_MANY_CATE(newCateList));
+                    setData();
+                } else {
+                    alert(res.data.error)
+                }})
+            .catch(e => console.log(e))
+
         }
 
         const updateOneCate = (target: {cateId:number, val:string, event: React.FormEvent<HTMLFormElement>}) => {
@@ -122,7 +138,7 @@ export const CateModifyModal = () => {
                     className="relative z-30"
                     onClose={() => {
                         setAddCateValue('');
-                        updateCate();
+                        updateManyCate();
                     }}
                 >
                     <Transition.Child
@@ -203,6 +219,7 @@ export const CateModifyModal = () => {
                                                                             type='button'
                                                                             className='relative group p-6px rounded-full hover:bg-zete-light-gray-200 -right-2px'
                                                                             onClick={() => {
+                                                                                setGetCateId(cateId)
                                                                                 setIsAgreeShow(true);
                                                                             }}
                                                                         >
@@ -221,11 +238,11 @@ export const CateModifyModal = () => {
                                         className="w-full flex justify-end p-1 py-16px pr-14px border-t border-zete-memo-border">
                                         <button
                                             type='button'
-                                            // onClick={(e) => {
-                                            //     if (categories.some(cate => cate.cateName === addCateValue)) return alert('새 카테고리 이름이 기존 카테고리 이름과 중복됩니다.')
-                                            //     addCate(e);
-                                            //     updateCate();
-                                            // }}
+                                            onClick={(e) => {
+                                                if (categories.some(cate => cate.cateName === addCateValue)) return alert('새 카테고리 이름이 기존 카테고리 이름과 중복됩니다.')
+                                                addCate(e);
+                                                updateManyCate();
+                                            }}
                                             className='text-15 font-normal text-zete-dark-500 py-8px px-22px hover:bg-zete-light-gray-200 rounded-[4px]'
                                         >
                                             완료
@@ -294,7 +311,7 @@ export const CateModifyModal = () => {
                                         <button
                                             ref={deleteButtonRef}
                                             type='button'
-                                            // onClick={handleDelete}
+                                            onClick={handleDelete}
                                             className='text-15 font-normal text-blue-500 py-6px px-20px hover:bg-zete-light-gray-200 rounded-[4px]'
                                         >
                                             삭제

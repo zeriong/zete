@@ -28,11 +28,13 @@ import { CateInputDto } from '../models';
 // @ts-ignore
 import { CoreOutput } from '../models';
 // @ts-ignore
-import { CreateCateDto } from '../models';
+import { CreateCateInputDto } from '../models';
 // @ts-ignore
 import { CreateCateOutputDto } from '../models';
 // @ts-ignore
 import { CreateMemoInputDto } from '../models';
+// @ts-ignore
+import { CreateMemoOutDto } from '../models';
 // @ts-ignore
 import { SendContentDataOutputDto } from '../models';
 // @ts-ignore
@@ -45,13 +47,13 @@ export const MemoApiAxiosParamCreator = function (configuration?: Configuration)
     return {
         /**
          * 
-         * @param {CreateCateDto} createCateDto 
+         * @param {CreateCateInputDto} createCateInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createCate: async (createCateDto: CreateCateDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createCateDto' is not null or undefined
-            assertParamExists('createCate', 'createCateDto', createCateDto)
+        createCate: async (createCateInputDto: CreateCateInputDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createCateInputDto' is not null or undefined
+            assertParamExists('createCate', 'createCateInputDto', createCateInputDto)
             const localVarPath = `/memo/createCate`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -71,7 +73,7 @@ export const MemoApiAxiosParamCreator = function (configuration?: Configuration)
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createCateDto, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(createCateInputDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -259,12 +261,12 @@ export const MemoApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {CreateCateDto} createCateDto 
+         * @param {CreateCateInputDto} createCateInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createCate(createCateDto: CreateCateDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCateOutputDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createCate(createCateDto, options);
+        async createCate(createCateInputDto: CreateCateInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCateOutputDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createCate(createCateInputDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -273,7 +275,7 @@ export const MemoApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createMemo(createMemoInputDto: CreateMemoInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
+        async createMemo(createMemoInputDto: CreateMemoInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateMemoOutDto>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createMemo(createMemoInputDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -328,12 +330,12 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
     return {
         /**
          * 
-         * @param {CreateCateDto} createCateDto 
+         * @param {CreateCateInputDto} createCateInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createCate(createCateDto: CreateCateDto, options?: any): AxiosPromise<CreateCateOutputDto> {
-            return localVarFp.createCate(createCateDto, options).then((request) => request(axios, basePath));
+        createCate(createCateInputDto: CreateCateInputDto, options?: any): AxiosPromise<CreateCateOutputDto> {
+            return localVarFp.createCate(createCateInputDto, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -341,7 +343,7 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMemo(createMemoInputDto: CreateMemoInputDto, options?: any): AxiosPromise<CoreOutput> {
+        createMemo(createMemoInputDto: CreateMemoInputDto, options?: any): AxiosPromise<CreateMemoOutDto> {
             return localVarFp.createMemo(createMemoInputDto, options).then((request) => request(axios, basePath));
         },
         /**
@@ -391,13 +393,13 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
 export class MemoApi extends BaseAPI {
     /**
      * 
-     * @param {CreateCateDto} createCateDto 
+     * @param {CreateCateInputDto} createCateInputDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MemoApi
      */
-    public createCate(createCateDto: CreateCateDto, options?: AxiosRequestConfig) {
-        return MemoApiFp(this.configuration).createCate(createCateDto, options).then((request) => request(this.axios, this.basePath));
+    public createCate(createCateInputDto: CreateCateInputDto, options?: AxiosRequestConfig) {
+        return MemoApiFp(this.configuration).createCate(createCateInputDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

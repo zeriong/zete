@@ -1,10 +1,12 @@
 import {CheckIcon, CloseIcon, FillStarIcon, PlusIcon, SearchIcon, StarIcon, StickerMemoIcon} from "../vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
-import {handleInputChange, handleResizeHeight, uniqueKey} from "../../utile";
+import {handleInputChange, handleResizeHeight, setData, uniqueKey} from "../../utile";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {useHorizontalScroll} from "../../hooks/useHorizontalScroll";
+import {ADD_MEMO} from "../../store/slices/memo.slice";
+import {Api} from "../../utile/api";
 
 export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
@@ -13,7 +15,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const tagsRef = useRef([]);
 
     const { cateStr, tagStr, menuStr } = useHandleQueryStr();
-    // const { tableData } = useSelector((state:RootState) => state.memo)
+    const { tableData } = useSelector((state:RootState) => state.memo)
 
     const dispatch = useDispatch();
     const horizonScroll = useHorizontalScroll();
@@ -23,7 +25,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const [tagValue, setTagValue] = useState<string>('');
     const [isImportant, setIsImportant] = useState<boolean>(false);
     const [tagNames, setTagNames] = useState<string[]>([]);
-    const [selectedCateId, setSelectedCateId] = useState<number|'undefined'>('undefined');
+    const [selectedCateId, setSelectedCateId] = useState<number|null>(null);
     const [selectedCateName, setSelectedCateName] = useState<string>('');
 
     const memoAutoResize = (e) => {
@@ -59,28 +61,51 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const importantHandler = () => setIsImportant(!isImportant);
 
     const addMemo = () => {
-        if (!titleValue && !memoValue) {
-            return alert('제목이나 내용을 입력해주세요.')
-        }
+        if (!titleValue && !memoValue) return alert('제목이나 내용을 입력해주세요.');
 
         const content = memoValue.replace(/\n/g, '<br/>'); // innerHTML해주기 위함
-        const categoryId = selectedCateId;
-        
+
         const newData = {
-            categoryId,
+            cateId: selectedCateId,
             important: isImportant,
             title: titleValue,
             content,
-            tagNames, // 키와 키값이 같으므로 tags: tags, => tags,
+            tags: tagNames,
         }
 
-        // dispatch(ADD_MEMO(newData));
-        // setData();
-        setMemoValue('');
-        setTitleValue('');
+        console.log(newData)
 
-        memoTextarea.current.style.height = 'auto';
-        titleTextarea.current.style.height = 'auto';
+        Api().memo.createMemo(newData)
+            .then((res) => {
+                if (res.data.success) {
+                    console.log('받은 테그즈',res.data.newTags)
+                    const resTags = res.data.newTags.map((tags) => {
+                        return {
+                            tagId: tags.id,
+                            tagName: tags.tagName,
+                            cateId: tags.cateId,
+                            memoId: tags.memoId,
+                        }
+                    })
+                    dispatch(ADD_MEMO({
+                        cateId: selectedCateId,
+                        important: isImportant,
+                        title: titleValue,
+                        content,
+                        tags: resTags,
+                    }));
+                    setData();
+                    setMemoValue('');
+                    setTitleValue('');
+
+                    memoTextarea.current.style.height = 'auto';
+                    titleTextarea.current.style.height = 'auto';
+
+                } else {
+                    console.log(res.data.error)
+                }
+            })
+            .catch(e => console.log(e))
     }
 
     const addTags = (e: React.FormEvent<HTMLFormElement>) => {
@@ -97,12 +122,12 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const handleSelectChange = (event) => {
         if (event.target.value === '전체메모') {
             setSelectedCateName('전체메모');
-            setSelectedCateId('undefined');
+            setSelectedCateId(null);
             return
         }
-        // const selectedCate = tableData.categories.filter(cate => cate.cateName === event.target.value);
-        // setSelectedCateId(selectedCate[0].cateId);
-        // setSelectedCateName(selectedCate[0].cateName);
+        const selectedCate = tableData.categories.filter(cate => cate.cateName === event.target.value);
+        setSelectedCateId(selectedCate[0].cateId);
+        setSelectedCateName(selectedCate[0].cateName);
     }
 
     const deleteTag = (name) => {
@@ -119,22 +144,22 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     },[tagStr])
 
     useEffect(() => {
-        let newSelectedCateId: number|'undefined' = 'undefined';
+        let newSelectedCateId: number|null = null;
         let newSelectedCateName: string = '전체메모';
 
         if (menuStr) setIsImportant(true);
         else setIsImportant(false);
 
         if (cateStr) {
-            // const defaultSelectedCate = tableData.categories.filter(cate => cate.cateName === cateStr)[0];
-            // if (defaultSelectedCate) {
-            //     newSelectedCateId = defaultSelectedCate.cateId;
-            //     newSelectedCateName = defaultSelectedCate.cateName;
-            // }
+            const defaultSelectedCate = tableData.categories.filter(cate => cate.cateName === cateStr)[0];
+            if (defaultSelectedCate) {
+                newSelectedCateId = defaultSelectedCate.cateId;
+                newSelectedCateName = defaultSelectedCate.cateName;
+            }
         }
 
         if ((!cateStr && !menuStr) || menuStr) {
-            newSelectedCateId = 'undefined';
+            newSelectedCateId = null;
             newSelectedCateName = '전체메모';
         }
 
@@ -145,8 +170,8 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     return (
         <article
             {...props}
-            className='relative min-w-0 w-full browser-width-900px:w-[300px] flex flex-col justify-between
-            border border-zete-light-gray-500 rounded-[8px] px-18px pb-10px pt-12px min-h-[212px] h-fit bg-zete-primary-200 memo-shadow'
+            className='relative min-w-0 w-full browser-width-900px:w-[300px] min-h-[212px] h-fit flex flex-col justify-between
+            border border-zete-light-gray-500 rounded-[8px] px-18px pb-10px pt-12px bg-zete-primary-200 memo-shadow'
         >
             <div className='w-full h-full flex flex-col min-h-[212px]'>
                 <div className='w-full h-full'>
@@ -187,7 +212,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                         {
                             tagNames.map((name, idx) => {
                                 return name === tagStr ? (
-                                    <div key={uniqueKey() + idx} className='relative flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                                    <div key={idx} className='relative flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                         <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
                                             {name}
                                         </span>
@@ -214,13 +239,13 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                             >
                                 <option>전체메모</option>
                                 {
-                                    // tableData.categories.map((cate, idx) => {
-                                    //     return (
-                                    //         <option key={uniqueKey() + idx}>
-                                    //             {cate.cateName}
-                                    //         </option>
-                                    //     )
-                                    // })
+                                    tableData.categories.map((cate, idx) => {
+                                        return (
+                                            <option key={idx}>
+                                                {cate.cateName}
+                                            </option>
+                                        )
+                                    })
                                 }
                             </select>
                             <form

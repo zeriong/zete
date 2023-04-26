@@ -158,7 +158,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CoreOutput"
+                $ref: "#/components/schemas/CreateMemoOutDto"
       tags:
         - Memo
   /memo/createCate:
@@ -170,7 +170,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateCateDto"
+              $ref: "#/components/schemas/CreateCateInputDto"
       responses:
         default:
           description: ""
@@ -529,7 +529,27 @@ components:
         - title
         - content
         - important
-    CreateCateDto:
+    CreateMemoOutDto:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        message:
+          type: string
+        success:
+          type: boolean
+        newMemoId:
+          type: number
+        newTags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tags"
+      required:
+        - success
+        - newMemoId
+    CreateCateInputDto:
       type: object
       properties:
         cateName:

@@ -33,14 +33,16 @@ export class User extends coreEntity {
   refreshToken?: string;
 
   @ApiProperty({ type: Categories })
-  @OneToMany(() => Categories, (categories) => categories.user)
+  @OneToMany(() => Categories, (categories) => categories.user, {
+    cascade: true,
+  })
   cate: Categories[];
 
   @ApiProperty({ type: Memos })
-  @OneToMany(() => Memos, (memos) => memos.user)
+  @OneToMany(() => Memos, (memos) => memos.user, { cascade: true })
   memos: Memos[];
 
   @ApiProperty({ type: Tags })
-  @OneToMany(() => Tags, (tags) => tags.user)
+  @OneToMany(() => Tags, (tags) => tags.user, { cascade: true })
   tags: Tags[];
 }

@@ -67,103 +67,75 @@ export const memoSlice = createSlice({
 
             return { ...state, tableData: newTableArr}
         },
-        // DELETE_CATE: (state: MemoData, action: PayloadAction<number|'undefined'>) => {
-        //     const target = state.tableData.cateMemos.filter(cateMemo => cateMemo.cateId === action.payload);
-        //     const currentCateTags = state.tableData.cateTags.filter(cateTags => cateTags.cateId === action.payload)
-        //     const memoId = target.map(val => val.memoId);
-        //
-        //     if (memoId.length !== 0) {
-        //         state.tableData.memos = state.tableData.memos.filter(memos => !memoId.some(memoId => memoId === memos.memoId))
-        //     }
-        //
-        //     state.tableData.categories = state.tableData.categories.filter(cate => cate.cateId !== action.payload).sort((a, b) => a.cateName > b.cateName ? 1 : -1);
-        //     state.tableData.cateMemos = state.tableData.cateMemos.filter(cateMemo => cateMemo.cateId !== action.payload);
-        //     state.tableData.cateTags = state.tableData.cateTags.filter(cateTags => cateTags.cateId !== action.payload);
-        //     state.tableData.tags = state.tableData.tags.filter(cateTags => !currentCateTags.some(current => current.tagId === cateTags.tagId));
-        // },
-        // ADD_MEMO: (state: MemoData, action: PayloadAction<addMemoPayload>) => {
-        //     const { ...table } = state.tableData;
-        //     const { categoryId, title, content, important, tagNames } = action.payload;
-        //
-        //     // add memos
-        //     let memos = table.memos;
-        //
-        //     const memoIds = memos.map((memo) => memo.memoId) || [];
-        //     const newMemoId = memoIds.length > 0 ? Math.max(...memoIds) + 1 : 1;
-        //     const newMemo = {
-        //         memoId: newMemoId,
-        //         title,
-        //         content,
-        //         important,
-        //     };
-        //     memos = [...memos, newMemo];
-        //
-        //     // add tags
-        //     const getTags = table.tags.filter(exist => tagNames.some(tag => tag === exist.tagName)); //name이 일치하는 데이터들을가져온다. (일치하지 않는 데이터는 반드시추가대상)
-        //     const sameCateTagsId = table.cateTags.filter(exist => exist.cateId === categoryId); //현재 카테고리id에 일치하는 cateTags 데이터
-        //     const existCateTags = table.tags.filter(tags => sameCateTagsId.some(id => id.tagId === tags.tagId)) //현재카테고리기준 모든 tags를 가져옴
-        //     const existCateNames = existCateTags.filter(tags => getTags.some(name => name.tagName === tags.tagName)) //이름으로 중복체크해서 카테고리기준으로 이름이 안겹치도록
-        //     const mustBeAddTags = getTags.filter(tags => !existCateNames.some(exist => exist.tagName === tags.tagName)).map(tag => tag.tagName) || []
-        //     const tagNamesFilter = tagNames.filter(name => !table.tags.some(val => val.tagName === name))  //받아온 name을 전체name에서 검색해서 일치하지 않는 것을 가져온다.
-        //     let tagNamesSet = [...tagNamesFilter, ...mustBeAddTags];
-        //
-        //     const addTags = tagNamesSet.map((newTagName, idx) => {
-        //             const tagIds = table.tags.map((tag) => tag.tagId); // new id를 만들기 위해 선언
-        //             const makeId = tagIds.length > 0 ? Math.max(...tagIds) + (idx + 1) : idx + 1;
-        //
-        //             return {
-        //                 tagId: makeId,
-        //                 tagName: newTagName,
-        //             }
-        //     });
-        //
-        //     const newTags = [...table.tags, ...addTags];
-        //
-        //     // add cateMemos
-        //     let newCateMemos = [...table.cateMemos, {cateId: categoryId, memoId: newMemoId}];
-        //
-        //     // add cateTags
-        //     let newCateTags = [
-        //         ...table.cateTags,
-        //         ...addTags.map(val => ({cateId: categoryId, tagId: val.tagId}))
-        //     ];
-        //
-        //     // add memoTags
-        //     let newMemoTags = [...table.memoTags];
-        //
-        //     if (tagNames.length !== 0) {
-        //         newMemoTags = [
-        //             ...table.memoTags,
-        //             ...tagNames.map((tagName) => {
-        //                 const currentCateTags = newCateTags.filter(cateTag => cateTag.cateId === categoryId);
-        //                 const addTagNames = newTags.filter(tags => currentCateTags.some(match => match.tagId === tags.tagId));
-        //                 const targetTagId = addTagNames.filter(current => tagName === current.tagName).map(id => id.tagId);
-        //
-        //                 return (
-        //                     {
-        //                         memoId: newMemoId,
-        //                         tagId: targetTagId[0],
-        //                     }
-        //                 )
-        //             })
-        //         ]
-        //     }
-        //
-        //     // Update state
-        //     const newState = {
-        //         tableData: {
-        //             ...state.tableData,
-        //             memos,
-        //             tags: [...newTags],
-        //             memoTags: newMemoTags,
-        //             cateMemos: newCateMemos,
-        //             cateTags: newCateTags,
-        //         },
-        //         data: state.data
-        //     }
-        //
-        //     return newState
-        // },
+        UPDATE_MANY_CATE: (state: MemoData, action: PayloadAction<Category[]>) => {
+            const newCategories = action.payload;
+            const newTableArr = {
+                ...state.tableData,
+                categories: state.tableData['categories'].map((category) => {
+                    const matchingCategory = newCategories.find((cate) => cate.cateId === category.cateId);
+                    if (matchingCategory) {
+                        return { ...category, cateName: matchingCategory.cateName };
+                    }
+                    return category;
+                }).sort((a, b) => a.cateName > b.cateName ? 1 : -1)
+            };
+
+            return { ...state, tableData: newTableArr }
+        },
+        DELETE_CATE: (state: MemoData, action: PayloadAction<number>) => {
+            const { memos, tags, categories } = state.tableData
+
+            const remainedMemo = memos.filter(memo => memo.cateId !== action.payload);
+            const remainedCate = categories.filter(cate => cate.cateId !== action.payload);
+            const remainedTags = tags.filter(tags => tags.cateId !== action.payload);
+
+            return {
+                ...state,
+                tableData: {
+                    categories: remainedCate.sort((a, b) => a.cateName > b.cateName ? 1 : -1),
+                    memos: remainedMemo,
+                    tags: remainedTags,
+                }
+            }
+        },
+        ADD_MEMO: (state: MemoData, action: PayloadAction<addMemoPayload>) => {
+            const { ...table } = state.tableData;
+            const { cateId, title, content, important, tags, memoId } = action.payload;
+
+            console.log('리덕스',tags);
+
+            // add memos
+            const newMemo = {
+                cateId,
+                memoId,
+                title,
+                content,
+                important,
+            };
+
+            const memos = [...table.memos, newMemo];
+
+            // add tags
+            const addTags = tags.map((tag) => {
+                return {
+                    tagId: tag.tagId,
+                    tagName: tag.tagName,
+                    cateId: tag.cateId,
+                    memoId: tag.memoId,
+                }
+            });
+
+            const newTags = [...table.tags, ...addTags];
+
+            return {
+                tableData: {
+                    ...state.tableData,
+                    memos,
+                    tags: newTags,
+                },
+                data: state.data
+            }
+        },
         // UPDATE_MEMO: (state: MemoData, action: PayloadAction<ModifyMemoPayload>) => {
         //     const { ...table } = state.tableData;
         //     const { categoryId, title, content, important, tagNames, memoId } = action.payload;
@@ -271,41 +243,23 @@ export const memoSlice = createSlice({
         //     state.tableData.cateMemos = state.tableData.cateMemos.filter((cateMemo) => cateMemo.memoId !== memoId);
         //     state.tableData.tags = state.tableData.tags.filter(tags => deleteTagsMemos.some(delCate => delCate.tagId === tags.tagId));
         // },
-        // UPDATE_CATE: (state: MemoData, action: PayloadAction<Category[]>) => {
-        //     const newCategories = action.payload;
-        //     const newTableArr = {
-        //         ...state.tableData,
-        //         categories: state.tableData['categories'].map((category) => {
-        //             const matchingCategory = newCategories.find((cate) => cate.cateId === category.cateId);
-        //             if (matchingCategory) {
-        //                 return { ...category, cateName: matchingCategory.cateName };
-        //             }
-        //             return category;
-        //         }).sort((a, b) => a.cateName > b.cateName ? 1 : -1)
-        //     };
-        //
-        //     const newState = { ...state, tableData: newTableArr }
-        //
-        //
-        //     return newState;
-        // },
 
-        // CHANGE_IMPORTANT: (state: MemoData, action: PayloadAction<number>) => {
-        //     const memoId = action.payload
-        //     state.tableData.memos = state.tableData.memos.map(memos => {
-        //         let modifyMemo = memos
-        //
-        //         if (memos.memoId === memoId) {
-        //             modifyMemo = {
-        //                 ...memos,
-        //                 important: memos.important !== true
-        //             }
-        //         }
-        //
-        //         return modifyMemo
-        //     })
-        // },
+        CHANGE_IMPORTANT: (state: MemoData, action: PayloadAction<number>) => {
+            const memoId = action.payload
+            state.tableData.memos = state.tableData.memos.map(memos => {
+                let modifyMemo = memos
+
+                if (memos.memoId === memoId) {
+                    modifyMemo = {
+                        ...memos,
+                        important: memos.important !== true
+                    }
+                }
+
+                return modifyMemo
+            })
+        },
     },
 });
 
-export const { SET_TABLE_DATA, SET_DATA, ADD_CATE, UPDATE_ONE_CATE } = memoSlice.actions;
+export const { SET_TABLE_DATA, SET_DATA, ADD_CATE, UPDATE_ONE_CATE, UPDATE_MANY_CATE, DELETE_CATE, ADD_MEMO, CHANGE_IMPORTANT } = memoSlice.actions;
