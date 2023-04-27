@@ -2,13 +2,16 @@ import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MemoService } from './memo.service';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
-import { CreateMemoInputDto, CreateMemoOutDto } from './dtos/memo.dto';
+import { CreateMemoInputDto, CreateMemoOutDto, PaginationInputDto, PaginationOutputDto } from './dtos/memo.dto';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import {
   CreateCateInputDto,
-  CreateCateOutputDto, UpdateManyCateInputDto, CateInputDto, CateIdInputDto
+  CreateCateOutputDto,
+  UpdateManyCateInputDto,
+  CateInputDto,
+  CateIdInputDto,
 } from './dtos/cate.dto';
-import { SendContentDataOutputDto } from './dtos/sendContentData.dto';
+import { SendDefaultDataOutputDto } from './dtos/sendContentData.dto';
 
 @Controller('memo')
 @ApiTags('Memo') //스웨거 Tag를 지정
@@ -35,11 +38,11 @@ export class MemoController {
     return this.memoService.createCate(input, req.user);
   }
 
-  @ApiResponse({ type: SendContentDataOutputDto })
+  @ApiResponse({ type: SendDefaultDataOutputDto })
   @UseGuards(JwtAuthGuard)
   @Post('sendContentData')
-  sendContentData(@Req() req): Promise<SendContentDataOutputDto> {
-    return this.memoService.sendContentData(req.user);
+  sendDefaultData(@Req() req): Promise<SendDefaultDataOutputDto> {
+    return this.memoService.sendDefaultData(req.user);
   }
 
   @ApiResponse({ type: CoreOutput })
@@ -47,6 +50,7 @@ export class MemoController {
   updateOneCate(@Body() input: CateInputDto): Promise<CoreOutput> {
     return this.memoService.updateOneCate(input);
   }
+
   @ApiResponse({ type: CoreOutput })
   @Post('updateManyCate')
   updateManyCate(@Body() input: UpdateManyCateInputDto): Promise<CoreOutput> {
@@ -57,5 +61,15 @@ export class MemoController {
   @Delete()
   deleteCate(@Body() input: CateIdInputDto): Promise<CoreOutput> {
     return this.memoService.deleteCate(input);
+  }
+
+  @ApiResponse({ type: PaginationOutputDto })
+  @UseGuards(JwtAuthGuard)
+  @Post('scrollPagination')
+  scrollPagination(
+    @Body() input: PaginationInputDto,
+    @Req() req,
+  ): Promise<PaginationOutputDto> {
+    return this.memoService.scrollPagination(input, req.user);
   }
 }

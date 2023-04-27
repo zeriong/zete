@@ -80,14 +80,17 @@ export const MemoMain = () => {
     return (
         loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
             <CustomScroller>
-                <section className='flex gap-28px w-full min-h-full p-16px browser-width-900px:p-30px'>
-                    <div
-                        className='p-30px fixed left-1/2 top-1/2 bg-black text-white'
-                        onClick={() => {
-                        console.log(tableData)
-                        }}
-                    >
-                        test
+                <section className='relative flex gap-28px w-full min-h-full p-16px browser-width-900px:p-30px'>
+                    {/*<div*/}
+                    {/*    className='p-30px fixed left-1/2 top-1/2 bg-black text-white'*/}
+                    {/*    onClick={() => {*/}
+                    {/*    console.log(tableData)*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    {/*    test*/}
+                    {/*</div>*/}
+                    <div className='absolute left-30px top-30px mb-16px browser-width-900px:mb-30px z-20'>
+                        <AddMemo/>
                     </div>
                     <Masonry
                         key={subUniqueKey()}
@@ -95,9 +98,7 @@ export const MemoMain = () => {
                         className='my-masonry-grid flex gap-x-16px browser-width-900px:gap-x-30px w-full h-full browser-width-900px:w-auto'
                         columnClassName='my-masonry-grid_column'
                     >
-                        <div className='mb-16px browser-width-900px:mb-30px'>
-                            <AddMemo/>
-                        </div>
+                        <div className='mb-16px browser-width-900px:mb-30px browser-width-900px:w-[300px] min-h-[234px]'/>
                         {currentData &&
                             currentData?.map((val) => {
                                 let cleanContent = DOMPurify.sanitize(val.content);

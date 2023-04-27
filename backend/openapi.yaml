@@ -182,7 +182,7 @@ paths:
         - Memo
   /memo/sendContentData:
     post:
-      operationId: sendContentData
+      operationId: sendDefaultData
       parameters: []
       responses:
         default:
@@ -190,7 +190,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SendContentDataOutputDto"
+                $ref: "#/components/schemas/SendDefaultDataOutputDto"
       tags:
         - Memo
   /memo/updateOneCate:
@@ -250,6 +250,25 @@ paths:
                 $ref: "#/components/schemas/CoreOutput"
       tags:
         - Memo
+  /memo/scrollPagination:
+    post:
+      operationId: scrollPagination
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaginationInputDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationOutputDto"
+      tags:
+        - Memo
   /openAi/createCompletion:
     post:
       operationId: createCompletion
@@ -301,6 +320,8 @@ components:
           type: string
         user:
           $ref: "#/components/schemas/Promise"
+        userId:
+          type: number
         memos:
           $ref: "#/components/schemas/Promise"
         memoId:
@@ -315,6 +336,7 @@ components:
         - updateAt
         - tagName
         - user
+        - userId
         - memos
         - memoId
         - cate
@@ -338,6 +360,8 @@ components:
           type: boolean
         user:
           $ref: "#/components/schemas/Promise"
+        userId:
+          type: number
         cate:
           nullable: true
           allOf:
@@ -353,6 +377,7 @@ components:
         - updateAt
         - important
         - user
+        - userId
         - cate
         - cateId
         - tags
@@ -372,6 +397,8 @@ components:
           nullable: true
         user:
           $ref: "#/components/schemas/Promise"
+        userId:
+          type: number
         memos:
           $ref: "#/components/schemas/Memos"
         tags:
@@ -382,6 +409,7 @@ components:
         - updateAt
         - cateName
         - user
+        - userId
         - memos
         - tags
     User:
@@ -584,7 +612,27 @@ components:
       required:
         - success
         - savedCate
-    SendContentDataOutputDto:
+    MemoLengthInCate:
+      type: object
+      properties:
+        cateId:
+          type: number
+        length:
+          type: number
+      required:
+        - cateId
+        - length
+    TagNameAndCateId:
+      type: object
+      properties:
+        cateId:
+          type: number
+        tagName:
+          type: string
+      required:
+        - cateId
+        - tagName
+    SendDefaultDataOutputDto:
       type: object
       properties:
         error:
@@ -595,12 +643,22 @@ components:
           type: string
         success:
           type: boolean
-        cate:
-          $ref: "#/components/schemas/Categories"
-        memos:
-          $ref: "#/components/schemas/Memos"
+        memosLength:
+          type: number
+        importantMemoLength:
+          type: number
+        memoLengthInCate:
+          type: array
+          items:
+            $ref: "#/components/schemas/MemoLengthInCate"
         tags:
-          $ref: "#/components/schemas/Tags"
+          type: array
+          items:
+            $ref: "#/components/schemas/TagNameAndCateId"
+        cate:
+          type: array
+          items:
+            $ref: "#/components/schemas/Categories"
       required:
         - success
     UpdateManyCateInputDto:
@@ -620,6 +678,42 @@ components:
           nullable: true
       required:
         - cateId
+    PaginationInputDto:
+      type: object
+      properties:
+        offset:
+          type: number
+        limit:
+          type: number
+        cateStr:
+          type: string
+        tagStr:
+          type: string
+        menuStr:
+          type: string
+      required:
+        - offset
+        - limit
+        - cateStr
+        - tagStr
+        - menuStr
+    PaginationOutputDto:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        message:
+          type: string
+        success:
+          type: boolean
+        memos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Memos"
+      required:
+        - success
     CreateCompletionInputObj:
       type: object
       properties:

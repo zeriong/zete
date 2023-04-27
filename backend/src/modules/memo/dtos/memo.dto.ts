@@ -29,10 +29,40 @@ export class MemoIdInputDto {
   memoId: number;
 }
 
+export class PaginationInputDto {
+  @ApiProperty({ type: Number })
+  @Validator.IsNumber()
+  offset: number;
+
+  @ApiProperty({ type: Number })
+  @Validator.IsNumber()
+  limit: number;
+
+  @ApiProperty()
+  @Validator.IsOptional()
+  @Validator.IsString()
+  cateStr?: string;
+
+  @ApiProperty()
+  @Validator.IsOptional()
+  @Validator.IsString()
+  tagStr?: string;
+
+  @ApiProperty()
+  @Validator.IsOptional()
+  @Validator.IsString()
+  menuStr?: string;
+}
+
 export class CreateMemoOutDto extends CoreOutput {
   @ApiProperty({ type: Number })
   newMemoId?: number;
 
   @ApiProperty({ type: [Tags], required: false })
   newTags?: Array<Tags>;
+}
+
+export class PaginationOutputDto extends CoreOutput {
+  @ApiProperty({ type: [Memos], required: false })
+  memos?: Array<Memos>;
 }

@@ -36,7 +36,11 @@ import { CreateMemoInputDto } from '../models';
 // @ts-ignore
 import { CreateMemoOutDto } from '../models';
 // @ts-ignore
-import { SendContentDataOutputDto } from '../models';
+import { PaginationInputDto } from '../models';
+// @ts-ignore
+import { PaginationOutputDto } from '../models';
+// @ts-ignore
+import { SendDefaultDataOutputDto } from '../models';
 // @ts-ignore
 import { UpdateManyCateInputDto } from '../models';
 /**
@@ -152,10 +156,45 @@ export const MemoApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
+         * @param {PaginationInputDto} paginationInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        sendContentData: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        scrollPagination: async (paginationInputDto: PaginationInputDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'paginationInputDto' is not null or undefined
+            assertParamExists('scrollPagination', 'paginationInputDto', paginationInputDto)
+            const localVarPath = `/memo/scrollPagination`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(paginationInputDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendDefaultData: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/memo/sendContentData`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -291,11 +330,21 @@ export const MemoApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {PaginationInputDto} paginationInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async sendContentData(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SendContentDataOutputDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.sendContentData(options);
+        async scrollPagination(paginationInputDto: PaginationInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PaginationOutputDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.scrollPagination(paginationInputDto, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async sendDefaultData(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SendDefaultDataOutputDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.sendDefaultData(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -357,11 +406,20 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * 
+         * @param {PaginationInputDto} paginationInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        sendContentData(options?: any): AxiosPromise<SendContentDataOutputDto> {
-            return localVarFp.sendContentData(options).then((request) => request(axios, basePath));
+        scrollPagination(paginationInputDto: PaginationInputDto, options?: any): AxiosPromise<PaginationOutputDto> {
+            return localVarFp.scrollPagination(paginationInputDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        sendDefaultData(options?: any): AxiosPromise<SendDefaultDataOutputDto> {
+            return localVarFp.sendDefaultData(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -426,12 +484,23 @@ export class MemoApi extends BaseAPI {
 
     /**
      * 
+     * @param {PaginationInputDto} paginationInputDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MemoApi
      */
-    public sendContentData(options?: AxiosRequestConfig) {
-        return MemoApiFp(this.configuration).sendContentData(options).then((request) => request(this.axios, this.basePath));
+    public scrollPagination(paginationInputDto: PaginationInputDto, options?: AxiosRequestConfig) {
+        return MemoApiFp(this.configuration).scrollPagination(paginationInputDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MemoApi
+     */
+    public sendDefaultData(options?: AxiosRequestConfig) {
+        return MemoApiFp(this.configuration).sendDefaultData(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

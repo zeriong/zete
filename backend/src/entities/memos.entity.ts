@@ -23,6 +23,10 @@ export class Memos extends coreEntity {
   @ManyToOne(() => User, (user) => user.memos, { onDelete: 'CASCADE' })
   user: User;
 
+  @ApiProperty({ type: Number })
+  @RelationId((memos: Memos) => memos.user)
+  userId: number;
+
   @ApiProperty({ nullable: true, type: Promise<Categories> })
   @ManyToOne(() => Categories, (cate) => cate.memos, { onDelete: 'CASCADE' })
   cate: Categories;

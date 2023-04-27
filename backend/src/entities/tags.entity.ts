@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, RelationId } from 'typeorm';
+import { Entity, Column, ManyToOne, RelationId, JoinColumn } from 'typeorm';
 import { Memos } from './memos.entity';
 import { coreEntity } from '../common/entities/core.entity';
 import { Categories } from './categories.entity';
@@ -15,8 +15,13 @@ export class Tags extends coreEntity {
   @ManyToOne(() => User, (user) => user.tags, { onDelete: 'CASCADE' })
   user: User;
 
+  @ApiProperty({ type: Number })
+  @RelationId((tags: Tags) => tags.user)
+  userId: number;
+
   @ApiProperty({ type: Promise<Memos> })
   @ManyToOne(() => Memos, (memo) => memo.tags, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'memoId' })
   memos: Memos;
 
   @ApiProperty({ type: Number })

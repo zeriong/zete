@@ -67,6 +67,12 @@ export interface Memos {
     'user': object;
     /**
      * 
+     * @type {number}
+     * @memberof Memos
+     */
+    'userId': number;
+    /**
+     * 
      * @type {object}
      * @memberof Memos
      */

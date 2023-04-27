@@ -58,6 +58,12 @@ export interface Categories {
     'user': object;
     /**
      * 
+     * @type {number}
+     * @memberof Categories
+     */
+    'userId': number;
+    /**
+     * 
      * @type {Memos}
      * @memberof Categories
      */

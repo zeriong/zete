@@ -16,32 +16,9 @@ function App() {
     useEffect( ()=> {
         (async () => {
             await dispatch(sendRefreshAccessToken());
-            await Api().memo.sendContentData().then((res) => {
+            await Api().memo.sendDefaultData().then((res) => {
                 console.log(res.data)
-                const table = {
-                    categories: Object.values(res.data.cate).map((cate) => {
-                        return {
-                            cateId: cate.id,
-                            cateName: cate.cateName
-                        }}).sort((a, b) => a.cateName > b.cateName ? 1 : -1),
-                    tags: Object.values(res.data.tags).map((tags) => {
-                        return {
-                            tagId: tags.id,
-                            tagName: tags.tagName,
-                            memoId: tags.memoId,
-                            cateId: tags.cateId
-                        }}).sort((a, b) => a.tagName > b.tagName ? 1 : -1),
-                    memos: Object.values(res.data.memos).map((memos) => {
-                        return {
-                            memoId: memos.id,
-                            title: memos.title,
-                            content: memos.content,
-                            cateId: memos.cateId,
-                            important: Boolean(JSON.parse(memos.important)),
-                        }}),
-                }
-                dispatch(SET_TABLE_DATA(table));
-                setData();
+
             });
         })();
     },[dispatch]);

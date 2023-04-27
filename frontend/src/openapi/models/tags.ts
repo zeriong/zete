@@ -52,6 +52,12 @@ export interface Tags {
     'user': object;
     /**
      * 
+     * @type {number}
+     * @memberof Tags
+     */
+    'userId': number;
+    /**
+     * 
      * @type {object}
      * @memberof Tags
      */
