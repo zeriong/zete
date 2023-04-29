@@ -39,6 +39,11 @@ export class CreateCateOutputDto extends CoreOutput {
   savedCate?: CateInputDto;
 }
 
+export class DeleteCateOutputDto extends CoreOutput {
+  @ApiProperty({ type: Number, required: false })
+  importantMemoLength?: number;
+}
+
 export class UpdateManyCateInputDto {
   @ApiProperty({ type: [CateInputDto] })
   @Validator.IsArray({ message: '잘못된 형식입니다.' })

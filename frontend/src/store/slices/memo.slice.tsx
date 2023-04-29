@@ -1,139 +1,156 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {Category, memoSliceInitState, MemoData, ModifyMemoPayload, addMemoPayload, TableData} from "./constants";
+import {addMemoPayload, Category, CombineData, Data, memoSliceInitState} from "./constants";
+import {execSync} from "child_process";
+import {tab} from "@testing-library/user-event/dist/tab";
 
 export const memoSlice = createSlice({
     name: 'memo',
     initialState: memoSliceInitState,
     reducers: {
-        SET_TABLE_DATA: (state: MemoData, action: PayloadAction<TableData>) => {
-            state.tableData = action.payload
+        SET_DATA: (state: CombineData, action: PayloadAction<Data>) => {
+            state.data = action.payload
         },
-        SET_DATA: (state: MemoData) => {
-            const { memos, tags } = state.tableData;
-            const setCate = new Set(memos.map(memo => memo.cateId));
-            const newData = [];
-
-            Array.from(setCate).map(set => newData.push([ { cateId: set, memos: [] } ]) );
-
-            memos.map((memo) => {
-                const findTags = tags.filter(tags => tags.memoId === memo.memoId);
-
-                newData.map((data) => {
-                    if (memo.cateId === data[0].cateId) {
-                        data[0].memos.push({
-                            memoId: memo.memoId,
-                            title: memo.title,
-                            content: memo.content,
-                            tags: findTags || [],
-                            important: memo.important,
-                        })
-                    }
-                    return newData
-                });
-
-                return newData
-            })
-
-            return {...state, data: newData}
-        },
-        ADD_CATE: (state: MemoData, action: PayloadAction<Category>) => {
+        ADD_CATE: (state: CombineData, action: PayloadAction<Category>) => {
             const { cateName, cateId } = action.payload;
 
-            const existsCate = state.tableData.categories.filter(cate => cate.cateName === cateName);
+            const existsCate = state.data.cate.filter(cate => cate.cateName === cateName);
 
             if (!cateName) return
             if (existsCate.length !== 0) return
 
             return {
-                tableData: {
-                    ...state.tableData,
-                    categories:[
-                        ...state.tableData.categories,
-                        {cateName: cateName, cateId: cateId}
+                data: {
+                    ...state.data,
+                    memoLengthInCate: [
+                        ...state.data.memoLengthInCate,
+                        { cateId: cateId, length: 0 },
+                    ],
+                    cate:[
+                        ...state.data.cate,
+                        { cateName: cateName, cateId: cateId }
                     ].sort((a, b) => a.cateName > b.cateName ? 1 : -1)
-                },
-                data: state.data
+                }
             };
         },
-        UPDATE_ONE_CATE: (state: MemoData, action: PayloadAction<Category>) => {
-            const existCate = state.tableData.categories.filter(cate => cate.cateId !== action.payload.cateId);
-            const newTableArr = {
-                ...state.tableData,
-                categories: [
-                    ...existCate,
-                    action.payload
-                ].sort((a, b) => a.cateName > b.cateName ? 1 : -1)
-            }
-
-            return { ...state, tableData: newTableArr}
-        },
-        UPDATE_MANY_CATE: (state: MemoData, action: PayloadAction<Category[]>) => {
-            const newCategories = action.payload;
-            const newTableArr = {
-                ...state.tableData,
-                categories: state.tableData['categories'].map((category) => {
-                    const matchingCategory = newCategories.find((cate) => cate.cateId === category.cateId);
-                    if (matchingCategory) {
-                        return { ...category, cateName: matchingCategory.cateName };
-                    }
-                    return category;
-                }).sort((a, b) => a.cateName > b.cateName ? 1 : -1)
-            };
-
-            return { ...state, tableData: newTableArr }
-        },
-        DELETE_CATE: (state: MemoData, action: PayloadAction<number>) => {
-            const { memos, tags, categories } = state.tableData
-
-            const remainedMemo = memos.filter(memo => memo.cateId !== action.payload);
-            const remainedCate = categories.filter(cate => cate.cateId !== action.payload);
-            const remainedTags = tags.filter(tags => tags.cateId !== action.payload);
+        UPDATE_ONE_CATE: (state: CombineData, action: PayloadAction<Category>) => {
+            const existCate = state.data.cate.filter(cate => cate.cateId !== action.payload.cateId);
 
             return {
-                ...state,
-                tableData: {
-                    categories: remainedCate.sort((a, b) => a.cateName > b.cateName ? 1 : -1),
-                    memos: remainedMemo,
-                    tags: remainedTags,
+                data: {
+                    ...state.data,
+                    cate: [
+                        ...existCate,
+                        action.payload
+                    ].sort((a, b) => a.cateName > b.cateName ? 1 : -1)
                 }
             }
         },
-        ADD_MEMO: (state: MemoData, action: PayloadAction<addMemoPayload>) => {
-            const { ...table } = state.tableData;
-            const { cateId, title, content, important, tags, memoId } = action.payload;
+        UPDATE_MANY_CATE: (state: CombineData, action: PayloadAction<Category[]>) => {
+            const newCategories = action.payload;
 
-            console.log('리덕스',tags);
+            return {
+                data: {
+                    ...state.data,
+                    cate: state.data.cate.map((category) => {
+                        const matchingCategory = newCategories.find((cate) => cate.cateId === category.cateId);
+                        if (matchingCategory) {
+                            return { ...category, cateName: matchingCategory.cateName };
+                        }
+                        return category;
+                    }).sort((a, b) => a.cateName > b.cateName ? 1 : -1)
+                }
+            }
+        },
+        DELETE_CATE: (state: CombineData, action: PayloadAction<{ importantMemoLength: number, cateId: number }>) => {
+            const { cateId, importantMemoLength } = action.payload;
+            const { memos, tagsInCate, cate, memoLengthInCate, memosLength } = state.data
 
-            // add memos
-            const newMemo = {
-                cateId,
+            const remainedMemo = memos.filter(memo => memo.cateId !== cateId);
+            const remainedCate = cate.filter(exists => exists.cateId !== cateId);
+            const remainedTags = tagsInCate.filter(tags => tags.cateId !== cateId);
+            const targetLength = memoLengthInCate.filter(tags => tags.cateId === cateId)[0].length;
+
+            return {
+                data: {
+                    ...state.data,
+                    memosLength: memosLength - targetLength,
+                    importantMemoLength,
+                    cate: remainedCate.sort((a, b) => a.cateName > b.cateName ? 1 : -1),
+                    memos: remainedMemo.sort((a, b) => b.updateAt - a.updateAt),
+                    tagsInCate: remainedTags,
+                }
+            }
+        },
+        ADD_MEMO: (state: CombineData, action: PayloadAction<addMemoPayload>) => {
+            const { ...table } = state.data;
+            const { cateId, title, content, important, tags, memoId, updateAt } = action.payload;
+
+            let newAllLength = table.memosLength + 1;
+            let newInCateLength = table.memoLengthInCate;
+            let importantMemoLength = table.importantMemoLength;
+
+            // memosLength
+            const lengthValidator = table.memoLengthInCate.filter(inCate => inCate.cateId === cateId) || [];
+
+            if (important) importantMemoLength += 1;
+
+            if (lengthValidator[0]?.cateId !== null) {
+                newInCateLength = table.memoLengthInCate.map((inCate) => {
+                    if (inCate.cateId === lengthValidator[0].cateId) {
+                        return {
+                            cateId: inCate.cateId,
+                            length: inCate.length + 1,
+                        }
+                    } else {
+                        return inCate;
+                    }
+                })
+            }
+
+            // tagsInCate
+            const resTagsInCate = tags.map((tags) => {
+                return {
+                    cateId: tags.cateId,
+                    tagName: tags.tagName,
+                }
+            })
+
+            const setTagsInCate = [
+                ...table.tagsInCate,
+                ...resTagsInCate,
+            ];
+
+            const tagInCateMap = new Map(); // 키와 값을 가지는 데이터구조 Map을 선언
+
+            for (const { cateId, tagName } of setTagsInCate) { // 반복문으로 id와 name을 그룹으로 지어주고 중복되지 않는경우만 추가하여 중복값을 제거
+                const key = `${cateId}-${tagName}`;
+                if (!tagInCateMap.has(key)) {
+                    tagInCateMap.set(key, { cateId, tagName });
+                }
+            }
+
+            const newTagsInCate = Array.from(tagInCateMap.values()); // 최종적으로 값인 {cateId: ??, tagName: '??'}인 데이터를 배열에 담는다.
+
+            // memos
+            const memos = [...table.memos, {
                 memoId,
+                cateId,
                 title,
                 content,
                 important,
-            };
-
-            const memos = [...table.memos, newMemo];
-
-            // add tags
-            const addTags = tags.map((tag) => {
-                return {
-                    tagId: tag.tagId,
-                    tagName: tag.tagName,
-                    cateId: tag.cateId,
-                    memoId: tag.memoId,
-                }
-            });
-
-            const newTags = [...table.tags, ...addTags];
+                tags,
+                updateAt,
+            }];
 
             return {
-                tableData: {
-                    ...state.tableData,
+                data: {
+                    ...state.data,
+                    importantMemoLength,
+                    memosLength: newAllLength,
+                    memoLengthInCate: newInCateLength,
                     memos,
-                    tags: newTags,
-                },
-                data: state.data
+                    tagsInCate: newTagsInCate.sort((a, b) => a.tagName > b.tagName ? 1 : -1),
+                }
             }
         },
         // UPDATE_MEMO: (state: MemoData, action: PayloadAction<ModifyMemoPayload>) => {
@@ -244,22 +261,22 @@ export const memoSlice = createSlice({
         //     state.tableData.tags = state.tableData.tags.filter(tags => deleteTagsMemos.some(delCate => delCate.tagId === tags.tagId));
         // },
 
-        CHANGE_IMPORTANT: (state: MemoData, action: PayloadAction<number>) => {
-            const memoId = action.payload
-            state.tableData.memos = state.tableData.memos.map(memos => {
-                let modifyMemo = memos
-
-                if (memos.memoId === memoId) {
-                    modifyMemo = {
-                        ...memos,
-                        important: memos.important !== true
-                    }
-                }
-
-                return modifyMemo
-            })
-        },
+        // CHANGE_IMPORTANT: (state: MemoData, action: PayloadAction<number>) => {
+        //     const memoId = action.payload
+        //     state.tableData.memos = state.tableData.memos.map(memos => {
+        //         let modifyMemo = memos
+        //
+        //         if (memos.memoId === memoId) {
+        //             modifyMemo = {
+        //                 ...memos,
+        //                 important: memos.important !== true
+        //             }
+        //         }
+        //
+        //         return modifyMemo
+        //     })
+        // },
     },
 });
 
-export const { SET_TABLE_DATA, SET_DATA, ADD_CATE, UPDATE_ONE_CATE, UPDATE_MANY_CATE, DELETE_CATE, ADD_MEMO, CHANGE_IMPORTANT } = memoSlice.actions;
+export const { SET_DATA, ADD_CATE, DELETE_CATE, UPDATE_MANY_CATE, UPDATE_ONE_CATE, ADD_MEMO } = memoSlice.actions;

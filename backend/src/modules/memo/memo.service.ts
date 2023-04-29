@@ -6,7 +6,7 @@ import { Tags } from '../../entities/tags.entity';
 import { Memos } from '../../entities/memos.entity';
 import {
   CreateMemoInputDto,
-  CreateMemoOutDto,
+  CreateMemoOutputDto,
   MemoIdInputDto,
   PaginationInputDto,
   PaginationOutputDto,
@@ -19,6 +19,7 @@ import {
   UpdateManyCateInputDto,
   CateInputDto,
   CateIdInputDto,
+  DeleteCateOutputDto,
 } from './dtos/cate.dto';
 import { SendDefaultDataOutputDto } from './dtos/sendContentData.dto';
 
@@ -66,7 +67,7 @@ export class MemoService {
 
       const memoLengthInCate = await this.memoRepository
         .createQueryBuilder('memos')
-        .select('memos.cateId, COUNT(*) as length')
+        .select('memos.cateId, COUNT(*) AS length')
         .groupBy('memos.cateId')
         .getRawMany();
       /* 예상 반환데이터 폼
@@ -85,7 +86,10 @@ export class MemoService {
 
       return {
         success: true,
-        cate,
+        cate: cate.map((cate) => ({
+          cateName: cate.cateName,
+          cateId: cate.id,
+        })),
         tags,
         importantMemoLength,
         memosLength,
@@ -105,40 +109,60 @@ export class MemoService {
   ): Promise<PaginationOutputDto> {
     try {
       if (!input.cateStr && !input.tagStr && !input.menuStr) {
-        const [memos] = await this.memoRepository.findAndCount({
-          where: { userId: user.id },
-          order: { id: 'DESC' }, // 정렬해야 페이징데이터 중복방지
-          skip: input.offset, // 수만큼 건너뛰고 시작
-          take: input.limit, // 페이징 1회 갯수
-          relations: ['tags'], // OneToMany 관계
-        });
+        const memos = await this.memoRepository
+          .createQueryBuilder('memos')
+          .leftJoinAndSelect('memos.tags', 'tag') // OneToMany 관계
+          .where('memos.userId = :userId', { userId: user.id })
+          .orderBy('memos.id', 'DESC') // 정렬해야 페이징데이터 중복방지
+          .skip(input.offset) // 수만큼 건너뛰고 시작
+          .take(input.limit) // 페이징 1회 갯수
+          .getMany();
 
         return {
           success: true,
           memos: memos.map((memo) => ({
-            ...memo,
-            tags: memo.tags.map((tag) => ({ ...tag })),
+            updateAt: memo.updateAt,
+            memoId: memo.id,
+            cateId: memo.cateId,
+            title: memo.title,
+            content: memo.content,
+            important: memo.important,
+            tags: memo.tags.map((tag) => ({
+              tagId: tag.id,
+              cateId: tag.cateId,
+              memoId: tag.memoId,
+              tagName: tag.tagName,
+            })),
           })),
         };
       }
 
       if (input.menuStr) {
-        const [importantMemos] = await this.memoRepository.findAndCount({
-          where: {
-            userId: user.id,
-            important: true,
-          },
-          order: { id: 'DESC' },
-          skip: input.offset,
-          take: input.limit,
-          relations: ['tags'],
-        });
+        const importantMemos = await this.memoRepository
+          .createQueryBuilder('memos')
+          .leftJoinAndSelect('memos.tags', 'tag')
+          .where('memos.userId = :userId', { userId: user.id })
+          .andWhere('memos.important = :important', { important: true })
+          .orderBy('memos.id', 'DESC')
+          .skip(input.offset)
+          .take(input.limit)
+          .getMany();
 
         return {
           success: true,
           memos: importantMemos.map((memo) => ({
-            ...memo,
-            tags: memo.tags.map((tag) => ({ ...tag })),
+            updateAt: memo.updateAt,
+            memoId: memo.id,
+            cateId: memo.cateId,
+            title: memo.title,
+            content: memo.content,
+            important: memo.important,
+            tags: memo.tags.map((tag) => ({
+              tagId: tag.id,
+              cateId: tag.cateId,
+              memoId: tag.memoId,
+              tagName: tag.tagName,
+            })),
           })),
         };
       }
@@ -150,22 +174,31 @@ export class MemoService {
 
         const categoryId = category.id;
 
-        const [cateMemos] = await this.memoRepository.findAndCount({
-          where: {
-            userId: user.id,
-            cateId: categoryId,
-          },
-          order: { id: 'DESC' },
-          skip: input.offset,
-          take: input.limit,
-          relations: ['tags'],
-        });
+        const cateMemos = await this.memoRepository
+          .createQueryBuilder('memos')
+          .leftJoinAndSelect('memos.tags', 'tag')
+          .where('memos.userId = :userId', { userId: user.id })
+          .andWhere('memos.cateId = :cateId', { cateId: categoryId })
+          .orderBy('memos.id', 'DESC')
+          .skip(input.offset)
+          .take(input.limit)
+          .getMany();
 
         return {
           success: true,
           memos: cateMemos.map((memo) => ({
-            ...memo,
-            tags: memo.tags.map((tag) => ({ ...tag })),
+            updateAt: memo.updateAt,
+            memoId: memo.id,
+            cateId: memo.cateId,
+            title: memo.title,
+            content: memo.content,
+            important: memo.important,
+            tags: memo.tags.map((tag) => ({
+              tagId: tag.id,
+              cateId: tag.cateId,
+              memoId: tag.memoId,
+              tagName: tag.tagName,
+            })),
           })),
         };
       }
@@ -181,23 +214,32 @@ export class MemoService {
         const categoryId = category.id;
         const tagsIds = tags.map((tags) => tags.memoId);
 
-        const [tagsMemos] = await this.memoRepository.findAndCount({
-          where: {
-            userId: user.id,
-            cateId: categoryId,
-            id: In(tagsIds),
-          },
-          order: { id: 'DESC' },
-          skip: input.offset,
-          take: input.limit,
-          relations: ['tags'],
-        });
+        const tagsMemos = await this.memoRepository
+          .createQueryBuilder('memos')
+          .leftJoinAndSelect('memos.tags', 'tag')
+          .where('memos.userId = :userId', { userId: user.id })
+          .andWhere('memos.cateId = :cateId', { cateId: categoryId })
+          .andWhere('memos.id IN (:...ids)', { ids: tagsIds })
+          .orderBy('memos.id', 'DESC')
+          .skip(input.offset)
+          .take(input.limit)
+          .getMany();
 
         return {
           success: true,
           memos: tagsMemos.map((memo) => ({
-            ...memo,
-            tags: memo.tags.map((tag) => ({ ...tag })),
+            updateAt: memo.updateAt,
+            memoId: memo.id,
+            cateId: memo.cateId,
+            title: memo.title,
+            content: memo.content,
+            important: memo.important,
+            tags: memo.tags.map((tag) => ({
+              tagId: tag.id,
+              cateId: tag.cateId,
+              memoId: tag.memoId,
+              tagName: tag.tagName,
+            })),
           })),
         };
       }
@@ -315,10 +357,22 @@ export class MemoService {
     }
   }
 
-  async deleteCate(input: CateIdInputDto): Promise<CoreOutput> {
+  async deleteCate(input: CateIdInputDto): Promise<DeleteCateOutputDto> {
     try {
+      const getImportantMemoLength = await this.memoRepository
+        .createQueryBuilder('memos')
+        .where('memos.important = :important', { important: 1 })
+        .select('COUNT(*) AS importantMemoCount')
+        .getRawOne();
+
+      const importantMemoLength = getImportantMemoLength.importantMemoCount;
+
       await this.categoriesRepository.delete(input.cateId);
-      return { success: true, message: '해당 카테고리가 삭제되었습니다.' };
+      return {
+        success: true,
+        message: '해당 카테고리가 삭제되었습니다.',
+        importantMemoLength,
+      };
     } catch (e) {
       return { success: false, error: `${e}` };
     }
@@ -327,7 +381,7 @@ export class MemoService {
   async createMemo(
     input: CreateMemoInputDto,
     user: User,
-  ): Promise<CreateMemoOutDto> {
+  ): Promise<CreateMemoOutputDto> {
     try {
       const saveMemo = await this.memoRepository.save(
         this.memoRepository.create({
@@ -355,7 +409,20 @@ export class MemoService {
           }),
         );
       }
-      return { success: true, newMemoId: saveMemo.id, newTags };
+
+      return {
+        success: true,
+        newMemoId: saveMemo.id,
+        updateAt: saveMemo.updateAt,
+        newTags: newTags.map((tags) => {
+          return {
+            tagId: tags.id,
+            tagName: tags.tagName,
+            cateId: tags.cateId,
+            memoId: tags.memoId,
+          };
+        }),
+      };
     } catch (e) {
       return {
         success: false,

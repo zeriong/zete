@@ -2,20 +2,18 @@ import {Link} from "react-router-dom";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../vectors";
 import React, {useEffect, useMemo, useState} from "react";
 import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
-import {Category, Data, TableData} from "../../store/slices/constants";
+import {Category, CombineData, Data} from "../../store/slices/constants";
 import {match} from "assert";
 
 
 interface SetCateProps {
-    matchData?: Data[];
-    tableData?: TableData;
-    data?: Data[];
+    data?: Data;
     cate?: Category;
 }
 
 export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
-    const { tableData } = props;
-    const { cateStr, menuStr } = useHandleQueryStr()
+    const { data } = props;
+    const { cateStr, menuStr } = useHandleQueryStr();
 
     const [selected, setSelected] = useState(1);
 
@@ -29,7 +27,7 @@ export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
     return (
         <div className="flex flex-col font-bold gap-4px">
             {
-                tableData &&
+                data &&
                 <>
                     <Link
                         to={{pathname: '/memo'}}
@@ -47,7 +45,7 @@ export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
                             ${selected === 1 ? 'bg-white' : 'bg-zete-light-gray-300'}`}
                         >
                             <span className='relative bottom-1px'>
-                                {tableData.memos.length}
+                                {data.memosLength}
                             </span>
                         </div>
                     </Link>
@@ -68,7 +66,7 @@ export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
                             ${selected === 2 ? 'bg-white' : 'bg-zete-light-gray-300'}`}
                         >
                             <span className='relative bottom-1px'>
-                                {tableData.memos.filter(memo => memo.important === true).length}
+                                {data.importantMemoLength}
                             </span>
                         </div>
                     </Link>
@@ -79,7 +77,7 @@ export const MainMemoList: React.FC<SetCateProps> = (props: SetCateProps) => {
 }
 
 export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
-    const { matchData, cate, tableData } = props;
+    const { data, cate } = props;
     const { setSearchParams, tagStr, cateStr } = useHandleQueryStr();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -92,12 +90,8 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
     }
 
     const currentTags = useMemo(() => {
-        const findTags = tableData.tags
-            .filter(tags => tags.cateId === cate.cateId)
-            .map(tags => tags.tagName);
-
-        return findTags.filter((value, index) => findTags.indexOf(value) === index);
-    },[matchData, tableData])
+        return data.tagsInCate.filter(inCate => inCate.cateId === cate.cateId);
+    },[data])
 
     useEffect(() => {
         if (cateStr === cate.cateName) {
@@ -129,7 +123,7 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
                         ${isOpen ? 'bg-white' : 'group-hover:bg-white bg-zete-light-gray-300'}`}
                     >
                         <span className='relative bottom-1px'>
-                            {tableData.memos.filter(memos => memos.cateId === cate.cateId).length}
+                            {data.memoLengthInCate.filter(inCate => inCate.cateId === cate.cateId)[0]?.length || 0}
                         </span>
                     </div>
                 </button>
@@ -137,7 +131,7 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
                     {
                         currentTags && (
                             (currentTags.length !== 0) ? (
-                                currentTags.map((tagName, idx) => {
+                                currentTags.map((tagsInCate, idx) => {
                                     return (
                                         <div
                                             key={idx}
@@ -147,14 +141,14 @@ export const CategoryList: React.FC<SetCateProps> = (props: SetCateProps) => {
                                             <button
                                                 type='button'
                                                 className={`flex w-full h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
-                                                ${tagStr === tagName && 'bg-zete-light-gray-500'}`}
-                                                onClick={() => tagParamsHandler(tagName)}
+                                                ${tagStr === tagsInCate.tagName && 'bg-zete-light-gray-500'}`}
+                                                onClick={() => tagParamsHandler(tagsInCate.tagName)}
                                             >
                                                 <>
                                                     <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>
                                                 </>
                                                 <span>
-                                                    {tagName}
+                                                    {tagsInCate.tagName}
                                                 </span>
                                             </button>
                                         </div>

@@ -1,21 +1,23 @@
 import {CheckIcon, CloseIcon, FillStarIcon, PlusIcon, SearchIcon, StarIcon, StickerMemoIcon} from "../vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../hooks/useHandleQueryStr";
-import {handleInputChange, handleResizeHeight, setData, uniqueKey} from "../../utile";
+import {handleInputChange, handleResizeHeight, uniqueKey} from "../../utile";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../store";
 import {useHorizontalScroll} from "../../hooks/useHorizontalScroll";
 import {ADD_MEMO} from "../../store/slices/memo.slice";
 import {Api} from "../../utile/api";
+import {Category} from "../../store/slices/constants";
 
 export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
     const titleTextarea = useRef<HTMLTextAreaElement>(null);
     const tagsInput = useRef<HTMLInputElement>(null);
     const tagsRef = useRef([]);
+    const selectRef = useRef<HTMLSelectElement>(null);
 
     const { cateStr, tagStr, menuStr } = useHandleQueryStr();
-    const { tableData } = useSelector((state:RootState) => state.memo)
+    const { data } = useSelector((state:RootState) => state.memo)
 
     const dispatch = useDispatch();
     const horizonScroll = useHorizontalScroll();
@@ -25,6 +27,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
     const [tagValue, setTagValue] = useState<string>('');
     const [isImportant, setIsImportant] = useState<boolean>(false);
     const [tagNames, setTagNames] = useState<string[]>([]);
+    const [selectedCate, setSelectedCate] = useState<Category[]>([]);
     const [selectedCateId, setSelectedCateId] = useState<number|null>(null);
     const [selectedCateName, setSelectedCateName] = useState<string>('');
 
@@ -78,25 +81,31 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         Api().memo.createMemo(newData)
             .then((res) => {
                 if (res.data.success) {
-                    console.log('받은 테그즈',res.data.newTags)
-                    const resTags = res.data.newTags.map((tags) => {
+                    console.log(res.data);
+                    const data = res.data;
+                    const updateAt = new Date(data.updateAt).valueOf();
+
+                    const resTags = data.newTags.map((tags) => {
                         return {
-                            tagId: tags.id,
+                            tagId: tags.tagId,
                             tagName: tags.tagName,
                             cateId: tags.cateId,
                             memoId: tags.memoId,
                         }
-                    })
+                    });
                     dispatch(ADD_MEMO({
+                        memoId: data.newMemoId,
                         cateId: selectedCateId,
                         important: isImportant,
                         title: titleValue,
                         content,
                         tags: resTags,
+                        updateAt,
                     }));
-                    setData();
                     setMemoValue('');
                     setTitleValue('');
+                    setTagNames([]);
+                    setIsImportant(false);
 
                     memoTextarea.current.style.height = 'auto';
                     titleTextarea.current.style.height = 'auto';
@@ -125,7 +134,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
             setSelectedCateId(null);
             return
         }
-        const selectedCate = tableData.categories.filter(cate => cate.cateName === event.target.value);
+        const selectedCate = data.cate.filter(cate => cate.cateName === event.target.value);
         setSelectedCateId(selectedCate[0].cateId);
         setSelectedCateName(selectedCate[0].cateName);
     }
@@ -134,6 +143,14 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         const filter = tagNames.filter(tagName => tagName !== name);
         setTagNames(filter)
     }
+
+    useEffect(() => {
+        if (selectRef.current && data) {
+            console.log('이제 그만하자')
+            setSelectedCate(data.cate.filter(cate => cate.cateName === selectRef.current.value));
+            setSelectedCateId(data.cate.filter(cate => cate.cateName === selectRef.current.value)[0]?.cateId);
+        }
+    },[data, cateStr])
 
     useEffect(() => {
         if (tagStr) {
@@ -151,7 +168,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         else setIsImportant(false);
 
         if (cateStr) {
-            const defaultSelectedCate = tableData.categories.filter(cate => cate.cateName === cateStr)[0];
+            const defaultSelectedCate = data.cate.filter(cate => cate.cateName === cateStr)[0];
             if (defaultSelectedCate) {
                 newSelectedCateId = defaultSelectedCate.cateId;
                 newSelectedCateName = defaultSelectedCate.cateName;
@@ -234,12 +251,13 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                         }
                         <div className='h-full w-full text-zete-dark-400'>
                             <select
+                                ref={selectRef}
                                 value={selectedCateName}
                                 onChange={handleSelectChange}
                             >
                                 <option>전체메모</option>
                                 {
-                                    tableData.categories.map((cate, idx) => {
+                                    data.cate.map((cate, idx) => {
                                         return (
                                             <option key={idx}>
                                                 {cate.cateName}

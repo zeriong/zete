@@ -1,6 +1,4 @@
 import css from 'dom-css';
-import {store} from "../store";
-import {SET_DATA} from "../store/slices/memo.slice";
 
 export const getCookie = (name: string) => {
     let value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
@@ -97,5 +95,3 @@ export const subUniqueKey = () => {
             String(Math.random()))
     )
 }
-
-export const setData = () => store.dispatch(SET_DATA());

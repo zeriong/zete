@@ -15,7 +15,7 @@ import {Api} from "../../utile/api";
 export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
-    const { tableData } = useSelector((state: RootState) => (state.memo));
+    // const { tableData } = useSelector((state: RootState) => (state.memo));
     const { cateStr, tagStr, menuStr } = useHandleQueryStr()
 
     const [existCate,setExistCate] = useState(false);
@@ -26,14 +26,14 @@ export const MemoLayout = () => {
         dispatch(sendMyProfile());
     }, [dispatch])
 
-    useEffect(() => {
-        const cateList = tableData.categories.map((cate) => cate.cateName);
-        if (cateList.find((list) => list === cateStr)) {
-            setExistCate(true);
-        } else {
-            setExistCate(false);
-        }
-    },[tagStr,cateStr, tableData])
+    // useEffect(() => {
+    //     const cateList = tableData.categories.map((cate) => cate.cateName);
+    //     if (cateList.find((list) => list === cateStr)) {
+    //         setExistCate(true);
+    //     } else {
+    //         setExistCate(false);
+    //     }
+    // },[tagStr,cateStr, tableData])
 
     return ( loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
         <>

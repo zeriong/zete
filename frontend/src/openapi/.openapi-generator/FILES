@@ -13,6 +13,7 @@ index.ts
 models/access-token-output.ts
 models/cate-id-input-dto.ts
 models/cate-input-dto.ts
+models/cate-name-and-cate-id.ts
 models/categories.ts
 models/core-output.ts
 models/create-account-dto.ts
@@ -21,14 +22,18 @@ models/create-cate-output-dto.ts
 models/create-completion-input-dto.ts
 models/create-completion-input-obj.ts
 models/create-memo-input-dto.ts
-models/create-memo-out-dto.ts
+models/create-memo-new-tags-output-dto.ts
+models/create-memo-output-dto.ts
+models/delete-cate-output-dto.ts
 models/index.ts
 models/login-input.ts
 models/login-output.ts
 models/memo-length-in-cate.ts
 models/memos.ts
 models/pagination-input-dto.ts
+models/pagination-memos-dto.ts
 models/pagination-output-dto.ts
+models/pagination-tags-dto.ts
 models/send-default-data-output-dto.ts
 models/tag-name-and-cate-id.ts
 models/tags.ts

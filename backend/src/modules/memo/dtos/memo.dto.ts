@@ -54,15 +54,69 @@ export class PaginationInputDto {
   menuStr?: string;
 }
 
-export class CreateMemoOutDto extends CoreOutput {
+export class CreateMemoNewTagsOutputDto {
+  @ApiProperty({ type: Number })
+  tagId: number;
+
+  @ApiProperty({ type: Number })
+  cateId: number;
+
+  @ApiProperty({ type: Number })
+  memoId: number;
+
+  @ApiProperty()
+  tagName: string;
+}
+
+export class CreateMemoOutputDto extends CoreOutput {
   @ApiProperty({ type: Number })
   newMemoId?: number;
 
-  @ApiProperty({ type: [Tags], required: false })
-  newTags?: Array<Tags>;
+  @ApiProperty({ type: Date })
+  updateAt?: Date;
+
+  @ApiProperty({ type: [CreateMemoNewTagsOutputDto] })
+  newTags?: Array<CreateMemoNewTagsOutputDto>;
+}
+
+export class PaginationTagsDto {
+  @ApiProperty({ type: Number })
+  memoId: number;
+
+  @ApiProperty({ type: Number })
+  cateId: number;
+
+  @ApiProperty({ type: Number })
+  tagId: number;
+
+  @ApiProperty()
+  tagName: string;
+}
+
+export class PaginationMemosDto {
+  @ApiProperty({ type: Number })
+  memoId: number;
+
+  @ApiProperty({ type: Number })
+  cateId: number;
+
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  content: string;
+
+  @ApiProperty()
+  updateAt: Date;
+
+  @ApiProperty({ type: Boolean })
+  important: boolean;
+
+  @ApiProperty({ type: [PaginationTagsDto] })
+  tags: Array<PaginationTagsDto>;
 }
 
 export class PaginationOutputDto extends CoreOutput {
-  @ApiProperty({ type: [Memos], required: false })
-  memos?: Array<Memos>;
+  @ApiProperty({ type: [PaginationMemosDto], required: false })
+  memos?: Array<PaginationMemosDto>;
 }

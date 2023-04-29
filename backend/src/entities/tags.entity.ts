@@ -30,6 +30,7 @@ export class Tags extends coreEntity {
 
   @ApiProperty({ type: Promise<Categories> })
   @ManyToOne(() => Categories, (cate) => cate.tags, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'cateId' })
   cate: Categories;
 
   @ApiProperty({ type: Number })

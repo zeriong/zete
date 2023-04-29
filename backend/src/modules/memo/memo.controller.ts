@@ -2,14 +2,14 @@ import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MemoService } from './memo.service';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
-import { CreateMemoInputDto, CreateMemoOutDto, PaginationInputDto, PaginationOutputDto } from './dtos/memo.dto';
+import { CreateMemoInputDto, CreateMemoOutputDto, PaginationInputDto, PaginationOutputDto } from './dtos/memo.dto';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import {
   CreateCateInputDto,
   CreateCateOutputDto,
   UpdateManyCateInputDto,
   CateInputDto,
-  CateIdInputDto,
+  CateIdInputDto, DeleteCateOutputDto
 } from './dtos/cate.dto';
 import { SendDefaultDataOutputDto } from './dtos/sendContentData.dto';
 
@@ -18,13 +18,13 @@ import { SendDefaultDataOutputDto } from './dtos/sendContentData.dto';
 export class MemoController {
   constructor(private readonly memoService: MemoService) {}
 
-  @ApiResponse({ type: CreateMemoOutDto })
+  @ApiResponse({ type: CreateMemoOutputDto })
   @UseGuards(JwtAuthGuard)
   @Post('createMemo')
   createMemo(
     @Req() req,
     @Body() input: CreateMemoInputDto,
-  ): Promise<CreateMemoOutDto> {
+  ): Promise<CreateMemoOutputDto> {
     return this.memoService.createMemo(input, req.user);
   }
 
@@ -57,9 +57,9 @@ export class MemoController {
     return this.memoService.updateManyCate(input);
   }
 
-  @ApiResponse({ type: CoreOutput })
+  @ApiResponse({ type: DeleteCateOutputDto })
   @Delete()
-  deleteCate(@Body() input: CateIdInputDto): Promise<CoreOutput> {
+  deleteCate(@Body() input: CateIdInputDto): Promise<DeleteCateOutputDto> {
     return this.memoService.deleteCate(input);
   }
 

@@ -34,7 +34,9 @@ import { CreateCateOutputDto } from '../models';
 // @ts-ignore
 import { CreateMemoInputDto } from '../models';
 // @ts-ignore
-import { CreateMemoOutDto } from '../models';
+import { CreateMemoOutputDto } from '../models';
+// @ts-ignore
+import { DeleteCateOutputDto } from '../models';
 // @ts-ignore
 import { PaginationInputDto } from '../models';
 // @ts-ignore
@@ -314,7 +316,7 @@ export const MemoApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createMemo(createMemoInputDto: CreateMemoInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateMemoOutDto>> {
+        async createMemo(createMemoInputDto: CreateMemoInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateMemoOutputDto>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createMemo(createMemoInputDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -324,7 +326,7 @@ export const MemoApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteCate(cateIdInputDto: CateIdInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
+        async deleteCate(cateIdInputDto: CateIdInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeleteCateOutputDto>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCate(cateIdInputDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -392,7 +394,7 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMemo(createMemoInputDto: CreateMemoInputDto, options?: any): AxiosPromise<CreateMemoOutDto> {
+        createMemo(createMemoInputDto: CreateMemoInputDto, options?: any): AxiosPromise<CreateMemoOutputDto> {
             return localVarFp.createMemo(createMemoInputDto, options).then((request) => request(axios, basePath));
         },
         /**
@@ -401,7 +403,7 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteCate(cateIdInputDto: CateIdInputDto, options?: any): AxiosPromise<CoreOutput> {
+        deleteCate(cateIdInputDto: CateIdInputDto, options?: any): AxiosPromise<DeleteCateOutputDto> {
             return localVarFp.deleteCate(cateIdInputDto, options).then((request) => request(axios, basePath));
         },
         /**

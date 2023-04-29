@@ -5,16 +5,15 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../store";
 import CustomScroller from "../components/customScroller";
 import {ADD_CATE, DELETE_CATE, UPDATE_MANY_CATE, UPDATE_ONE_CATE} from "../store/slices/memo.slice";
-import {setData} from "../utile";
 import {Api} from "../utile/api";
 import {Category} from "../store/slices/constants";
 
 export const CateModifyModal = () => {
     const deleteButtonRef = useRef(null)
 
-    const { tableData } = useSelector((state: RootState) => state.memo);
+    const { data } = useSelector((state: RootState) => state.memo);
 
-    const categories = tableData.categories
+    const categories = data.cate
 
     const [isShow, setIsShow] = useState(false);
     const [newCateListNames, setNewCateListNames] = useState<string[]>(categories.map(cate => cate.cateName));
@@ -35,7 +34,6 @@ export const CateModifyModal = () => {
             .then((res) => {
                 if (res.data.success) {
                     dispatch(ADD_CATE(res.data.savedCate));
-                    setData();
                     setAddCateValue('');
                 } else {
                     alert(res.data.error);
@@ -48,16 +46,15 @@ export const CateModifyModal = () => {
             .then((res) => {
                 if (res.data.success) {
                     setIsAgreeShow(false);
-                    deleteCate(getCateId);
+                    deleteCate(getCateId, res.data.importantMemoLength);
                 } else {
                     alert(res.data.error);
                 }})
             .catch(e => console.log(e))
     }
 
-    const deleteCate = (cateId: number) => {
-        dispatch(DELETE_CATE(cateId));
-        setData();
+    const deleteCate = (cateId: number, importantMemoLength: number) => {
+        dispatch(DELETE_CATE({cateId, importantMemoLength}));
     }
 
     const handleUpdateName = (idx, event) => {
@@ -75,7 +72,6 @@ export const CateModifyModal = () => {
                 if (res.data.success) {
                     setIsShow(false);
                     dispatch(UPDATE_MANY_CATE(newCateList));
-                    setData();
                 } else {
                     alert(res.data.error)
                 }})
@@ -103,10 +99,10 @@ export const CateModifyModal = () => {
         useEffect(() => {
             setNewCateList(categories);
             setNewCateListNames(categories.map(cate => cate.cateName));
-        },[tableData])
+        },[data])
 
         useEffect(() => {
-            const reBuildNewCate = tableData.categories.map((cate, idx) => {
+            const reBuildNewCate = data.cate.map((cate, idx) => {
             return {
                 cateId: cate.cateId,
                 cateName: newCateListNames[idx]
@@ -127,7 +123,7 @@ export const CateModifyModal = () => {
                 <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
                     <ModifyIcon className='mr-10px'/>
                     <span>{
-                        tableData.categories.length !== 0 ?
+                        data.cate.length !== 0 ?
                         '카테고리 수정' : '카테고리 추가'
                     }</span>
                 </div>

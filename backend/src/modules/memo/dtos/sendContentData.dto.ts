@@ -19,6 +19,14 @@ export class TagNameAndCateId {
   tagName: string;
 }
 
+export class CateNameAndCateId {
+  @ApiProperty({ type: Number })
+  cateId: number;
+
+  @ApiProperty()
+  cateName: string;
+}
+
 export class SendDefaultDataOutputDto extends CoreOutput {
   @ApiProperty({ type: Number, required: false })
   memosLength?: number;
@@ -32,6 +40,6 @@ export class SendDefaultDataOutputDto extends CoreOutput {
   @ApiProperty({ type: [TagNameAndCateId], required: false })
   tags?: Array<TagNameAndCateId>;
 
-  @ApiProperty({ type: [Categories], required: false })
-  cate?: Array<Categories>;
+  @ApiProperty({ type: [CateNameAndCateId], required: false })
+  cate?: Array<CateNameAndCateId>;
 }
