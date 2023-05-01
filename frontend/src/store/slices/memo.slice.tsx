@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {addMemoPayload, Category, CombineData, Data, memoSliceInitState} from "./constants";
+import {addMemoPayload, Category, CombineData, Data, Memos, memoSliceInitState} from "./constants";
 import {execSync} from "child_process";
 import {tab} from "@testing-library/user-event/dist/tab";
 
@@ -153,6 +153,38 @@ export const memoSlice = createSlice({
                 }
             }
         },
+        SET_MEMO: (state: CombineData, action: PayloadAction<Memos[]>) => {
+            return {
+                data: {
+                    ...state.data,
+                    memos: [...state.data.memos, ...action.payload]
+                }
+            }
+        },
+        SET_IMPORTANT_LENGTH: (state: CombineData, action: PayloadAction<number>) => {
+            return {
+                data: {
+                    ...state.data,
+                    importantMemoLength: action.payload,
+                }
+            }
+        },
+        CHANGE_IMPORTANT: (state: CombineData, action: PayloadAction<Memos[]>) => {
+            return {
+                data: {
+                    ...state.data,
+                    memos: action.payload,
+                }
+            }
+        },
+        RESET_MEMOS: (state: CombineData) => {
+            return {
+                data: {
+                    ...state.data,
+                    memos: [],
+                }
+            }
+        },
         // UPDATE_MEMO: (state: MemoData, action: PayloadAction<ModifyMemoPayload>) => {
         //     const { ...table } = state.tableData;
         //     const { categoryId, title, content, important, tagNames, memoId } = action.payload;
@@ -260,23 +292,9 @@ export const memoSlice = createSlice({
         //     state.tableData.cateMemos = state.tableData.cateMemos.filter((cateMemo) => cateMemo.memoId !== memoId);
         //     state.tableData.tags = state.tableData.tags.filter(tags => deleteTagsMemos.some(delCate => delCate.tagId === tags.tagId));
         // },
-
-        // CHANGE_IMPORTANT: (state: MemoData, action: PayloadAction<number>) => {
-        //     const memoId = action.payload
-        //     state.tableData.memos = state.tableData.memos.map(memos => {
-        //         let modifyMemo = memos
-        //
-        //         if (memos.memoId === memoId) {
-        //             modifyMemo = {
-        //                 ...memos,
-        //                 important: memos.important !== true
-        //             }
-        //         }
-        //
-        //         return modifyMemo
-        //     })
-        // },
     },
 });
 
-export const { SET_DATA, ADD_CATE, DELETE_CATE, UPDATE_MANY_CATE, UPDATE_ONE_CATE, ADD_MEMO } = memoSlice.actions;
+export const {
+    SET_DATA, ADD_CATE, DELETE_CATE, UPDATE_MANY_CATE, UPDATE_ONE_CATE, ADD_MEMO,
+    SET_MEMO, SET_IMPORTANT_LENGTH, CHANGE_IMPORTANT, RESET_MEMOS } = memoSlice.actions;

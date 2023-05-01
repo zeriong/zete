@@ -24,10 +24,11 @@ models/create-completion-input-obj.ts
 models/create-memo-input-dto.ts
 models/create-memo-new-tags-output-dto.ts
 models/create-memo-output-dto.ts
-models/delete-cate-output-dto.ts
+models/important-memo-length-output-dto.ts
 models/index.ts
 models/login-input.ts
 models/login-output.ts
+models/memo-id-input-dto.ts
 models/memo-length-in-cate.ts
 models/memos.ts
 models/pagination-input-dto.ts

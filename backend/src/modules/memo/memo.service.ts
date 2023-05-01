@@ -19,7 +19,7 @@ import {
   UpdateManyCateInputDto,
   CateInputDto,
   CateIdInputDto,
-  DeleteCateOutputDto,
+  ImportantMemoLengthOutputDto,
 } from './dtos/cate.dto';
 import { SendDefaultDataOutputDto } from './dtos/sendContentData.dto';
 
@@ -137,7 +137,7 @@ export class MemoService {
         };
       }
 
-      if (input.menuStr) {
+      if (input.menuStr === 'important') {
         const importantMemos = await this.memoRepository
           .createQueryBuilder('memos')
           .leftJoinAndSelect('memos.tags', 'tag')
@@ -357,7 +357,9 @@ export class MemoService {
     }
   }
 
-  async deleteCate(input: CateIdInputDto): Promise<DeleteCateOutputDto> {
+  async deleteCate(
+    input: CateIdInputDto,
+  ): Promise<ImportantMemoLengthOutputDto> {
     try {
       const getImportantMemoLength = await this.memoRepository
         .createQueryBuilder('memos')
@@ -430,17 +432,31 @@ export class MemoService {
       };
     }
   }
-  async changeImportant(input: MemoIdInputDto): Promise<CoreOutput> {
+  async changeImportant(
+    input: MemoIdInputDto,
+  ): Promise<ImportantMemoLengthOutputDto> {
     try {
       const targetMemo = await this.memoRepository.findOneOrFail({
         where: { id: input.memoId },
       });
 
-      targetMemo.important = !targetMemo.important;
+      await this.memoRepository.update(input.memoId, {
+        important: !targetMemo.important,
+      });
 
-      await this.memoRepository.save(targetMemo);
+      const getImportantMemoLength = await this.memoRepository
+        .createQueryBuilder('memos')
+        .where('memos.important = :important', { important: 1 })
+        .select('COUNT(*) AS importantMemoCount')
+        .getRawOne();
 
-      return { success: true, message: 'changed important' };
+      const importantMemoLength = getImportantMemoLength.importantMemoCount;
+
+      return {
+        success: true,
+        message: 'changed important',
+        importantMemoLength,
+      };
     } catch (e) {
       return {
         success: false,

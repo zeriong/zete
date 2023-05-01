@@ -2,14 +2,21 @@ import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MemoService } from './memo.service';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
-import { CreateMemoInputDto, CreateMemoOutputDto, PaginationInputDto, PaginationOutputDto } from './dtos/memo.dto';
+import {
+  CreateMemoInputDto,
+  CreateMemoOutputDto,
+  MemoIdInputDto,
+  PaginationInputDto,
+  PaginationOutputDto,
+} from './dtos/memo.dto';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import {
   CreateCateInputDto,
   CreateCateOutputDto,
   UpdateManyCateInputDto,
   CateInputDto,
-  CateIdInputDto, DeleteCateOutputDto
+  CateIdInputDto,
+  ImportantMemoLengthOutputDto,
 } from './dtos/cate.dto';
 import { SendDefaultDataOutputDto } from './dtos/sendContentData.dto';
 
@@ -57,9 +64,11 @@ export class MemoController {
     return this.memoService.updateManyCate(input);
   }
 
-  @ApiResponse({ type: DeleteCateOutputDto })
+  @ApiResponse({ type: ImportantMemoLengthOutputDto })
   @Delete()
-  deleteCate(@Body() input: CateIdInputDto): Promise<DeleteCateOutputDto> {
+  deleteCate(
+    @Body() input: CateIdInputDto,
+  ): Promise<ImportantMemoLengthOutputDto> {
     return this.memoService.deleteCate(input);
   }
 
@@ -71,5 +80,13 @@ export class MemoController {
     @Req() req,
   ): Promise<PaginationOutputDto> {
     return this.memoService.scrollPagination(input, req.user);
+  }
+
+  @ApiResponse({ type: ImportantMemoLengthOutputDto })
+  @Post('changeImportant')
+  changeImportant(
+    @Body() input: MemoIdInputDto,
+  ): Promise<ImportantMemoLengthOutputDto> {
+    return this.memoService.changeImportant(input);
   }
 }

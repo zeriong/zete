@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  RelationId,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Tags } from './tags.entity';
 import { User } from './user.entity';
@@ -16,11 +23,12 @@ export class Memos extends coreEntity {
   content: string;
 
   @ApiProperty({ type: Boolean })
-  @Column({ type: 'text' }) //text: 	65,535
+  @Column({ type: 'boolean' }) //text: 	65,535
   important: boolean;
 
   @ApiProperty({ type: Promise<User> })
   @ManyToOne(() => User, (user) => user.memos, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
   user: User;
 
   @ApiProperty({ type: Number })

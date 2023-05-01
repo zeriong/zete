@@ -1,18 +1,18 @@
 import React from "react";
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import {Home} from "../pages/intro";
-import {MemoLayout} from "../layout/memo";
-import {ProfileModify} from "../pages/memo/profileModify";
+import {Home} from "../modules/intro/pages";
+import {MemoLayout} from "../modules/main/layout";
+import {ProfileModify} from "../modules/main/pages/profileModify";
 import {PrivateElement} from "./privateElement";
-import {Profile} from "../pages/memo/profile";
-import {MemoMain} from "../pages/memo";
-import {HomeLayout} from "../layout/intro";
-import {Service} from "../pages/intro/service";
-import {Guide} from "../pages/intro/guide";
-import {PayNotice} from "../pages/intro/paymentNotice";
-import {UserExp} from "../pages/intro/userExperience";
-import {Notice} from "../pages/intro/notice";
-import MemoInfoPopov from "../popovers/MemoInfoPopov";
+import {Profile} from "../modules/main/pages/profile";
+import {MemoMain} from "../modules/main/pages";
+import {HomeLayout} from "../modules/intro/layout";
+import {Service} from "../modules/intro/pages/service";
+import {Guide} from "../modules/intro/pages/guide";
+import {PayNotice} from "../modules/intro/pages/paymentNotice";
+import {UserExp} from "../modules/intro/pages/userExperience";
+import {Notice} from "../modules/intro/pages/notice";
+import {MemoInfoPopover} from "../modules/main/components/popovers/MemoInfoPopover";
 
 export const Index = ()=> {
     return (
@@ -25,7 +25,7 @@ export const Index = ()=> {
                     <Route path="userExp" element={<UserExp/>}/>
                     <Route path="payNotice" element={<PayNotice/>}/>
                     <Route path="notice" element={<Notice/>}/>
-                    <Route path="e" element={<MemoInfoPopov/>}/>
+                    <Route path="e" element={<MemoInfoPopover/>}/>
                 </Route>
 
                 <Route path="/memo/*" element={<PrivateElement><MemoLayout/></PrivateElement>}>

@@ -247,7 +247,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeleteCateOutputDto"
+                $ref: "#/components/schemas/ImportantMemoLengthOutputDto"
       tags:
         - Memo
   /memo/scrollPagination:
@@ -267,6 +267,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginationOutputDto"
+      tags:
+        - Memo
+  /memo/changeImportant:
+    post:
+      operationId: changeImportant
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemoIdInputDto"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportantMemoLengthOutputDto"
       tags:
         - Memo
   /openAi/createCompletion:
@@ -709,7 +728,7 @@ components:
           nullable: true
       required:
         - cateId
-    DeleteCateOutputDto:
+    ImportantMemoLengthOutputDto:
       type: object
       properties:
         error:
@@ -804,6 +823,13 @@ components:
             $ref: "#/components/schemas/PaginationMemosDto"
       required:
         - success
+    MemoIdInputDto:
+      type: object
+      properties:
+        memoId:
+          type: number
+      required:
+        - memoId
     CreateCompletionInputObj:
       type: object
       properties:

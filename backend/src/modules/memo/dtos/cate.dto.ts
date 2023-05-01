@@ -39,7 +39,7 @@ export class CreateCateOutputDto extends CoreOutput {
   savedCate?: CateInputDto;
 }
 
-export class DeleteCateOutputDto extends CoreOutput {
+export class ImportantMemoLengthOutputDto extends CoreOutput {
   @ApiProperty({ type: Number, required: false })
   importantMemoLength?: number;
 }

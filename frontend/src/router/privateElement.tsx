@@ -11,9 +11,9 @@ export const PrivateElement = ({children}: PrivateRouterProps) : React.ReactElem
     const { data: {isLoggedIn} } = useSelector((state: RootState) => (state.auth));
     let location = useLocation();
 
-    console.log('프라이빗 접근!!!!');
+    // console.log('프라이빗 접근!!!!');
     if (isLoggedIn) {
-        console.log('로그인 확인');
+        // console.log('로그인 확인');
         return children
     } else {
         return <Navigate to={'/'} state={{ from: location }}/>

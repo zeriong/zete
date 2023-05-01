@@ -36,7 +36,9 @@ import { CreateMemoInputDto } from '../models';
 // @ts-ignore
 import { CreateMemoOutputDto } from '../models';
 // @ts-ignore
-import { DeleteCateOutputDto } from '../models';
+import { ImportantMemoLengthOutputDto } from '../models';
+// @ts-ignore
+import { MemoIdInputDto } from '../models';
 // @ts-ignore
 import { PaginationInputDto } from '../models';
 // @ts-ignore
@@ -51,6 +53,41 @@ import { UpdateManyCateInputDto } from '../models';
  */
 export const MemoApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @param {MemoIdInputDto} memoIdInputDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        changeImportant: async (memoIdInputDto: MemoIdInputDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'memoIdInputDto' is not null or undefined
+            assertParamExists('changeImportant', 'memoIdInputDto', memoIdInputDto)
+            const localVarPath = `/memo/changeImportant`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(memoIdInputDto, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @param {CreateCateInputDto} createCateInputDto 
@@ -302,6 +339,16 @@ export const MemoApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {MemoIdInputDto} memoIdInputDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async changeImportant(memoIdInputDto: MemoIdInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ImportantMemoLengthOutputDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.changeImportant(memoIdInputDto, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {CreateCateInputDto} createCateInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -326,7 +373,7 @@ export const MemoApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteCate(cateIdInputDto: CateIdInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeleteCateOutputDto>> {
+        async deleteCate(cateIdInputDto: CateIdInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ImportantMemoLengthOutputDto>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteCate(cateIdInputDto, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -381,6 +428,15 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
     return {
         /**
          * 
+         * @param {MemoIdInputDto} memoIdInputDto 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        changeImportant(memoIdInputDto: MemoIdInputDto, options?: any): AxiosPromise<ImportantMemoLengthOutputDto> {
+            return localVarFp.changeImportant(memoIdInputDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {CreateCateInputDto} createCateInputDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -403,7 +459,7 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteCate(cateIdInputDto: CateIdInputDto, options?: any): AxiosPromise<DeleteCateOutputDto> {
+        deleteCate(cateIdInputDto: CateIdInputDto, options?: any): AxiosPromise<ImportantMemoLengthOutputDto> {
             return localVarFp.deleteCate(cateIdInputDto, options).then((request) => request(axios, basePath));
         },
         /**
@@ -451,6 +507,17 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
  * @extends {BaseAPI}
  */
 export class MemoApi extends BaseAPI {
+    /**
+     * 
+     * @param {MemoIdInputDto} memoIdInputDto 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MemoApi
+     */
+    public changeImportant(memoIdInputDto: MemoIdInputDto, options?: AxiosRequestConfig) {
+        return MemoApiFp(this.configuration).changeImportant(memoIdInputDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {CreateCateInputDto} createCateInputDto 

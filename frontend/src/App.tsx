@@ -3,7 +3,7 @@ import { Index } from "./router";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "./store";
 import {sendRefreshAccessToken} from "./store/slices/auth.slice";
-import {Api} from "./utile/api";
+import {ApiLib} from "./common/libs/api.lib";
 import {SET_DATA} from "./store/slices/memo.slice";
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
     useEffect( ()=> {
         (async () => {
             await dispatch(sendRefreshAccessToken());
-            await Api().memo.sendDefaultData().then((res) => {
+            await ApiLib().memo.sendDefaultData().then((res) => {
                 if (res.data.success) {
                     console.log(res.data)
                     const { importantMemoLength, memosLength, memoLengthInCate, cate, tags } = res.data
@@ -41,7 +41,7 @@ function App() {
         })();
         (async () => {
             await dispatch(sendRefreshAccessToken());
-            await Api().memo.scrollPagination({
+            await ApiLib().memo.scrollPagination({
                 offset: 0,
                 limit: 10,
                 cateStr: null,
