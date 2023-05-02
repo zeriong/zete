@@ -1,15 +1,16 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useMemo} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {SET_ALERT} from "../../../store/slices/alert.slice";
 import {RootState} from "../../../store";
 import {SET_SHOW_MENU, TOGGLE_SHOW_MENU} from "../../../store/slices/changedMenu.slice";
-import {CategoryList, MainMemoList} from "./asideComponents";
 import CustomScroller from "../../../common/components/customScroller";
 import {CateModifyModal} from "../components/modals/cateModifyModal";
+import {Link, To} from "react-router-dom";
+import {TagsInCate} from "../../../store/slices/constants";
+import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
+import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../../../assets/vectors";
 
 export const Aside = () => {
     const dispatch = useDispatch();
-    const { alerts } = useSelector((state: RootState) => state.alert);
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
 
     const { data } = useSelector((state: RootState) => state.memo);
@@ -44,46 +45,112 @@ export const Aside = () => {
             >
                 <CustomScroller>
                     <div className="flex flex-col h-full w-full min-h-[600px] p-14px text-zete-dark-500 font-light text-14">
-                        <>
-                            <MainMemoList data={data}/>
-                        </>
+                        <ul className='flex flex-col justify-center gap-4px'>
+                            <CateItemList
+                                to={{ pathname: '/memo' }}
+                                iconComponent={AllIcon}
+                                iconClassName='mr-14px w-20px'
+                                cateName='전체메모'
+                                cateId={null}
+                                count={data.memosLength}
+                            />
+                            <CateItemList
+                                to={{ pathname: '/memo', search: '?menu=important' }}
+                                iconComponent={StarIcon}
+                                iconClassName='mr-14px w-20px'
+                                cateName='중요메모'
+                                cateId={null}
+                                count={data.importantMemoLength}
+                            />
+                        </ul>
                         <p className='text-zete-dark-300 text-11 font-light pb-14px pt-17px pl-12px'>
                             카테고리
                         </p>
                         <ul className='grid gap-4px'>
-                            {
-                                data &&
-                                data.cate.map((cate, idx) => {
+                            {data.cate.map((cate, idx) => {
+                                const count = data.memoLengthInCate.find(find => find.cateId === cate.cateId)?.length || 0;
+                                const tags = data.tagsInCate.filter(find => find.cateId === cate.cateId) || []
                                     return (
-                                        <CategoryList
+                                        <CateItemList
                                             key={idx}
-                                            data={data}
-                                            cate={cate}
+                                            to={{ pathname: '/memo', search: `?cate=${cate.cateId}` }}
+                                            iconComponent={CategoryIcon}
+                                            iconClassName='mr-10px mt-4px min-w-[21px]'
+                                            cateName={cate.cateName}
+                                            cateId={String(cate.cateId)}
+                                            count={count}
+                                            tags={tags}
                                         />
                                     )
                                 })
                             }
                         </ul>
-                        <>
-                            <CateModifyModal/>
-                        </>
-                        <button
-                            className="fixed bg-black text-white bottom-0 right-0 p-2"
-                            type="button"
-                            onClick={
-                                () => {
-                                    dispatch(
-                                        SET_ALERT({type: "success", message:"안녕안녕안녕안녕ㅇㄴ"})
-                                    )
-                                    console.log(alerts);
-                                }
-                            }
-                        >
-                            알림 테스트
-                        </button>
+                        <CateModifyModal/>
                     </div>
                 </CustomScroller>
             </nav>
         </>
+    )
+}
+
+const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string, cateName: string, cateId: string, count: number, tags?: TagsInCate[] }) => {
+    const { tagQueryStr, cateQueryStr, searchParams, menuQueryStr } = useHandleQueryStr();
+
+    const isActive = useMemo(() => {
+        if (props.cateId) return cateQueryStr === props.cateId
+        if (props.cateName === '전체메모') return !cateQueryStr && !tagQueryStr && !menuQueryStr
+        if (props.cateName === '중요메모') return menuQueryStr
+    },[searchParams])
+
+    return (
+        <li
+            className={`font-bold group rounded-[5px] hover:bg-zete-light-gray-200
+            ${isActive && 'bg-zete-light-gray-200'}`}
+        >
+            <Link
+                to={props.to}
+                className='flex w-full justify-between items-center p-10px hover:bg-zete-light-gray-200 rounded-[5px]'
+            >
+                <div
+                    className={`flex justify-start w-full font-light transition-all duration-150
+                    ${props.cateId ? 'items-start' : 'items-center'}`}
+                >
+                    <props.iconComponent className={props.iconClassName}/>
+                    <span>
+                        {props.cateName}
+                    </span>
+                </div>
+                <div
+                    className={`rounded-full text-zete-dark-100 py-2px px-8px text-12 font-medium
+                    ${isActive ? 'bg-white' : 'group-hover:bg-white bg-zete-light-gray-300'}`}
+                >
+                        <span className='relative bottom-1px'>
+                            {props.count}
+                        </span>
+                </div>
+            </Link>
+            <div className={(isActive && props.tags?.length > 0) ? 'px-12px pb-12px' : 'h-0 overflow-hidden'}>
+                {props.tags?.map((tags, idx) => (
+                    <div
+                        key={idx}
+                        className={`overflow-hidden font-light text-13 transition-all duration-300 
+                                    ${isActive ? 'max-h-[200px] mt-6px' : 'h-[0vh] p-0 m-0'}`}
+                    >
+                        <Link
+                            to={{ pathname: '/memo', search: `${props.to.search}&tag=${tags.tagName}` }}
+                            className={`flex w-full h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
+                                        ${tagQueryStr === tags.tagName && 'bg-zete-light-gray-500'}`}
+                        >
+                            <>
+                                <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>
+                            </>
+                            <span>
+                                {tags.tagName}
+                            </span>
+                        </Link>
+                    </div>
+                ))}
+            </div>
+        </li>
     )
 }

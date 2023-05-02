@@ -11,7 +11,7 @@ import {subUniqueKey} from "../../../common/libs/common.lib";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
 import {MemoModifyModal} from "../components/modals/memoModifyModal";
 import {SavedMemoMenuPopover} from "../components/popovers/savedMemoMenuPopover";
-import {ApiLib} from "../../../common/libs/api.lib";
+import {Api} from "../../../common/libs/api";
 import {
     ADD_MEMO,
     CHANGE_IMPORTANT,
@@ -25,23 +25,39 @@ export const MemoMain = () => {
     const divObsRef = useRef(null);
     const loadEndRef = useRef(false); // 모든 데이터로드시 true
     const preventRef = useRef(true); // obs 중복방지
-    const limit = useRef<number>(5);
+    const limit = useRef<number>(10);
     const offset = useRef<number>(0);
     const obsRef = useRef<IntersectionObserver>(null);
+    const targetRef = useRef(null);
+    const cloneRef = useRef(null);
+    const timeout = useRef<NodeJS.Timeout>(null);
 
     const [masonryCols,setMasonryCols] = useState<{}>({})
     const [currentMemoId,setCurrentMemoId] = useState<number>(0);
     const [isReset,setIsReset] = useState<boolean>(false);
     const [retryObs,setRetryObs] = useState<boolean>(false);
+    const [changeHeight, setChangeHeight] = useState(0);
 
     const { loading } = useSelector((state: RootState) => (state.user));
     const { data } = useSelector((state: RootState) => state.memo);
-    const { menuStr, cateStr, tagStr, searchParams, setSearchParams } = useHandleQueryStr();
+    const { menuQueryStr, cateQueryStr, tagQueryStr, searchParams, setSearchParams } = useHandleQueryStr();
 
     const horizonScroll = useHorizontalScroll();
     const dispatch = useDispatch();
 
-    useEffect(()=> { //옵저버 생성
+    useEffect(() => { //addMemo-clone-box 옵저버생성
+        if (!targetRef.current || !cloneRef.current) return;
+        const observer = new ResizeObserver(() => setChangeHeight(targetRef.current.offsetHeight));
+        observer.observe(targetRef.current);
+
+        return () => observer.disconnect();
+    },[]);
+    useEffect(() => {
+        if (!cloneRef.current) return;
+        cloneRef.current.style.height = `${changeHeight}px`;
+    }, [changeHeight]);
+
+    useEffect(()=> { //페이지네이션 옵저버 생성
         console.log('옵저버!!')
         obsRef.current = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !loadEndRef.current && preventRef.current) {
@@ -49,14 +65,16 @@ export const MemoMain = () => {
                 preventRef.current = false;
                 getMemo();
             }
-        }, { threshold : 0.2 });
+        });
         if(divObsRef.current) obsRef.current.observe(divObsRef.current);
         return () => { obsRef.current.disconnect(); }
-    }, [retryObs])
+    }, [retryObs]);
 
     const handleLoadMore = () => offset.current += limit.current;
 
     useEffect(() => {
+        clearTimeout(timeout.current);
+        timeout.current = null;
         obsRef.current.disconnect();
 
         if (!isReset) {
@@ -79,12 +97,12 @@ export const MemoMain = () => {
 
     const getMemo = () => {
         (async () => {
-            await ApiLib().memo.scrollPagination({
+            await Api().memo.scrollPagination({
                 offset: offset.current,
                 limit: limit.current,
-                cateStr,
-                tagStr,
-                menuStr,
+                cateQueryStr: Number(cateQueryStr),
+                tagQueryStr,
+                menuQueryStr,
             })
                 .then((res) => {
                     if (res.data.success) {
@@ -92,6 +110,7 @@ export const MemoMain = () => {
                             loadEndRef.current = true;
                         }
                         handleLoadMore();
+                        timeout.current = setTimeout(() => {
                             console.log(res.data.memos,'데이터 들어왔다~~~~~~~~~~~~~~~~~~~')
                             if (res.data.memos.length === limit.current) {
                                 setRetryObs(!retryObs);
@@ -104,6 +123,7 @@ export const MemoMain = () => {
                             }));
 
                             dispatch(SET_MEMO(setMemoType));
+                        },150);
                     } else {
                         console.log(res.data.error)
                     }
@@ -120,7 +140,7 @@ export const MemoMain = () => {
 
     const importantModifier = (memoId:number) => {
         console.log(memoId)
-        ApiLib().memo.changeImportant({memoId})
+        Api().memo.changeImportant({memoId})
             .then((res) => {
                 if (res.data.success) {
                     const importantMemoLength = Number(res.data.importantMemoLength);
@@ -168,84 +188,79 @@ export const MemoMain = () => {
                 <div
                     className='p-30px fixed left-1/2 top-1/2 bg-black text-white z-50'
                     onClick={() => {
-                        handleLoadMore()
-                        getMemo();
-                        console.log(offset)
+                        console.log(data)
                     }}
                 >
-                    test
+                    show redux
                 </div>
                 <CustomScroller>
                     <section className='relative top-0 flex gap-28px w-full p-16px browser-width-900px:p-30px'>
-                        <div className='absolute left-30px top-30px mb-16px browser-width-900px:mb-30px z-20'>
-                            <AddMemo/>
-                        </div>
+                        {!menuQueryStr && (
+                            <div ref={targetRef} className='absolute left-30px top-30px mb-16px browser-width-900px:mb-30px z-20'>
+                                <AddMemo/>
+                            </div>
+                        )}
                         <Masonry
                             key={subUniqueKey()}
                             breakpointCols={masonryCols}
                             className='my-masonry-grid flex gap-x-16px browser-width-900px:gap-x-30px w-full browser-width-900px:w-auto'
                             columnClassName='my-masonry-grid_column'
                         >
-                            <div className='mb-16px browser-width-900px:mb-30px browser-width-900px:w-[300px] min-h-[234px]'/>
+                            {!menuQueryStr && (
+                                <div ref={cloneRef} className='mb-16px browser-width-900px:mb-30px browser-width-900px:w-[300px] min-h-[234px]'/>
+                            )}
                             {data.memos &&
-                                data.memos?.map((val) => {
-                                    let cleanContent = DOMPurify.sanitize(val.content);
-                                    return (
+                                data.memos?.map((val) => (
+                                    <div
+                                        key={val.memoId}
+                                        className='relative'
+                                    >
                                         <div
-                                            key={val.memoId}
-                                            className='relative'
+                                            className='mb-16px browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
+                                            onClick={() => memoModifier(val.memoId)}
                                         >
-                                            <div
-                                                className='mb-16px browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
-                                                onClick={() => memoModifier(val.memoId)}
+                                            <article
+                                                className='relative min-w-0 w-full browser-width-900px:w-[300px] flex flex-col justify-between border
+                                                border-zete-light-gray-500 rounded-[8px] p-20px min-h-[212px] bg-zete-primary-200'
                                             >
-                                                <article
-                                                    className='relative min-w-0 w-full browser-width-900px:w-[300px] flex flex-col justify-between border
-                                                    border-zete-light-gray-500 rounded-[8px] p-20px min-h-[212px] bg-zete-primary-200'
-                                                >
-                                                    <div className='flex flex-col h-full w-full'>
-                                                        <div className='w-full mb-20px pr-30px'>
-                                                            <p className='text-zete-gray-500 font-light text-start'>
-                                                                {val.title}
-                                                            </p>
-                                                        </div>
-                                                        <div className='items-end h-full w-full line-clamp-[14]'>
-                                                            <p
-                                                                className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
-                                                                dangerouslySetInnerHTML={{__html: cleanContent}}
-                                                            />
-                                                        </div>
-                                                        <div className='flex w-full items-center pt-16px pr-26px'>
-                                                            <div ref={horizonScroll} className='flex w-full h-full relative py-4px overflow-y-hidden memo-custom-vertical-scroll'>
-                                                                {
-                                                                    val.tags.map((val, idx) => {
-                                                                        return (
-                                                                            <div key={idx} className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
-                                                                            <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
-                                                                                {val.tagName}
-                                                                            </span>
-                                                                            </div>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </div>
+                                                <div className='flex flex-col h-full w-full'>
+                                                    <div className='w-full mb-20px pr-30px'>
+                                                        <p className='text-zete-gray-500 font-light text-start'>
+                                                            {val.title}
+                                                        </p>
+                                                    </div>
+                                                    <div className='items-end h-full w-full line-clamp-[14]'>
+                                                        <p
+                                                            className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
+                                                            dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(val.content)}}
+                                                        />
+                                                    </div>
+                                                    <div className='flex w-full items-center pt-16px pr-26px'>
+                                                        <div ref={horizonScroll} className='flex w-full h-full relative py-4px overflow-y-hidden memo-custom-vertical-scroll'>
+                                                            {val.tags.map((val, idx) => (
+                                                                <div key={idx} className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                                                                        <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
+                                                                            {val.tagName}
+                                                                        </span>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
-                                                </article>
-                                                <div className='absolute bottom-16px right-21px '>
-                                                    <SavedMemoMenuPopover memoId={val.memoId}/>
                                                 </div>
+                                            </article>
+                                            <div className='absolute bottom-16px right-21px '>
+                                                <SavedMemoMenuPopover memoId={val.memoId}/>
                                             </div>
-                                            <button
-                                                type='button'
-                                                className='absolute top-18px right-20px'
-                                                onClick={() => { importantModifier(val.memoId); }}
-                                            >
-                                                {val.important ? <FillStarIcon/> : <StarIcon/>}
-                                            </button>
                                         </div>
-                                    )
-                                })}
+                                        <button
+                                            type='button'
+                                            className='absolute top-18px right-20px'
+                                            onClick={() => { importantModifier(val.memoId); }}
+                                        >
+                                            {val.important ? <FillStarIcon/> : <StarIcon/>}
+                                        </button>
+                                    </div>
+                                ))}
                         </Masonry>
                         <>
                             <MemoModifyModal memoId={currentMemoId}/>

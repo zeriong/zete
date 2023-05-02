@@ -555,6 +555,13 @@ components:
           type: string
       required:
         - success
+    TagNameInputDto:
+      type: object
+      properties:
+        tagName:
+          type: string
+      required:
+        - tagName
     CreateMemoInputDto:
       type: object
       properties:
@@ -570,7 +577,7 @@ components:
         tags:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/TagNameInputDto"
       required:
         - cateId
         - title
@@ -750,18 +757,18 @@ components:
           type: number
         limit:
           type: number
-        cateStr:
+        cateQueryStr:
+          type: number
+        tagQueryStr:
           type: string
-        tagStr:
-          type: string
-        menuStr:
+        menuQueryStr:
           type: string
       required:
         - offset
         - limit
-        - cateStr
-        - tagStr
-        - menuStr
+        - cateQueryStr
+        - tagQueryStr
+        - menuQueryStr
     PaginationTagsDto:
       type: object
       properties:

@@ -15,7 +15,7 @@ import { Categories } from './categories.entity';
 @Entity({ name: 'memos' })
 export class Memos extends coreEntity {
   @ApiProperty({ required: false })
-  @Column({ type: 'tinytext' }) //tinytext: 	255
+  @Column({ type: 'varchar', length: 64 })
   title: string;
 
   @ApiProperty({ required: false })

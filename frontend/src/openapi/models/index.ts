@@ -24,6 +24,7 @@ export * from './pagination-output-dto';
 export * from './pagination-tags-dto';
 export * from './send-default-data-output-dto';
 export * from './tag-name-and-cate-id';
+export * from './tag-name-input-dto';
 export * from './tags';
 export * from './update-account-dto';
 export * from './update-many-cate-input-dto';

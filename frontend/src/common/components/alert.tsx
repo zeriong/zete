@@ -12,17 +12,13 @@ export const Alert = () => {
     const dispatch = useDispatch();
 
     const showAlert = () => {
-        console.log('접근!', store.getState().alert.alerts.length)
         if (!isRunning && store.getState().alert.alerts.length > 0) {
-            console.log('실행!')
             setIsRunning(true)
             setAlert(store.getState().alert.alerts[store.getState().alert.alerts.length - 1])
             setIsShow(true)
             setTimeout(() => {
                 setIsShow(false)
                 setTimeout(() => {
-                    console.log('종료!')
-                    //setShow(false)
                     dispatch(DELETE_ALERT())
                     setIsRunning(false)
                     showAlert()

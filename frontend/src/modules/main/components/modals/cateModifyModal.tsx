@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import CustomScroller from "../../../../common/components/customScroller";
 import {ADD_CATE, DELETE_CATE, UPDATE_MANY_CATE, UPDATE_ONE_CATE} from "../../../../store/slices/memo.slice";
-import {ApiLib} from "../../../../common/libs/api.lib";
+import {Api} from "../../../../common/libs/api";
 import {Category} from "../../../../store/slices/constants";
 
 export const CateModifyModal = () => {
@@ -30,7 +30,7 @@ export const CateModifyModal = () => {
         e.preventDefault();
         if (categories.some(cate => cate.cateName === addCateValue)) return alert('새 카테고리 이름이 기존 카테고리 이름과 중복됩니다.')
 
-        ApiLib().memo.createCate({ cateName: addCateValue })
+        Api().memo.createCate({ cateName: addCateValue })
             .then((res) => {
                 if (res.data.success) {
                     dispatch(ADD_CATE(res.data.savedCate));
@@ -42,7 +42,7 @@ export const CateModifyModal = () => {
     }
 
     const handleDelete = () => {
-        ApiLib().memo.deleteCate({ cateId: getCateId })
+        Api().memo.deleteCate({ cateId: getCateId })
             .then((res) => {
                 if (res.data.success) {
                     setIsAgreeShow(false);
@@ -67,7 +67,7 @@ export const CateModifyModal = () => {
         if (newCateListNames.some(name => name === '')) return alert('비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.');
         if (newCateListNames.length !== new Set(newCateListNames).size) return alert('중복된 카테고리가 존재합니다.')
         console.log('뉴케이트리스트',newCateList)
-        ApiLib().memo.updateManyCate({data: newCateList})
+        Api().memo.updateManyCate({data: newCateList})
             .then((res) => {
                 if (res.data.success) {
                     setIsShow(false);
@@ -85,7 +85,7 @@ export const CateModifyModal = () => {
 
             const inputCate = {cateId:target.cateId, cateName:target.val};
 
-            ApiLib().memo.updateOneCate(inputCate)
+            Api().memo.updateOneCate(inputCate)
                 .then((res) => {
                     if (res.data.success) {
                         dispatch(UPDATE_ONE_CATE(inputCate));

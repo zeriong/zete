@@ -23,7 +23,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
 
     const { searchParams, setSearchParams } = useHandleQueryStr();
     const { data } = useSelector((state:RootState) => state.memo);
-    const { cateStr, tagStr, menuStr } = useHandleQueryStr();
+    const { cateQueryStr, tagQueryStr, menuQueryStr } = useHandleQueryStr();
 
     const dispatch = useDispatch();
     const horizonScroll = useHorizontalScroll();
@@ -122,25 +122,25 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         let newSelectedCateId: number|'undefined' = 'undefined';
         let newSelectedCateName: string = '전체메모';
 
-        if (menuStr) setIsImportant(true);
+        if (menuQueryStr) setIsImportant(true);
         else setIsImportant(false);
 
-        if (cateStr) {
-            // const defaultSelectedCate = tableData.categories.filter(cate => cate.cateName === cateStr)[0];
+        if (cateQueryStr) {
+            // const defaultSelectedCate = tableData.categories.filter(cate => cate.cateName === cateQueryStr)[0];
             // if (defaultSelectedCate) {
             //     newSelectedCateId = defaultSelectedCate.cateId;
             //     newSelectedCateName = defaultSelectedCate.cateName;
             // }
         }
 
-        if ((!cateStr && !menuStr) || menuStr) {
+        if ((!cateQueryStr && !menuQueryStr) || menuQueryStr) {
             newSelectedCateId = 'undefined';
             newSelectedCateName = '전체메모';
         }
 
         setSelectedCateName(newSelectedCateName);
         setSelectedCateId(newSelectedCateId);
-    },[cateStr, menuStr])
+    },[cateQueryStr, menuQueryStr])
 
     useEffect(() => {
         if (searchParams.get("modal") === "memoModify") {
@@ -164,14 +164,14 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     }, [searchParams])
 
     useEffect(() => {
-        if (menuStr) setIsImportant(true);
+        if (menuQueryStr) setIsImportant(true);
         else setIsImportant(false);
-        if (tagStr) {
-            tagsRef.current[0] = tagStr;
-            setTagNames([tagStr])
+        if (tagQueryStr) {
+            tagsRef.current[0] = tagQueryStr;
+            setTagNames([tagQueryStr])
         } // 첫번째 배열에 쿼리에 적힌 테그추가
-        if (!tagStr) setTagNames([]);
-    },[tagStr, cateStr])
+        if (!tagQueryStr) setTagNames([]);
+    },[tagQueryStr, cateQueryStr])
 
     return (
         <Transition appear show={isShow} as={Fragment}>
@@ -226,7 +226,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                     className='resize-none w-full pr-6px max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
                                                 />
                                                 {
-                                                    menuStr ? <FillStarIcon/> :
+                                                    menuQueryStr ? <FillStarIcon/> :
                                                         isImportant ? (
                                                             <FillStarIcon onClick={importantHandler}/>
                                                         ) : (
@@ -251,7 +251,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                             <div ref={horizonScroll} className='flex w-full h-full relative border-b border-zete-memo-border pb-8px overflow-y-hidden memo-custom-vertical-scroll'>
                                                 {
                                                     tagNames.map((name, idx) => {
-                                                        return name === tagStr ? (
+                                                        return name === tagQueryStr ? (
                                                             <div key={uniqueKey() + idx} className='relative flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                                                 <span className='font-light text-11 text-zete-dark-400'>
                                                                     {name}

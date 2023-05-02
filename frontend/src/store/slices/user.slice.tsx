@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {ApiLib} from "../../common/libs/api.lib";
+import {Api} from "../../common/libs/api";
 
 export interface userState {
     data: {
@@ -24,7 +24,7 @@ export const sendMyProfile = createAsyncThunk(
     'user/sendMyProfile',
     async (_, thunkAPI) => {
         try {
-            const response = await ApiLib().user.profile();
+            const response = await Api().user.profile();
 
             if (!response) {
                 return thunkAPI.rejectWithValue(null);

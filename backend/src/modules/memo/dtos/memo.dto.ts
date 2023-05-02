@@ -5,6 +5,13 @@ import { Tags } from '../../../entities/tags.entity';
 import { Memos } from '../../../entities/memos.entity';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 
+export class TagNameInputDto {
+  @ApiProperty()
+  @Validator.IsOptional()
+  @Validator.IsString()
+  tagName: string;
+}
+
 export class CreateMemoInputDto extends CateIdInputDto {
   @ApiProperty()
   @Validator.MaxLength(255, { message: '최대 255자 까지 메모가능합니다.' })
@@ -18,9 +25,9 @@ export class CreateMemoInputDto extends CateIdInputDto {
   @Validator.IsBoolean()
   important: boolean;
 
-  @ApiProperty({ type: [String], required: false })
+  @ApiProperty({ type: [TagNameInputDto], required: false })
   @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
-  tags?: Array<string>;
+  tags?: Array<TagNameInputDto>;
 }
 
 export class MemoIdInputDto {
@@ -38,20 +45,20 @@ export class PaginationInputDto {
   @Validator.IsNumber()
   limit: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: Number })
   @Validator.IsOptional()
-  @Validator.IsString()
-  cateStr?: string;
+  @Validator.IsNumber()
+  cateQueryStr?: number;
 
   @ApiProperty()
   @Validator.IsOptional()
   @Validator.IsString()
-  tagStr?: string;
+  tagQueryStr?: string;
 
   @ApiProperty()
   @Validator.IsOptional()
   @Validator.IsString()
-  menuStr?: string;
+  menuQueryStr?: string;
 }
 
 export class CreateMemoNewTagsOutputDto {

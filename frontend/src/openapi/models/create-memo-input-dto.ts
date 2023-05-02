@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { TagNameInputDto } from './tag-name-input-dto';
 
 /**
  * 
@@ -46,9 +49,9 @@ export interface CreateMemoInputDto {
     'important': boolean;
     /**
      * 
-     * @type {Array<string>}
+     * @type {Array<TagNameInputDto>}
      * @memberof CreateMemoInputDto
      */
-    'tags'?: Array<string>;
+    'tags'?: Array<TagNameInputDto>;
 }
 

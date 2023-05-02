@@ -7,7 +7,7 @@ import {SET_USER} from "../../../store/slices/user.slice";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../store";
 
-import {ApiLib} from "../../libs/api.lib";
+import {Api} from "../../libs/api";
 import {FuncButton} from "../funcBtn";
 /** 폼항목 */
 type FormData = {
@@ -63,7 +63,7 @@ export const SigninModal = () => {
     /** submit */
     const onSubmit = handleSubmit(async () => {
         const {email,password} = getValues();
-        await ApiLib().auth.login(
+        await Api().auth.login(
             {
                 email, password,
             },)

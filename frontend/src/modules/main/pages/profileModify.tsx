@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useForm} from "react-hook-form";
-import {ApiLib} from "../../../common/libs/api.lib";
+import {Api} from "../../../common/libs/api";
 import {FuncButton} from "../../../common/components/funcBtn";
 import {SET_ALERT} from "../../../store/slices/alert.slice";
 import {useNavigate} from "react-router-dom";
@@ -52,7 +52,7 @@ export const ProfileModify = () => {
     const onSubmit = handleSubmit(async () => {
         console.log('서브밋~!!')
         const {email,password,name,mobile} = getValues();
-        await ApiLib().user.profileUpdate(
+        await Api().user.profileUpdate(
             {
                 "email": email,
                 "name": name,

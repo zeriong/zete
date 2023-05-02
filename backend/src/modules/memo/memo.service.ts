@@ -108,7 +108,7 @@ export class MemoService {
     user: User,
   ): Promise<PaginationOutputDto> {
     try {
-      if (!input.cateStr && !input.tagStr && !input.menuStr) {
+      if (!input.cateQueryStr && !input.tagQueryStr && !input.menuQueryStr) {
         const memos = await this.memoRepository
           .createQueryBuilder('memos')
           .leftJoinAndSelect('memos.tags', 'tag') // OneToMany 관계
@@ -137,7 +137,7 @@ export class MemoService {
         };
       }
 
-      if (input.menuStr === 'important') {
+      if (input.menuQueryStr === 'important') {
         const importantMemos = await this.memoRepository
           .createQueryBuilder('memos')
           .leftJoinAndSelect('memos.tags', 'tag')
@@ -167,9 +167,9 @@ export class MemoService {
         };
       }
 
-      if (input.cateStr && !input.tagStr) {
+      if (input.cateQueryStr && !input.tagQueryStr) {
         const category = await this.categoriesRepository.findOne({
-          where: { cateName: input.cateStr },
+          where: { id: input.cateQueryStr },
         });
 
         const categoryId = category.id;
@@ -203,12 +203,12 @@ export class MemoService {
         };
       }
 
-      if (input.tagStr) {
+      if (input.tagQueryStr) {
         const category = await this.categoriesRepository.findOne({
-          where: { cateName: input.cateStr },
+          where: { id: input.cateQueryStr },
         });
         const tags = await this.tagsRepository.find({
-          where: { tagName: input.cateStr },
+          where: { tagName: input.tagQueryStr },
         });
 
         const categoryId = category.id;
@@ -402,7 +402,7 @@ export class MemoService {
           input.tags.map(async (tag) => {
             return await this.tagsRepository.save(
               this.tagsRepository.create({
-                tagName: tag,
+                tagName: tag.tagName,
                 user,
                 memos: { id: saveMemo.id },
                 cate: { id: input.cateId },

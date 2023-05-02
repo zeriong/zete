@@ -5,7 +5,7 @@ import {useForm} from "react-hook-form";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 
-import {ApiLib} from "../../libs/api.lib";
+import {Api} from "../../libs/api";
 import {Dialog, Transition } from "@headlessui/react";
 import {FuncButton} from "../funcBtn";
 
@@ -70,7 +70,7 @@ export const SignupModal = () => {
     /** submit */
     const onSubmit = handleSubmit(async () => {
         const {email,password,name,mobile} = getValues();
-        await ApiLib().user.createAccount(
+        await Api().user.createAccount(
             {
                 "email": email,
                 "password": password,

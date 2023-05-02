@@ -5,7 +5,6 @@ import {AppDispatch, RootState} from "../../../store";
 import {Outlet} from "react-router-dom";
 import {Header} from "./header";
 import {Aside} from "./aside";
-import {Alert} from "../../../common/components/alert";
 import {TagIcon} from "../../../assets/vectors";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {SearchMemo} from "../components/searchMemo";
@@ -13,7 +12,7 @@ export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
     // const { tableData } = useSelector((state: RootState) => (state.memo));
-    const { cateStr, tagStr, menuStr } = useHandleQueryStr()
+    const { cateQueryStr, tagQueryStr, menuQueryStr } = useHandleQueryStr()
 
     const [existCate,setExistCate] = useState(false);
 
@@ -25,12 +24,12 @@ export const MemoLayout = () => {
 
     // useEffect(() => {
     //     const cateList = tableData.categories.map((cate) => cate.cateName);
-    //     if (cateList.find((list) => list === cateStr)) {
+    //     if (cateList.find((list) => list === cateQueryStr)) {
     //         setExistCate(true);
     //     } else {
     //         setExistCate(false);
     //     }
-    // },[tagStr,cateStr, tableData])
+    // },[tagQueryStr,cateQueryStr, tableData])
 
     return ( loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
         <>
@@ -51,24 +50,24 @@ export const MemoLayout = () => {
                                 existCate ? (
                                     <>
                                         <span>
-                                            {menuStr ? '중요메모' :
-                                                (!cateStr && !menuStr) ? '전체메모' : cateStr}
+                                            {menuQueryStr ? '중요메모' :
+                                                (!cateQueryStr && !menuQueryStr) ? '전체메모' : cateQueryStr}
                                         </span>
                                         {
-                                            tagStr && (
+                                            tagQueryStr && (
                                                 <div className='flex'>
                                                     <p className='mx-8px'>
                                                         &gt;
                                                     </p>
-                                                    {tagStr}
+                                                    {tagQueryStr}
                                                 </div>
                                             )
                                         }
                                     </>
-                                ) : (menuStr || (!cateStr && !menuStr)) ? (
+                                ) : (menuQueryStr || (!cateQueryStr && !menuQueryStr)) ? (
                                     <span>
-                                        {menuStr ? '중요메모' :
-                                            (!cateStr && !menuStr) ? '전체메모' : cateStr}
+                                        {menuQueryStr ? '중요메모' :
+                                            (!cateQueryStr && !menuQueryStr) ? '전체메모' : cateQueryStr}
                                     </span>
                                 ) : (
                                     <h1 className='text-zete-placeHolder'>
@@ -83,7 +82,6 @@ export const MemoLayout = () => {
                         </div>
                     </header>
                     <div className='w-full h-full bg-zete-light-gray-100'>
-                        <Alert/>
                         <Outlet/>
                     </div>
                 </div>

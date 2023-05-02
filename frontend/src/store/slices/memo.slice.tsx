@@ -86,26 +86,23 @@ export const memoSlice = createSlice({
             const { cateId, title, content, important, tags, memoId, updateAt } = action.payload;
 
             let newAllLength = table.memosLength + 1;
-            let newInCateLength = table.memoLengthInCate;
             let importantMemoLength = table.importantMemoLength;
 
             // memosLength
-            const lengthValidator = table.memoLengthInCate.filter(inCate => inCate.cateId === cateId) || [];
 
             if (important) importantMemoLength += 1;
-
-            if (lengthValidator[0]?.cateId !== null) {
-                newInCateLength = table.memoLengthInCate.map((inCate) => {
-                    if (inCate.cateId === lengthValidator[0].cateId) {
-                        return {
-                            cateId: inCate.cateId,
-                            length: inCate.length + 1,
-                        }
-                    } else {
-                        return inCate;
+            
+            const newInCateLength = table.memoLengthInCate.map((inCate) => {
+                if (inCate.cateId === cateId) {
+                    return {
+                        cateId: inCate.cateId,
+                        length: inCate.length + 1,
                     }
-                })
-            }
+                } else {
+                    return inCate;
+                }
+            })
+            
 
             // tagsInCate
             const resTagsInCate = tags.map((tags) => {

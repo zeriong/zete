@@ -37,6 +37,7 @@ models/pagination-output-dto.ts
 models/pagination-tags-dto.ts
 models/send-default-data-output-dto.ts
 models/tag-name-and-cate-id.ts
+models/tag-name-input-dto.ts
 models/tags.ts
 models/update-account-dto.ts
 models/update-many-cate-input-dto.ts

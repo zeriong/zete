@@ -14,7 +14,7 @@ const instance = axios.create({
     withCredentials: true,
 });
 
-export const ApiLib = () => {
+export const Api = () => {
     return {
         user: UserApiFactory(null,'',instance),
         auth: AuthApiFactory(null,'',instance),
