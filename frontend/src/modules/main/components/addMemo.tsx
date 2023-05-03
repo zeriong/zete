@@ -89,7 +89,6 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                     setIsImportant(false);
                     memoTextarea.current.style.height = 'auto';
                     titleTextarea.current.style.height = 'auto';
-
                 } else {
                     console.log(res.data.error)
                 }

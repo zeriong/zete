@@ -31,18 +31,6 @@ export interface Tags {
      * @type {string}
      * @memberof Tags
      */
-    'createAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Tags
-     */
-    'updateAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Tags
-     */
     'tagName': string;
     /**
      * 

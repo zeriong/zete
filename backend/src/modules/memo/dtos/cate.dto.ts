@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 import { Categories } from '../../../entities/categories.entity';
 
-export class CateInputDto {
+export class CateInput {
   @ApiProperty({ type: Number })
   @Validator.IsNumber()
   cateId: number;
@@ -16,7 +16,7 @@ export class CateInputDto {
   cateName: string;
 }
 
-export class CreateCateInputDto {
+export class CreateCateInput {
   @ApiProperty()
   @Validator.MaxLength(255, {
     message: '카테고리 제목은 최대 255자 까지 가능합니다.',
@@ -24,28 +24,22 @@ export class CreateCateInputDto {
   cateName: string;
 }
 
-export class CateIdInputDto {
+export class CateIdInput {
   @ApiProperty({ nullable: true, type: Number })
   @Validator.IsOptional()
   @Validator.IsNumber()
   cateId?: number;
 }
 
-export class CreateCateOutputDto extends CoreOutput {
+export class CreateCateOutput extends CoreOutput {
   @ApiProperty({ type: Categories, required: false })
   cate?: Categories[];
 
-  @ApiProperty({ type: CateInputDto })
-  savedCate?: CateInputDto;
+  @ApiProperty({ type: CateInput })
+  savedCate?: CateInput;
 }
 
-export class ImportantMemoLengthOutputDto extends CoreOutput {
+export class ImportantMemoLengthOutput extends CoreOutput {
   @ApiProperty({ type: Number, required: false })
   importantMemoLength?: number;
-}
-
-export class UpdateManyCateInputDto {
-  @ApiProperty({ type: [CateInputDto] })
-  @Validator.IsArray({ message: '잘못된 형식입니다.' })
-  data: Array<CateInputDto>;
 }

@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, RelationId, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, RelationId, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { Memos } from './memos.entity';
 import { coreEntity } from '../common/entities/core.entity';
 import { Categories } from './categories.entity';
@@ -6,7 +6,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { User } from './user.entity';
 
 @Entity({ name: 'tags' })
-export class Tags extends coreEntity {
+export class Tags {
+  @ApiProperty({ type: Number })
+  @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
+  id: number;
+
   @ApiProperty()
   @Column()
   tagName: string;

@@ -1,6 +1,6 @@
 import * as Validator from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { CateIdInputDto } from './cate.dto';
+import { CateIdInput } from './cate.dto';
 import { Tags } from '../../../entities/tags.entity';
 import { Memos } from '../../../entities/memos.entity';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
@@ -12,7 +12,7 @@ export class TagNameInputDto {
   tagName: string;
 }
 
-export class CreateMemoInputDto extends CateIdInputDto {
+export class CreateMemoInputDto extends CateIdInput {
   @ApiProperty()
   @Validator.MaxLength(255, { message: '최대 255자 까지 메모가능합니다.' })
   title: string;
@@ -36,26 +36,31 @@ export class MemoIdInputDto {
   memoId: number;
 }
 
-export class PaginationInputDto {
-  @ApiProperty({ type: Number })
+export class GetMemosInput {
+  @ApiProperty({ nullable: true })
+  @Validator.IsOptional()
+  @Validator.IsString()
+  search?: string;
+
+  @ApiProperty({ type: Number, default: 0 })
   @Validator.IsNumber()
   offset: number;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, default: 15 })
   @Validator.IsNumber()
   limit: number;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, nullable: true })
   @Validator.IsOptional()
   @Validator.IsNumber()
   cateQueryStr?: number;
 
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   @Validator.IsOptional()
   @Validator.IsString()
   tagQueryStr?: string;
 
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   @Validator.IsOptional()
   @Validator.IsString()
   menuQueryStr?: string;
@@ -86,7 +91,7 @@ export class CreateMemoOutputDto extends CoreOutput {
   newTags?: Array<CreateMemoNewTagsOutputDto>;
 }
 
-export class PaginationTagsDto {
+export class GetMemosTags {
   @ApiProperty({ type: Number })
   memoId: number;
 
@@ -100,7 +105,7 @@ export class PaginationTagsDto {
   tagName: string;
 }
 
-export class PaginationMemosDto {
+export class GetMemos {
   @ApiProperty({ type: Number })
   memoId: number;
 
@@ -119,11 +124,20 @@ export class PaginationMemosDto {
   @ApiProperty({ type: Boolean })
   important: boolean;
 
-  @ApiProperty({ type: [PaginationTagsDto] })
-  tags: Array<PaginationTagsDto>;
+  @ApiProperty({ type: [GetMemosTags] })
+  tags: Array<GetMemosTags>;
 }
 
-export class PaginationOutputDto extends CoreOutput {
-  @ApiProperty({ type: [PaginationMemosDto], required: false })
-  memos?: Array<PaginationMemosDto>;
+export class GetMemosOutput extends CoreOutput {
+  @ApiProperty({ type: [GetMemos] })
+  memos?: Array<GetMemos>;
+
+  @ApiProperty({ type: Number })
+  memosLength?: number;
+
+  @ApiProperty({ type: Number })
+  importantMemoLength?: number;
+
+  @ApiProperty({ type: Number })
+  tagsLength?: number;
 }

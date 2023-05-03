@@ -27,19 +27,26 @@ export class CateNameAndCateId {
   cateName: string;
 }
 
-export class SendDefaultDataOutputDto extends CoreOutput {
+export class AsideData {
   @ApiProperty({ type: Number, required: false })
   memosLength?: number;
 
   @ApiProperty({ type: Number, required: false })
   importantMemoLength?: number;
 
+  @ApiProperty({ type: Number, required: false })
+  tagsLength?: number;
+
   @ApiProperty({ type: [MemoLengthInCate], required: false })
   memoLengthInCate?: Array<MemoLengthInCate>;
 
   @ApiProperty({ type: [TagNameAndCateId], required: false })
-  tags?: Array<TagNameAndCateId>;
+  tagsInCate?: Array<TagNameAndCateId>;
 
   @ApiProperty({ type: [CateNameAndCateId], required: false })
   cate?: Array<CateNameAndCateId>;
+}
+export class AsideDataOutput extends CoreOutput {
+  @ApiProperty({ type: AsideData, required: false })
+  asideData?: AsideData;
 }

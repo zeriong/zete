@@ -14,26 +14,25 @@ function App() {
     useEffect( ()=> {
         (async () => {
             await dispatch(sendRefreshAccessToken());
-            await Api().memo.sendDefaultData().then((res) => {
+            await Api().memo.getAsideData().then((res) => {
                 if (res.data.success) {
-                    console.log(res.data)
-                    const { importantMemoLength, memosLength, memoLengthInCate, cate, tags } = res.data
+                    console.log('받아버린데이터', res.data)
 
-                    const lengthToNumber = memoLengthInCate.map((inCate) => {
-                        return {
-                            cateId: inCate.cateId,
-                            length: Number(inCate.length),
-                        }
-                    })
+                    // const lengthToNumber = memoLengthInCate.map((inCate) => {
+                    //     return {
+                    //         cateId: inCate.cateId,
+                    //         length: Number(inCate.length),
+                    //     }
+                    // })
 
-                    dispatch(SET_DATA({
-                        memosLength: Number(memosLength),
-                        importantMemoLength: Number(importantMemoLength),
-                        memoLengthInCate: lengthToNumber,
-                        cate: cate.sort((a, b) => a.cateName > b.cateName ? 1 : -1),
-                        tagsInCate: tags.sort((a, b) => a.tagName > b.tagName ? 1 : -1),
-                        memos:[],
-                    }))
+                    // dispatch(SET_DATA({
+                    //     memosLength: Number(memosLength),
+                    //     importantMemoLength: Number(importantMemoLength),
+                    //     memoLengthInCate: lengthToNumber,
+                    //     cate: cate.sort((a, b) => a.cateName > b.cateName ? 1 : -1),
+                    //     tagsInCate: tags.sort((a, b) => a.tagName > b.tagName ? 1 : -1),
+                    //     memos:[],
+                    // }))
                 } else {
                     console.log(res.data.error)
                 }

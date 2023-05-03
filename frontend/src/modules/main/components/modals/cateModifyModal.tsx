@@ -67,15 +67,15 @@ export const CateModifyModal = () => {
         if (newCateListNames.some(name => name === '')) return alert('비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.');
         if (newCateListNames.length !== new Set(newCateListNames).size) return alert('중복된 카테고리가 존재합니다.')
         console.log('뉴케이트리스트',newCateList)
-        Api().memo.updateManyCate({data: newCateList})
-            .then((res) => {
-                if (res.data.success) {
-                    setIsShow(false);
-                    dispatch(UPDATE_MANY_CATE(newCateList));
-                } else {
-                    alert(res.data.error)
-                }})
-            .catch(e => console.log(e))
+        // Api().memo.updateCategory({data: newCateList})
+        //     .then((res) => {
+        //         if (res.data.success) {
+        //             setIsShow(false);
+        //             dispatch(UPDATE_MANY_CATE(newCateList));
+        //         } else {
+        //             alert(res.data.error)
+        //         }})
+        //     .catch(e => console.log(e))
 
         }
 
@@ -85,15 +85,15 @@ export const CateModifyModal = () => {
 
             const inputCate = {cateId:target.cateId, cateName:target.val};
 
-            Api().memo.updateOneCate(inputCate)
-                .then((res) => {
-                    if (res.data.success) {
-                        dispatch(UPDATE_ONE_CATE(inputCate));
-                        target.event.currentTarget.blur();
-                    } else {
-                        alert(res.data.error)
-                    }})
-                .catch(e => console.log(e))
+            // Api().memo.updateOneCate(inputCate)
+            //     .then((res) => {
+            //         if (res.data.success) {
+            //             dispatch(UPDATE_ONE_CATE(inputCate));
+            //             target.event.currentTarget.blur();
+            //         } else {
+            //             alert(res.data.error)
+            //         }})
+            //     .catch(e => console.log(e))
         }
 
         useEffect(() => {

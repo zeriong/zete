@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MemoService } from './memo.service';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
@@ -6,27 +6,26 @@ import {
   CreateMemoInputDto,
   CreateMemoOutputDto,
   MemoIdInputDto,
-  PaginationInputDto,
-  PaginationOutputDto,
+  GetMemosInput,
+  GetMemosOutput,
 } from './dtos/memo.dto';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import {
-  CreateCateInputDto,
-  CreateCateOutputDto,
-  UpdateManyCateInputDto,
-  CateInputDto,
-  CateIdInputDto,
-  ImportantMemoLengthOutputDto,
+  CreateCateInput,
+  CreateCateOutput,
+  CateInput,
+  CateIdInput,
+  ImportantMemoLengthOutput,
 } from './dtos/cate.dto';
-import { SendDefaultDataOutputDto } from './dtos/sendContentData.dto';
+import { AsideDataOutput } from './dtos/asideData.dto';
 
 @Controller('memo')
-@ApiTags('Memo') //스웨거 Tag를 지정
+@ApiTags('Memo')
+@UseGuards(JwtAuthGuard)
 export class MemoController {
   constructor(private readonly memoService: MemoService) {}
 
   @ApiResponse({ type: CreateMemoOutputDto })
-  @UseGuards(JwtAuthGuard)
   @Post('createMemo')
   createMemo(
     @Req() req,
@@ -35,58 +34,48 @@ export class MemoController {
     return this.memoService.createMemo(input, req.user);
   }
 
-  @ApiResponse({ type: CreateCateOutputDto })
-  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ type: CreateCateOutput })
   @Post('createCate')
   createCate(
     @Req() req,
-    @Body() input: CreateCateInputDto,
-  ): Promise<CreateCateOutputDto> {
-    return this.memoService.createCate(input, req.user);
+    @Body() input: CreateCateInput,
+  ): Promise<CreateCateOutput> {
+    return this.memoService.createCategory(input, req.user);
   }
 
-  @ApiResponse({ type: SendDefaultDataOutputDto })
-  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ type: AsideDataOutput })
   @Post('sendContentData')
-  sendDefaultData(@Req() req): Promise<SendDefaultDataOutputDto> {
-    return this.memoService.sendDefaultData(req.user);
+  getAsideData(@Req() req): Promise<AsideDataOutput> {
+    return this.memoService.getAsideData(req.user);
   }
 
   @ApiResponse({ type: CoreOutput })
   @Post('updateOneCate')
-  updateOneCate(@Body() input: CateInputDto): Promise<CoreOutput> {
-    return this.memoService.updateOneCate(input);
+  updateCategory(@Req() req, @Body() input: CateInput): Promise<CoreOutput> {
+    return this.memoService.updateCategory(input, req.user);
   }
 
-  @ApiResponse({ type: CoreOutput })
-  @Post('updateManyCate')
-  updateManyCate(@Body() input: UpdateManyCateInputDto): Promise<CoreOutput> {
-    return this.memoService.updateManyCate(input);
-  }
-
-  @ApiResponse({ type: ImportantMemoLengthOutputDto })
+  @ApiResponse({ type: ImportantMemoLengthOutput })
   @Delete()
   deleteCate(
-    @Body() input: CateIdInputDto,
-  ): Promise<ImportantMemoLengthOutputDto> {
-    return this.memoService.deleteCate(input);
-  }
-
-  @ApiResponse({ type: PaginationOutputDto })
-  @UseGuards(JwtAuthGuard)
-  @Post('scrollPagination')
-  scrollPagination(
-    @Body() input: PaginationInputDto,
     @Req() req,
-  ): Promise<PaginationOutputDto> {
-    return this.memoService.scrollPagination(input, req.user);
+    @Body() input: CateIdInput,
+  ): Promise<ImportantMemoLengthOutput> {
+    return this.memoService.deleteCate(input, req.user);
   }
 
-  @ApiResponse({ type: ImportantMemoLengthOutputDto })
+  @ApiResponse({ type: GetMemosOutput })
+  @Patch('get')
+  get(@Req() req, @Body() input: GetMemosInput): Promise<GetMemosOutput> {
+    return this.memoService.getMemos(input, req.user);
+  }
+
+  @ApiResponse({ type: ImportantMemoLengthOutput })
   @Post('changeImportant')
   changeImportant(
+    @Req() req,
     @Body() input: MemoIdInputDto,
-  ): Promise<ImportantMemoLengthOutputDto> {
-    return this.memoService.changeImportant(input);
+  ): Promise<ImportantMemoLengthOutput> {
+    return this.memoService.changeImportant(input, req.user);
   }
 }

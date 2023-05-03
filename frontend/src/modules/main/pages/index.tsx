@@ -25,7 +25,7 @@ export const MemoMain = () => {
     const divObsRef = useRef(null);
     const loadEndRef = useRef(false); // 모든 데이터로드시 true
     const preventRef = useRef(true); // obs 중복방지
-    const limit = useRef<number>(10);
+    const limit = useRef<number>(15);
     const offset = useRef<number>(0);
     const obsRef = useRef<IntersectionObserver>(null);
     const targetRef = useRef(null);
@@ -97,7 +97,8 @@ export const MemoMain = () => {
 
     const getMemo = () => {
         (async () => {
-            await Api().memo.scrollPagination({
+            await Api().memo.get({
+                search: null,
                 offset: offset.current,
                 limit: limit.current,
                 cateQueryStr: Number(cateQueryStr),

@@ -37,18 +37,6 @@ export interface Categories {
      * @type {string}
      * @memberof Categories
      */
-    'createAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Categories
-     */
-    'updateAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Categories
-     */
     'cateName': string | null;
     /**
      * 
