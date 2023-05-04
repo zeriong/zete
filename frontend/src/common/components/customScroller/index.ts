@@ -582,7 +582,7 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
             universal,
             autoHeight,
             autoHeightMin,
-            //autoHeightMax,
+            autoHeightMax,
             style,
             children,
             ...props
@@ -649,7 +649,7 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
 
         return createElement(tagName, { ...props, style: containerStyle, ref: (ref) => { this.container = ref; } }, [
             cloneElement(
-                renderView({ style: viewStyle, class: 'customScrollerInner' }),
+                renderView({ style: viewStyle, className: 'customScrollerInner' }),
                 { key: 'view', ref: (ref: any) => { this.view = ref; } },
                 children
             ),

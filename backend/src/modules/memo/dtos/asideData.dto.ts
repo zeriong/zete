@@ -1,7 +1,5 @@
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Tags } from '../../../entities/tags.entity';
-import { Categories } from '../../../entities/categories.entity';
 
 export class MemoLengthInCate {
   @ApiProperty({ type: Number })

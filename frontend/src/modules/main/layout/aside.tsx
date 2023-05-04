@@ -5,9 +5,9 @@ import {SET_SHOW_MENU, TOGGLE_SHOW_MENU} from "../../../store/slices/changedMenu
 import CustomScroller from "../../../common/components/customScroller";
 import {CateModifyModal} from "../components/modals/cateModifyModal";
 import {Link, To} from "react-router-dom";
-import {TagsInCate} from "../../../store/slices/constants";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../../../assets/vectors";
+import {TagNameAndCateId} from "../../../openapi";
 
 export const Aside = () => {
     const dispatch = useDispatch();
@@ -93,7 +93,7 @@ export const Aside = () => {
     )
 }
 
-const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string, cateName: string, cateId: string, count: number, tags?: TagsInCate[] }) => {
+const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string, cateName: string, cateId: string, count: number, tags?: TagNameAndCateId[] }) => {
     const { tagQueryStr, cateQueryStr, searchParams, menuQueryStr } = useHandleQueryStr();
 
     const isActive = useMemo(() => {

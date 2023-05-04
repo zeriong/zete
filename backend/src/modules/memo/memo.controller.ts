@@ -3,9 +3,9 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MemoService } from './memo.service';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
 import {
-  CreateMemoInputDto,
-  CreateMemoOutputDto,
-  MemoIdInputDto,
+  CreateMemoInput,
+  CreateMemoOutput,
+  MemoIdInput,
   GetMemosInput,
   GetMemosOutput,
 } from './dtos/memo.dto';
@@ -25,12 +25,12 @@ import { AsideDataOutput } from './dtos/asideData.dto';
 export class MemoController {
   constructor(private readonly memoService: MemoService) {}
 
-  @ApiResponse({ type: CreateMemoOutputDto })
-  @Post('createMemo')
-  createMemo(
+  @ApiResponse({ type: CreateMemoOutput })
+  @Post('create')
+  create(
     @Req() req,
-    @Body() input: CreateMemoInputDto,
-  ): Promise<CreateMemoOutputDto> {
+    @Body() input: CreateMemoInput,
+  ): Promise<CreateMemoOutput> {
     return this.memoService.createMemo(input, req.user);
   }
 
@@ -74,7 +74,7 @@ export class MemoController {
   @Post('changeImportant')
   changeImportant(
     @Req() req,
-    @Body() input: MemoIdInputDto,
+    @Body() input: MemoIdInput,
   ): Promise<ImportantMemoLengthOutput> {
     return this.memoService.changeImportant(input, req.user);
   }

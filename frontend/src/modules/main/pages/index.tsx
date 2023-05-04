@@ -11,152 +11,26 @@ import {subUniqueKey} from "../../../common/libs/common.lib";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
 import {MemoModifyModal} from "../components/modals/memoModifyModal";
 import {SavedMemoMenuPopover} from "../components/popovers/savedMemoMenuPopover";
-import {Api} from "../../../common/libs/api";
-import {
-    ADD_MEMO,
-    CHANGE_IMPORTANT,
-    RESET_MEMOS,
-    SET_DATA,
-    SET_IMPORTANT_LENGTH,
-    SET_MEMO
-} from "../../../store/slices/memo.slice";
+import {importantConverter} from "../../../store/slices/memo.slice";
+import {useCloneDivObserver, usePaginationObservers} from "../../../hooks/useObservers";
 
 export const MemoMain = () => {
-    const divObsRef = useRef(null);
-    const loadEndRef = useRef(false); // 모든 데이터로드시 true
-    const preventRef = useRef(true); // obs 중복방지
-    const limit = useRef<number>(15);
-    const offset = useRef<number>(0);
-    const obsRef = useRef<IntersectionObserver>(null);
-    const targetRef = useRef(null);
-    const cloneRef = useRef(null);
-    const timeout = useRef<NodeJS.Timeout>(null);
-
     const [masonryCols,setMasonryCols] = useState<{}>({})
     const [currentMemoId,setCurrentMemoId] = useState<number>(0);
-    const [isReset,setIsReset] = useState<boolean>(false);
-    const [retryObs,setRetryObs] = useState<boolean>(false);
-    const [changeHeight, setChangeHeight] = useState(0);
 
     const { loading } = useSelector((state: RootState) => (state.user));
     const { data } = useSelector((state: RootState) => state.memo);
-    const { menuQueryStr, cateQueryStr, tagQueryStr, searchParams, setSearchParams } = useHandleQueryStr();
+    const { menuQueryStr, searchParams, setSearchParams } = useHandleQueryStr();
+    const { paginationDivObsRef } = usePaginationObservers();
+    const { cloneMainRef, cloneRef } = useCloneDivObserver()
 
     const horizonScroll = useHorizontalScroll();
-    const dispatch = useDispatch();
-
-    useEffect(() => { //addMemo-clone-box 옵저버생성
-        if (!targetRef.current || !cloneRef.current) return;
-        const observer = new ResizeObserver(() => setChangeHeight(targetRef.current.offsetHeight));
-        observer.observe(targetRef.current);
-
-        return () => observer.disconnect();
-    },[]);
-    useEffect(() => {
-        if (!cloneRef.current) return;
-        cloneRef.current.style.height = `${changeHeight}px`;
-    }, [changeHeight]);
-
-    useEffect(()=> { //페이지네이션 옵저버 생성
-        console.log('옵저버!!')
-        obsRef.current = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting && !loadEndRef.current && preventRef.current) {
-                console.log('옵저버 핸들러실행')
-                preventRef.current = false;
-                getMemo();
-            }
-        });
-        if(divObsRef.current) obsRef.current.observe(divObsRef.current);
-        return () => { obsRef.current.disconnect(); }
-    }, [retryObs]);
-
-    const handleLoadMore = () => offset.current += limit.current;
-
-    useEffect(() => {
-        clearTimeout(timeout.current);
-        timeout.current = null;
-        obsRef.current.disconnect();
-
-        if (!isReset) {
-            console.log('url 변경')
-            dispatch(RESET_MEMOS());
-            offset.current = 0;
-            setIsReset(true);
-            loadEndRef.current = false;
-        }
-    },[searchParams])
-
-    useEffect(() => {
-        if (isReset) {
-            console.log('리셋!')
-            preventRef.current = true;
-            setRetryObs(!retryObs);
-            setIsReset(false);
-        }
-    },[isReset])
-
-    const getMemo = () => {
-        (async () => {
-            await Api().memo.get({
-                search: null,
-                offset: offset.current,
-                limit: limit.current,
-                cateQueryStr: Number(cateQueryStr),
-                tagQueryStr,
-                menuQueryStr,
-            })
-                .then((res) => {
-                    if (res.data.success) {
-                        if (res.data.memos.length < limit.current) {
-                            loadEndRef.current = true;
-                        }
-                        handleLoadMore();
-                        timeout.current = setTimeout(() => {
-                            console.log(res.data.memos,'데이터 들어왔다~~~~~~~~~~~~~~~~~~~')
-                            if (res.data.memos.length === limit.current) {
-                                setRetryObs(!retryObs);
-                            }
-                            preventRef.current = true;
-                            const setMemoType = res.data.memos.map((memos) => ({
-                                ...memos,
-                                important: memos.important,
-                                updateAt: new Date(memos.updateAt).valueOf(),
-                            }));
-
-                            dispatch(SET_MEMO(setMemoType));
-                        },150);
-                    } else {
-                        console.log(res.data.error)
-                    }
-                })
-                .catch(e => console.log(e))
-        })()
-    }
 
     const memoModifier = (memoId) => {
         setCurrentMemoId(memoId)
         searchParams.set('modal', 'memoModify');
         setSearchParams(searchParams);
     }
-
-    const importantModifier = (memoId:number) => {
-        console.log(memoId)
-        Api().memo.changeImportant({memoId})
-            .then((res) => {
-                if (res.data.success) {
-                    const importantMemoLength = Number(res.data.importantMemoLength);
-                    console.log(res.data.importantMemoLength)
-                    dispatch(SET_IMPORTANT_LENGTH(importantMemoLength));
-
-                    const changedList = data.memos.map(memo => {
-                        if (memo.memoId === memoId) return {...memo, important: memo.important !== true};
-                        return memo;
-                    })
-
-                    dispatch(CHANGE_IMPORTANT(changedList));
-                } else { console.log(res.data.error) }
-            })
-    };
 
     const convertCols = (n:number) => {
         if (!data.memos) return
@@ -197,7 +71,7 @@ export const MemoMain = () => {
                 <CustomScroller>
                     <section className='relative top-0 flex gap-28px w-full p-16px browser-width-900px:p-30px'>
                         {!menuQueryStr && (
-                            <div ref={targetRef} className='absolute left-30px top-30px mb-16px browser-width-900px:mb-30px z-20'>
+                            <div ref={cloneMainRef} className='absolute left-30px top-30px mb-16px browser-width-900px:mb-30px z-20'>
                                 <AddMemo/>
                             </div>
                         )}
@@ -256,7 +130,7 @@ export const MemoMain = () => {
                                         <button
                                             type='button'
                                             className='absolute top-18px right-20px'
-                                            onClick={() => { importantModifier(val.memoId); }}
+                                            onClick={() => importantConverter(val.memoId)}
                                         >
                                             {val.important ? <FillStarIcon/> : <StarIcon/>}
                                         </button>
@@ -268,7 +142,7 @@ export const MemoMain = () => {
                         </>
                     </section>
                     <div className='relative w-full h-1px bg-blue-500'>
-                        <div ref={divObsRef} className='absolute left-0 bottom-0 w-1px h-[500px] bg-red-500'/>
+                        <div ref={paginationDivObsRef} className='absolute left-0 bottom-0 w-1px h-[500px] bg-red-500'/>
                     </div>
                 </CustomScroller>
             </>

@@ -4,9 +4,9 @@ import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from "../../../.
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import CustomScroller from "../../../../common/components/customScroller";
-import {ADD_CATE, DELETE_CATE, UPDATE_MANY_CATE, UPDATE_ONE_CATE} from "../../../../store/slices/memo.slice";
+import {ADD_CATE, DELETE_CATE} from "../../../../store/slices/memo.slice";
 import {Api} from "../../../../common/libs/api";
-import {Category} from "../../../../store/slices/constants";
+import {CateNameAndCateId} from "../../../../openapi";
 
 export const CateModifyModal = () => {
     const deleteButtonRef = useRef(null)
@@ -17,7 +17,7 @@ export const CateModifyModal = () => {
 
     const [isShow, setIsShow] = useState(false);
     const [newCateListNames, setNewCateListNames] = useState<string[]>(categories.map(cate => cate.cateName));
-    const [newCateList, setNewCateList] = useState<Category[]>(categories);
+    const [newCateList, setNewCateList] = useState<CateNameAndCateId[]>(categories);
     const [addCateValue, setAddCateValue] = useState<string>('');
     const [isAgreeShow, setIsAgreeShow] = useState<boolean>(false);
     const [getCateId, setGetCateId] = useState<number>(0);

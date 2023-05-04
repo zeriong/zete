@@ -23,9 +23,9 @@ models/create-cate-input.ts
 models/create-cate-output.ts
 models/create-completion-input-dto.ts
 models/create-completion-input-obj.ts
-models/create-memo-input-dto.ts
-models/create-memo-new-tags-output-dto.ts
-models/create-memo-output-dto.ts
+models/create-memo-input.ts
+models/create-memo-new-tags-output.ts
+models/create-memo-output.ts
 models/get-memos-input.ts
 models/get-memos-output.ts
 models/get-memos-tags.ts
@@ -34,11 +34,11 @@ models/important-memo-length-output.ts
 models/index.ts
 models/login-input.ts
 models/login-output.ts
-models/memo-id-input-dto.ts
+models/memo-id-input.ts
 models/memo-length-in-cate.ts
 models/memos.ts
 models/tag-name-and-cate-id.ts
-models/tag-name-input-dto.ts
+models/tag-name-input.ts
 models/tags.ts
 models/update-account-dto.ts
 models/user.ts

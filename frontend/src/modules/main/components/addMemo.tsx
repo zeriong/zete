@@ -14,20 +14,11 @@ import {handleInputChange, handleResizeHeight, uniqueKey} from "../../../common/
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
-import {ADD_MEMO} from "../../../store/slices/memo.slice";
+// import {ADD_MEMO} from "../../../store/slices/memo.slice";
 import {Api} from "../../../common/libs/api";
-import {Category} from "../../../store/slices/constants";
 import {useForm} from "react-hook-form";
 import {showAlert} from "../../../store/slices/alert.slice";
-import {TagNameInputDto} from "../../../openapi";
-
-interface ReqData {
-    cateId: number | null;
-    important: boolean;
-    title: string;
-    content: string
-    tags: TagNameInputDto[];
-}
+import {CreateMemoInput} from "../../../openapi";
 
 export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
@@ -42,7 +33,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
 
     const [isImportant, setIsImportant] = useState<boolean>(false);
 
-    const form = useForm<ReqData>({ mode: 'onBlur' });
+    const form = useForm<CreateMemoInput>({ mode: 'onBlur' });
 
     const handleImportant = () => setIsImportant(!isImportant);
 
@@ -68,7 +59,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
             return
         }
 
-        Api().memo.createMemo({...form.getValues(), important: isImportant})
+        Api().memo.create({...form.getValues(), important: isImportant})
             .then((res) => {
                 if (res.data.success) {
                     const updateAt = new Date(res.data.updateAt).valueOf();
@@ -78,13 +69,13 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                         cateId: tags.cateId,
                         memoId: tags.memoId,
                     }));
-                    dispatch(ADD_MEMO({
-                        ...form.getValues(),
-                        important: isImportant,
-                        memoId: res.data.newMemoId,
-                        tags: resTags,
-                        updateAt,
-                    }));
+                    // dispatch(ADD_MEMO({
+                    //     ...form.getValues(),
+                    //     important: isImportant,
+                    //     memoId: res.data.newMemoId,
+                    //     tags: resTags,
+                    //     updateAt,
+                    // }));
                     form.reset({ title: '', content: '', cateId: null, tags: [] })
                     setIsImportant(false);
                     memoTextarea.current.style.height = 'auto';

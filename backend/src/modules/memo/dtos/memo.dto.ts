@@ -5,14 +5,14 @@ import { Tags } from '../../../entities/tags.entity';
 import { Memos } from '../../../entities/memos.entity';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 
-export class TagNameInputDto {
+export class TagNameInput {
   @ApiProperty()
   @Validator.IsOptional()
   @Validator.IsString()
   tagName: string;
 }
 
-export class CreateMemoInputDto extends CateIdInput {
+export class CreateMemoInput extends CateIdInput {
   @ApiProperty()
   @Validator.MaxLength(255, { message: '최대 255자 까지 메모가능합니다.' })
   title: string;
@@ -25,12 +25,12 @@ export class CreateMemoInputDto extends CateIdInput {
   @Validator.IsBoolean()
   important: boolean;
 
-  @ApiProperty({ type: [TagNameInputDto], required: false })
+  @ApiProperty({ type: [TagNameInput], required: false })
   @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
-  tags?: Array<TagNameInputDto>;
+  tags?: Array<TagNameInput>;
 }
 
-export class MemoIdInputDto {
+export class MemoIdInput {
   @ApiProperty({ type: Number })
   @Validator.IsNumber()
   memoId: number;
@@ -66,7 +66,7 @@ export class GetMemosInput {
   menuQueryStr?: string;
 }
 
-export class CreateMemoNewTagsOutputDto {
+export class CreateMemoNewTagsOutput {
   @ApiProperty({ type: Number })
   tagId: number;
 
@@ -80,15 +80,15 @@ export class CreateMemoNewTagsOutputDto {
   tagName: string;
 }
 
-export class CreateMemoOutputDto extends CoreOutput {
+export class CreateMemoOutput extends CoreOutput {
   @ApiProperty({ type: Number })
   newMemoId?: number;
 
   @ApiProperty({ type: Date })
   updateAt?: Date;
 
-  @ApiProperty({ type: [CreateMemoNewTagsOutputDto] })
-  newTags?: Array<CreateMemoNewTagsOutputDto>;
+  @ApiProperty({ type: [CreateMemoNewTagsOutput] })
+  newTags?: Array<CreateMemoNewTagsOutput>;
 }
 
 export class GetMemosTags {

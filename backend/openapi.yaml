@@ -142,23 +142,23 @@ paths:
                 $ref: "#/components/schemas/CoreOutput"
       tags:
         - Auth
-  /memo/createMemo:
+  /memo/create:
     post:
-      operationId: createMemo
+      operationId: create
       parameters: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateMemoInputDto"
+              $ref: "#/components/schemas/CreateMemoInput"
       responses:
         default:
           description: ""
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateMemoOutputDto"
+                $ref: "#/components/schemas/CreateMemoOutput"
       tags:
         - Memo
   /memo/createCate:
@@ -259,7 +259,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MemoIdInputDto"
+              $ref: "#/components/schemas/MemoIdInput"
       responses:
         default:
           description: ""
@@ -520,14 +520,14 @@ components:
           type: string
       required:
         - success
-    TagNameInputDto:
+    TagNameInput:
       type: object
       properties:
         tagName:
           type: string
       required:
         - tagName
-    CreateMemoInputDto:
+    CreateMemoInput:
       type: object
       properties:
         cateId:
@@ -542,13 +542,13 @@ components:
         tags:
           type: array
           items:
-            $ref: "#/components/schemas/TagNameInputDto"
+            $ref: "#/components/schemas/TagNameInput"
       required:
         - cateId
         - title
         - content
         - important
-    CreateMemoNewTagsOutputDto:
+    CreateMemoNewTagsOutput:
       type: object
       properties:
         tagId:
@@ -564,7 +564,7 @@ components:
         - cateId
         - memoId
         - tagName
-    CreateMemoOutputDto:
+    CreateMemoOutput:
       type: object
       properties:
         error:
@@ -583,7 +583,7 @@ components:
         newTags:
           type: array
           items:
-            $ref: "#/components/schemas/CreateMemoNewTagsOutputDto"
+            $ref: "#/components/schemas/CreateMemoNewTagsOutput"
       required:
         - success
         - newMemoId
@@ -812,7 +812,7 @@ components:
         - memosLength
         - importantMemoLength
         - tagsLength
-    MemoIdInputDto:
+    MemoIdInput:
       type: object
       properties:
         memoId:

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Categories } from '../../entities/categories.entity';
 import { Tags } from '../../entities/tags.entity';
 import { Memos } from '../../entities/memos.entity';
 import {
-  CreateMemoInputDto,
-  CreateMemoOutputDto,
-  MemoIdInputDto,
+  CreateMemoInput,
+  CreateMemoOutput,
+  MemoIdInput,
   GetMemosInput,
   GetMemosOutput,
 } from './dtos/memo.dto';
@@ -109,24 +109,7 @@ export class MemoService {
       const qb = this.memoRepository
         .createQueryBuilder()
         .leftJoinAndSelect('Memos.tags', 'tags')
-        .where('userId = :userId', { userId: user.id });
-
-      if (input.search) {
-        qb.andWhere(
-          `Memo.title LIKE '%:search%' OR Memo.contents LIKE '%:search%'`,
-          { search: input.search },
-        );
-      }
-
-      if (input.cateQueryStr) {
-        qb.andWhere('Memo.cateId = :cateId', { cateId: input.cateQueryStr });
-      }
-      if (input.menuQueryStr) {
-        qb.andWhere('important = :important', { important: true });
-      }
-      if (input.tagQueryStr) {
-        qb.andWhere('tags.tagName = :tagName', { tagName: input.tagQueryStr });
-      }
+        .where('Memos.userId = :userId', { userId: user.id });
 
       const memosLength = await qb.getCount();
 
@@ -141,6 +124,56 @@ export class MemoService {
         .groupBy('tagName, tags.cateId')
         .orderBy('tagName, cateId, id')
         .getCount();
+
+      if (input.search) {
+        const findSearch = await this.memoRepository
+          .createQueryBuilder()
+          .leftJoinAndSelect('Memos.tags', 'tags')
+          .where('Memos.userId = :userId', { userId: user.id })
+          .andWhere('Memos.title LIKE :search OR Memos.content LIKE :search', {
+            search: `%${input.search}%`,
+          })
+          .skip(input.offset)
+          .take(input.limit)
+          .getMany();
+
+        const searchMemos = findSearch.map((memos) => {
+          const {
+            id: memoId,
+            cateId,
+            title,
+            content,
+            updateAt,
+            important,
+            tags: getTags,
+          } = memos;
+          const tags = getTags.map((tag) => ({
+            tagId: tag.id,
+            memoId: tag.memoId,
+            cateId: tag.cateId,
+            tagName: tag.tagName,
+          }));
+          return { memoId, cateId, title, content, updateAt, important, tags };
+        });
+
+        return {
+          success: true,
+          memos: searchMemos,
+          memosLength,
+          importantMemoLength,
+          tagsLength,
+        };
+      }
+
+      if (input.cateQueryStr) {
+        qb.andWhere('Memo.cateId = :cateId', { cateId: input.cateQueryStr });
+      }
+      if (input.menuQueryStr) {
+        qb.andWhere('Memos.important = :important', { important: true });
+      }
+      if (input.tagQueryStr) {
+        qb.andWhere('tags.tagName = :tagName', { tagName: input.tagQueryStr });
+      }
 
       const result = await qb.skip(input.offset).take(input.limit).getMany();
 
@@ -262,9 +295,9 @@ export class MemoService {
   }
 
   async createMemo(
-    input: CreateMemoInputDto,
+    input: CreateMemoInput,
     user: User,
-  ): Promise<CreateMemoOutputDto> {
+  ): Promise<CreateMemoOutput> {
     try {
       const saveMemo = await this.memoRepository.save(
         this.memoRepository.create({
@@ -314,7 +347,7 @@ export class MemoService {
     }
   }
   async changeImportant(
-    input: MemoIdInputDto,
+    input: MemoIdInput,
     user: User,
   ): Promise<ImportantMemoLengthOutput> {
     try {
