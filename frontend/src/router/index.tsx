@@ -12,7 +12,7 @@ import {Guide} from "../modules/intro/pages/guide";
 import {PayNotice} from "../modules/intro/pages/paymentNotice";
 import {UserExp} from "../modules/intro/pages/userExperience";
 import {Notice} from "../modules/intro/pages/notice";
-import {MemoInfoPopover} from "../modules/main/components/popovers/MemoInfoPopover";
+import {MemoInfoPopover} from "../modules/main/components/popovers/MemoInfo.popover";
 
 export const Index = ()=> {
     return (

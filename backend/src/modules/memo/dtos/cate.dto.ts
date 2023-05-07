@@ -32,11 +32,8 @@ export class CateIdInput {
 }
 
 export class CreateCateOutput extends CoreOutput {
-  @ApiProperty({ type: Categories, required: false })
-  cate?: Categories[];
-
-  @ApiProperty({ type: CateInput })
-  savedCate?: CateInput;
+  @ApiProperty({ type: Categories })
+  savedCate?: Categories;
 }
 
 export class ImportantMemoLengthOutput extends CoreOutput {

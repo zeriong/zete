@@ -34,34 +34,16 @@ export interface Tags {
     'tagName': string;
     /**
      * 
-     * @type {object}
-     * @memberof Tags
-     */
-    'user': object;
-    /**
-     * 
      * @type {number}
      * @memberof Tags
      */
     'userId': number;
     /**
      * 
-     * @type {object}
-     * @memberof Tags
-     */
-    'memos': object;
-    /**
-     * 
      * @type {number}
      * @memberof Tags
      */
     'memoId': number;
-    /**
-     * 
-     * @type {object}
-     * @memberof Tags
-     */
-    'cate': object;
     /**
      * 
      * @type {number}

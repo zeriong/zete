@@ -61,22 +61,10 @@ export interface Memos {
     'important': boolean;
     /**
      * 
-     * @type {object}
-     * @memberof Memos
-     */
-    'user': object;
-    /**
-     * 
      * @type {number}
      * @memberof Memos
      */
     'userId': number;
-    /**
-     * 
-     * @type {object}
-     * @memberof Memos
-     */
-    'cate': object | null;
     /**
      * 
      * @type {number}
@@ -85,9 +73,9 @@ export interface Memos {
     'cateId': number | null;
     /**
      * 
-     * @type {Tags}
+     * @type {Array<Tags>}
      * @memberof Memos
      */
-    'tags': Tags;
+    'tag': Array<Tags>;
 }
 

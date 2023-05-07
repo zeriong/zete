@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {resetMemos, resetSearch, SET_MEMO} from "../store/slices/memo.slice";
+import {loadAsideData, resetMemos, resetSearch, SET_MEMO} from "../store/slices/memo.slice";
 import {Api} from "../common/libs/api";
 import {useHandleQueryStr} from "./useHandleQueryStr";
 import {useDispatch, useSelector} from "react-redux";
@@ -12,20 +12,33 @@ export const usePaginationObservers = () => {
     const offset = useRef<number>(0);
     const obsRef = useRef<IntersectionObserver>(null);
     const paginationDivObsRef = useRef(null);
-
-    const timeout = useRef<NodeJS.Timeout>(null);
+    const dataLengthRef = useRef<{
+        importantMemoLength: number;
+        memosLength: number;
+        tagsLength: number;
+    }>(null);
 
     const [isReset,setIsReset] = useState<boolean>(false);
     const [retryObs,setRetryObs] = useState<boolean>(false);
+    const [payloadLength,setPayloadLength] = useState<{
+        importantMemoLength: number;
+        memosLength: number;
+        tagsLength: number;
+    }>({
+        importantMemoLength: 0,
+        memosLength: 0,
+        tagsLength: 0,
+    });
 
     const { menuQueryStr, cateQueryStr, tagQueryStr } = useHandleQueryStr();
-    const { searchInput } = useSelector((state: RootState) => state.memo);
+    const { searchInput, data } = useSelector((state: RootState) => state.memo);
 
     const dispatch = useDispatch();
 
     const handleLoadMore = () => offset.current += limit.current;
 
-    useEffect(()=> { //페이지네이션 옵저버 생성
+    // 페이지네이션 옵저버 생성
+    useEffect(()=> {
         console.log('retry감지')
         obsRef.current = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !loadEndRef.current && preventRef.current) {
@@ -39,9 +52,8 @@ export const usePaginationObservers = () => {
         }
     }, [retryObs]);
 
+    // url 변경시 옵저버 초기화
     useEffect(() => {
-        clearTimeout(timeout.current);
-        timeout.current = null;
         obsRef.current.disconnect();
 
         if (!isReset) {
@@ -52,6 +64,8 @@ export const usePaginationObservers = () => {
         }
     },[menuQueryStr, cateQueryStr, tagQueryStr]);
 
+
+    // 초기화 완료시 retryObs를 변경시켜 옵저버 재생성
     useEffect(() => {
         if (isReset) {
             preventRef.current = true;
@@ -60,21 +74,37 @@ export const usePaginationObservers = () => {
         }
     },[isReset]);
 
+    // 검색창 입력시 데이터로드
     useEffect(() => {
-        clearTimeout(timeout.current);
         obsRef.current.disconnect();
-        timeout.current = null;
         offset.current = 0;
         preventRef.current = true;
         loadEndRef.current = false;
         resetMemos();
         setRetryObs(!retryObs);
-        console.log('인풋바뀜')
     },[searchInput])
+
+    // aside정보 서버데이터와 비교 후 리로드
+    useEffect(() => {
+        console.log('데이터변경 체크1')
+        // if (dataLengthRef.current) {
+        //     dataLengthRef.current = {
+        //         importantMemoLength: data.importantMemoLength,
+        //         memosLength: data.memosLength,
+        //         tagsLength: data.tagsLength,
+        //     };
+        //
+        //     console.log('데이터변경 체크')
+        //
+        //     if (dataLengthRef.current !== payloadLength) {
+        //         console.log('무한루프는 아닐거야');
+        //         loadAsideData();
+        //     }
+        // }
+    },[data.memos, dataLengthRef.current])
 
     const loadMemos = () => {
         (async () => {
-            console.log('뭐임')
             const cateId = cateQueryStr === '' ? null : Number(cateQueryStr)
             await Api().memo.get({
                 search: searchInput,
@@ -89,43 +119,47 @@ export const usePaginationObservers = () => {
                         if (res.data.memos.length < limit.current) {
                             loadEndRef.current = true;
                         }
+
                         handleLoadMore();
-                        timeout.current = setTimeout(() => {
-                            console.log(res.data.memos,'데이터 들어왔다~~~~~~~~~~~~~~~~~~~')
-                            if (res.data.memos.length === limit.current) {
-                                setRetryObs(!retryObs)
-                            }
-                            preventRef.current = true;
-                            dispatch(SET_MEMO(res.data.memos));
-                        },200);
+                        console.log(res.data,'로드데이터');
+
+                        setPayloadLength({
+                            importantMemoLength: res.data.importantMemoLength,
+                            memosLength: res.data.memosLength,
+                            tagsLength: res.data.tagsLength,
+                        });
+
+                        if (res.data.memos.length === limit.current) {
+                            setRetryObs(!retryObs)
+                        }
+
+                        preventRef.current = true;
+
+                        dispatch(SET_MEMO(res.data.memos));
                     } else if (!res.data.memos) {
                         loadEndRef.current = true;
                         preventRef.current = true;
-                        dispatch(SET_MEMO([]));
                     } else { console.log(res.data.error) }
                 })
                 .catch(e => console.log(e))
         })()
     }
-
     return { paginationDivObsRef }
 }
 
 export const useCloneDivObserver = () => {
     const cloneMainRef = useRef(null);
     const cloneRef = useRef(null);
-    const obsRef = useRef<ResizeObserver>(null);
 
     const [changeHeight, setChangeHeight] = useState(0);
 
     useEffect(() => { //addMemo-clone-box 옵저버생성
-        if (cloneMainRef.current && cloneRef.current && obsRef.current) {
-            obsRef.current = new ResizeObserver(() => setChangeHeight(cloneMainRef.current.offsetHeight));
-            obsRef.current.observe(cloneMainRef.current);
-
-            return () => obsRef.current.disconnect();
+        if (cloneMainRef.current) {
+            const obsRef = new ResizeObserver(() => setChangeHeight(cloneMainRef.current.offsetHeight));
+            obsRef.observe(cloneMainRef.current);
+            return () => obsRef.disconnect();
         }
-    },[]);
+    },[cloneMainRef.current]);
 
     useEffect(() => { //addMemo-clone-box 변경감지
         if (!cloneRef.current) return;

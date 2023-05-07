@@ -1,5 +1,6 @@
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { Categories } from '../../../entities/categories.entity';
 
 export class MemoLengthInCate {
   @ApiProperty({ type: Number })
@@ -15,14 +16,6 @@ export class TagNameAndCateId {
 
   @ApiProperty()
   tagName: string;
-}
-
-export class CateNameAndCateId {
-  @ApiProperty({ type: Number })
-  cateId: number;
-
-  @ApiProperty()
-  cateName: string;
 }
 
 export class AsideData {
@@ -41,8 +34,8 @@ export class AsideData {
   @ApiProperty({ type: [TagNameAndCateId], required: false })
   tagsInCate?: Array<TagNameAndCateId>;
 
-  @ApiProperty({ type: [CateNameAndCateId], required: false })
-  cate?: Array<CateNameAndCateId>;
+  @ApiProperty({ type: [Categories], required: false })
+  cate?: Array<Categories>;
 }
 export class AsideDataOutput extends CoreOutput {
   @ApiProperty({ type: AsideData, required: false })

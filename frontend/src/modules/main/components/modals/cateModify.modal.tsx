@@ -4,112 +4,94 @@ import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from "../../../.
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import CustomScroller from "../../../../common/components/customScroller";
-import {ADD_CATE, DELETE_CATE} from "../../../../store/slices/memo.slice";
+import {ADD_CATE, createCategory, DELETE_CATE, memoSlice, UPDATE_CATE} from "../../../../store/slices/memo.slice";
 import {Api} from "../../../../common/libs/api";
-import {CateNameAndCateId} from "../../../../openapi";
+import {Categories} from "../../../../openapi";
+import {showAlert} from "../../../../store/slices/alert.slice";
 
 export const CateModifyModal = () => {
     const deleteButtonRef = useRef(null)
 
-    const { data } = useSelector((state: RootState) => state.memo);
-
-    const categories = data.cate
+    const { cate } = useSelector((state: RootState) => state.memo.data);
 
     const [isShow, setIsShow] = useState(false);
-    const [newCateListNames, setNewCateListNames] = useState<string[]>(categories.map(cate => cate.cateName));
-    const [newCateList, setNewCateList] = useState<CateNameAndCateId[]>(categories);
-    const [addCateValue, setAddCateValue] = useState<string>('');
     const [isAgreeShow, setIsAgreeShow] = useState<boolean>(false);
-    const [getCateId, setGetCateId] = useState<number>(0);
+    const [addInputValues, setAddInputValues] = useState({ addCateName: '' });
+    const [updateInputValues, setUpdateInputValues] = useState<{ [key: number]: string }>({});
 
     const dispatch = useDispatch();
 
-    const addCateValChange = (e) => setAddCateValue(e.target.value);
+    const closeModal = () => {
+        setAddInputValues({ addCateName: '' })
+        setIsShow(false)
+    }
 
-    const addCate = (e: any) => {
+    // 카테고리 목록에 따른 input state 생성
+    useEffect(() => {
+        let values = {}
+        cate.map((cate) => (
+            values = { ...values, [cate.id]: cate.cateName }
+        ));
+        setUpdateInputValues(values)
+    }, [cate])
+
+    // 카테고리 생성 form submit
+    const handleSubmit = (e) => {
         e.preventDefault();
-        if (categories.some(cate => cate.cateName === addCateValue)) return alert('새 카테고리 이름이 기존 카테고리 이름과 중복됩니다.')
-
-        Api().memo.createCate({ cateName: addCateValue })
-            .then((res) => {
-                if (res.data.success) {
-                    dispatch(ADD_CATE(res.data.savedCate));
-                    setAddCateValue('');
-                } else {
-                    alert(res.data.error);
-                }})
-            .catch(e => console.log(e))
-    }
-
-    const handleDelete = () => {
-        Api().memo.deleteCate({ cateId: getCateId })
-            .then((res) => {
-                if (res.data.success) {
-                    setIsAgreeShow(false);
-                    deleteCate(getCateId, res.data.importantMemoLength);
-                } else {
-                    alert(res.data.error);
-                }})
-            .catch(e => console.log(e))
-    }
-
-    const deleteCate = (cateId: number, importantMemoLength: number) => {
-        dispatch(DELETE_CATE({cateId, importantMemoLength}));
-    }
-
-    const handleUpdateName = (idx, event) => {
-        const newNames = [...newCateListNames];
-        newNames[idx] = event.target.value;
-        setNewCateListNames(newNames);
-    }
-
-    const updateManyCate = () => {
-        if (newCateListNames.some(name => name === '')) return alert('비어있는 태그를 삭제하거나 수정할 이름을 입력하세요.');
-        if (newCateListNames.length !== new Set(newCateListNames).size) return alert('중복된 카테고리가 존재합니다.')
-        console.log('뉴케이트리스트',newCateList)
-        // Api().memo.updateCategory({data: newCateList})
-        //     .then((res) => {
-        //         if (res.data.success) {
-        //             setIsShow(false);
-        //             dispatch(UPDATE_MANY_CATE(newCateList));
-        //         } else {
-        //             alert(res.data.error)
-        //         }})
-        //     .catch(e => console.log(e))
-
-        }
-
-        const updateOneCate = (target: {cateId:number, val:string, event: React.FormEvent<HTMLFormElement>}) => {
-            target.event.preventDefault();
-            if (newCateListNames.some(name => name === '')) return alert('비어있는 카테고리를 삭제하거나 수정할 이름을 입력하세요.');
-
-            const inputCate = {cateId:target.cateId, cateName:target.val};
-
-            // Api().memo.updateOneCate(inputCate)
-            //     .then((res) => {
-            //         if (res.data.success) {
-            //             dispatch(UPDATE_ONE_CATE(inputCate));
-            //             target.event.currentTarget.blur();
-            //         } else {
-            //             alert(res.data.error)
-            //         }})
-            //     .catch(e => console.log(e))
-        }
-
-        useEffect(() => {
-            setNewCateList(categories);
-            setNewCateListNames(categories.map(cate => cate.cateName));
-        },[data])
-
-        useEffect(() => {
-            const reBuildNewCate = data.cate.map((cate, idx) => {
-            return {
-                cateId: cate.cateId,
-                cateName: newCateListNames[idx]
-            }
+        createCategory({ cateName: addInputValues.addCateName })
+        setAddInputValues({
+            addCateName: ''
         })
-            setNewCateList(reBuildNewCate)
-        }, [newCateListNames])
+    }
+
+    // 카테고리 생성 input change
+    const handleInputChange = (e) => {
+        setAddInputValues({
+            ...addInputValues,
+            [e.target.name]: e.target.value,
+        })
+    }
+
+    // 카테고리 업데이트 input submit
+    const handleUpdateFormSubmit = (id: number, prevVal: string, input: any) => {
+        const val = input.value
+        if (val && val.length > 1 && val !== prevVal) {
+            //console.log('handleUpdateFormSubmit - ', val)
+            Api().memo.updateCategory({ cateId: id, cateName: val })
+                .then((res) => {
+                    if (res.data) {
+                        if (res.data.success) {
+                            dispatch(UPDATE_CATE({ cateId: id, cateName: val }))
+                        } else {
+                            // 입력 초기화
+                            input.value = prevVal
+                            showAlert(res.data.error)
+                        }
+                    }
+                })
+                .catch((e) => {
+                    // 입력 초기화
+                    input.value = prevVal
+                    console.log('에러: ', e)
+                    showAlert("카테고리 업데이트에 실패하였습니다.")
+                })
+        }
+    }
+
+    // 카테고리 업데이트 input change
+    const handleUpdateInputChange = (id: number, value: string) => {
+        setUpdateInputValues((state) => {
+            state[id] = value
+            return { ...state }
+        })
+    }
+
+    useEffect(() => {
+        if (isShow) {
+            // 모달 오픈시 카테고리 목록 갱신
+            loadMemoCategories()
+        }
+    },[isShow])
 
     return (
         <>
@@ -132,10 +114,7 @@ export const CateModifyModal = () => {
                 <Dialog
                     as="div"
                     className="relative z-30"
-                    onClose={() => {
-                        setAddCateValue('');
-                        updateManyCate();
-                    }}
+                    onClose={closeModal}
                 >
                     <Transition.Child
                         as={Fragment}
@@ -193,7 +172,7 @@ export const CateModifyModal = () => {
                                                     </form>
                                                     <ul className='text-zete-dark-200 grid gap-16px py-20px'>
                                                         {newCateListNames?.map((val,idx) => {
-                                                            const cateId = newCateList[idx].cateId;
+                                                            const cateId = newCateList[idx].id;
                                                             return (
                                                                 <li key={idx}>
                                                                     <form

@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {SET_SHOW_MENU, TOGGLE_SHOW_MENU} from "../../../store/slices/changedMenu.slice";
 import CustomScroller from "../../../common/components/customScroller";
-import {CateModifyModal} from "../components/modals/cateModifyModal";
+import {CateModifyModal} from "../components/modals/cateModify.modal";
 import {Link, To} from "react-router-dom";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../../../assets/vectors";
@@ -68,16 +68,16 @@ export const Aside = () => {
                         </p>
                         <ul className='grid gap-4px'>
                             {data.cate.map((cate, idx) => {
-                                const count = data.memoLengthInCate.find(find => find.cateId === cate.cateId)?.length || 0;
-                                const tags = data.tagsInCate.filter(find => find.cateId === cate.cateId) || []
+                                const count = data.memoLengthInCate.find(find => find.cateId === cate.id)?.length || 0;
+                                const tags = data.tagsInCate.filter(find => find.cateId === cate.id) || []
                                     return (
                                         <CateItemList
                                             key={idx}
-                                            to={{ pathname: '/memo', search: `?cate=${cate.cateId}` }}
+                                            to={{ pathname: '/memo', search: `?cate=${cate.id}` }}
                                             iconComponent={CategoryIcon}
                                             iconClassName='mr-10px mt-4px min-w-[21px]'
                                             cateName={cate.cateName}
-                                            cateId={String(cate.cateId)}
+                                            cateId={String(cate.id)}
                                             count={count}
                                             tags={tags}
                                         />

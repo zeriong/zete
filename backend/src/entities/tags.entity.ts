@@ -1,4 +1,11 @@
-import { Entity, Column, ManyToOne, RelationId, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  RelationId,
+  JoinColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Memos } from './memos.entity';
 import { coreEntity } from '../common/entities/core.entity';
 import { Categories } from './categories.entity';
@@ -15,28 +22,20 @@ export class Tags {
   @Column()
   tagName: string;
 
-  @ApiProperty({ type: Promise<User> })
   @ManyToOne(() => User, (user) => user.tags, { onDelete: 'CASCADE' })
   user: User;
-
   @ApiProperty({ type: Number })
   @RelationId((tags: Tags) => tags.user)
   userId: number;
 
-  @ApiProperty({ type: Promise<Memos> })
-  @ManyToOne(() => Memos, (memo) => memo.tags, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'memoId' })
-  memos: Memos;
-
+  @ManyToOne(() => Memos, (memo) => memo.tag, { onDelete: 'CASCADE' })
+  memo: Memos;
   @ApiProperty({ type: Number })
-  @RelationId((tags: Tags) => tags.memos)
+  @RelationId((tags: Tags) => tags.memo)
   memoId: number;
 
-  @ApiProperty({ type: Promise<Categories> })
-  @ManyToOne(() => Categories, (cate) => cate.tags, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'cateId' })
+  @ManyToOne(() => Categories, (cate) => cate.tag, { onDelete: 'CASCADE' })
   cate: Categories;
-
   @ApiProperty({ type: Number })
   @RelationId((tags: Tags) => tags.cate)
   cateId: number;

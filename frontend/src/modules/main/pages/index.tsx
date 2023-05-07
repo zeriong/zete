@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import React, {useCallback, useEffect, useState} from "react";
+import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {AddMemo} from "../components/addMemo";
 import Masonry from "react-masonry-css";
@@ -9,8 +9,8 @@ import * as DOMPurify from "dompurify";
 import {FillStarIcon, StarIcon} from "../../../assets/vectors";
 import {subUniqueKey} from "../../../common/libs/common.lib";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
-import {MemoModifyModal} from "../components/modals/memoModifyModal";
-import {SavedMemoMenuPopover} from "../components/popovers/savedMemoMenuPopover";
+import {MemoModifyModal} from "../components/modals/memoModify.modal";
+import {SavedMemoMenuPopover} from "../components/popovers/savedMemoMenu.popover";
 import {importantConverter} from "../../../store/slices/memo.slice";
 import {useCloneDivObserver, usePaginationObservers} from "../../../hooks/useObservers";
 
@@ -87,12 +87,12 @@ export const MemoMain = () => {
                             {data.memos &&
                                 data.memos?.map((val) => (
                                     <div
-                                        key={val.memoId}
+                                        key={val.id}
                                         className='relative'
                                     >
                                         <div
                                             className='mb-16px browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
-                                            onClick={() => memoModifier(val.memoId)}
+                                            onClick={() => memoModifier(val.id)}
                                         >
                                             <article
                                                 className='relative min-w-0 w-full browser-width-900px:w-[300px] flex flex-col justify-between border
@@ -112,7 +112,7 @@ export const MemoMain = () => {
                                                     </div>
                                                     <div className='flex w-full items-center pt-16px pr-26px'>
                                                         <div ref={horizonScroll} className='flex w-full h-full relative py-4px overflow-y-hidden memo-custom-vertical-scroll'>
-                                                            {val.tags.map((val, idx) => (
+                                                            {val.tag.map((val, idx) => (
                                                                 <div key={idx} className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                                                         <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
                                                                             {val.tagName}
@@ -124,13 +124,13 @@ export const MemoMain = () => {
                                                 </div>
                                             </article>
                                             <div className='absolute bottom-16px right-21px '>
-                                                <SavedMemoMenuPopover memoId={val.memoId}/>
+                                                <SavedMemoMenuPopover memoId={val.id}/>
                                             </div>
                                         </div>
                                         <button
                                             type='button'
                                             className='absolute top-18px right-20px'
-                                            onClick={() => importantConverter(val.memoId)}
+                                            onClick={() => importantConverter(val.id)}
                                         >
                                             {val.important ? <FillStarIcon/> : <StarIcon/>}
                                         </button>

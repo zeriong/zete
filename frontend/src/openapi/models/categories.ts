@@ -40,12 +40,6 @@ export interface Categories {
     'cateName': string | null;
     /**
      * 
-     * @type {object}
-     * @memberof Categories
-     */
-    'user': object;
-    /**
-     * 
      * @type {number}
      * @memberof Categories
      */
@@ -55,12 +49,12 @@ export interface Categories {
      * @type {Memos}
      * @memberof Categories
      */
-    'memos': Memos;
+    'memo': Memos;
     /**
      * 
      * @type {Tags}
      * @memberof Categories
      */
-    'tags': Tags;
+    'tag': Tags;
 }
 

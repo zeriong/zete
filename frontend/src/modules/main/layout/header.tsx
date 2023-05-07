@@ -1,5 +1,5 @@
 import React from "react";
-import {MemoInfoPopover} from "../components/popovers/MemoInfoPopover";
+import {MemoInfoPopover} from "../components/popovers/MemoInfo.popover";
 import {useDispatch} from "react-redux";
 import {Link} from "react-router-dom";
 import {TOGGLE_SHOW_MENU} from "../../../store/slices/changedMenu.slice";

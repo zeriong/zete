@@ -1,23 +1,31 @@
-import { Body, Controller, Delete, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MemoService } from './memo.service';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
 import {
-  CreateMemoInput,
   CreateMemoOutput,
   MemoIdInput,
   GetMemosInput,
-  GetMemosOutput,
+  GetMemosOutput, CreateMemoInput
 } from './dtos/memo.dto';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import {
   CreateCateInput,
   CreateCateOutput,
-  CateInput,
   CateIdInput,
   ImportantMemoLengthOutput,
+  CateInput,
 } from './dtos/cate.dto';
 import { AsideDataOutput } from './dtos/asideData.dto';
+import { Memos } from '../../entities/memos.entity';
 
 @Controller('memo')
 @ApiTags('Memo')
@@ -61,7 +69,7 @@ export class MemoController {
     @Req() req,
     @Body() input: CateIdInput,
   ): Promise<ImportantMemoLengthOutput> {
-    return this.memoService.deleteCate(input, req.user);
+    return this.memoService.deleteCategory(input, req.user);
   }
 
   @ApiResponse({ type: GetMemosOutput })

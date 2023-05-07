@@ -22,19 +22,17 @@ export class Categories {
   @Column({ type: 'tinytext' }) //tinytext: 	255
   cateName: string;
 
-  @ApiProperty({ type: Promise<User> })
   @ManyToOne(() => User, (user) => user.cate, { onDelete: 'CASCADE' })
   user: User;
-
   @ApiProperty({ type: Number })
   @RelationId((cate: Categories) => cate.user)
   userId: number;
 
   @ApiProperty({ type: Memos })
   @OneToMany(() => Memos, (memos) => memos.cate, { cascade: true })
-  memos: Memos[];
+  memo: Memos[];
 
   @ApiProperty({ type: Tags })
   @OneToMany(() => Tags, (tags) => tags.cate, { cascade: true })
-  tags: Tags[];
+  tag: Tags[];
 }

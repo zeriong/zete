@@ -26,24 +26,19 @@ export class Memos extends coreEntity {
   @Column({ type: 'boolean' }) //text: 	65,535
   important: boolean;
 
-  @ApiProperty({ type: Promise<User> })
   @ManyToOne(() => User, (user) => user.memos, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userId' })
   user: User;
-
   @ApiProperty({ type: Number })
   @RelationId((memos: Memos) => memos.user)
   userId: number;
 
-  @ApiProperty({ nullable: true, type: Promise<Categories> })
-  @ManyToOne(() => Categories, (cate) => cate.memos, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Categories, (cate) => cate.memo, { onDelete: 'CASCADE' })
   cate: Categories;
-
   @ApiProperty({ nullable: true, type: Number })
   @RelationId((memo: Memos) => memo.cate)
   cateId: number;
 
-  @ApiProperty({ type: Tags })
-  @OneToMany(() => Tags, (tags) => tags.memos, { cascade: true })
-  tags: Tags[];
+  @ApiProperty({ type: [Tags] })
+  @OneToMany(() => Tags, (tags) => tags.memo, { cascade: true })
+  tag: Array<Tags>;
 }
