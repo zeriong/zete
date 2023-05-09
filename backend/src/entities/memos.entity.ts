@@ -40,5 +40,5 @@ export class Memos extends coreEntity {
 
   @ApiProperty({ type: [Tags] })
   @OneToMany(() => Tags, (tags) => tags.memo, { cascade: true })
-  tag: Array<Tags>;
+  tag: Tags[];
 }

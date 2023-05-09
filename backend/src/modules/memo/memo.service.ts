@@ -35,67 +35,37 @@ export class MemoService {
     private readonly tagsRepository: Repository<Tags>,
   ) {}
 
-  async getCategories(user: User): Promise<Categories[]> {
-    const result = await this.categoriesRepository
-      .createQueryBuilder()
-      .where('Categories.userId = :userId', { userId: user.id })
-      .getMany();
-  }
-
   async getAsideData(user: User): Promise<AsideDataOutput> {
     try {
       const cateQb = await this.categoriesRepository
         .createQueryBuilder()
         .where('Categories.userId = :userId', { userId: user.id });
 
-      const cate = await cateQb.getMany();
+      const cateCount = await cateQb.getCount();
+
+      const cate = await cateQb
+        .leftJoinAndSelect('Categories.tag', 'tag')
+        .loadRelationCountAndMap('Categories.memoCount', 'Categories.memo')
+        .groupBy('Categories.id, tag.tagName')
+        .getMany();
 
       const memosQb = await this.memoRepository
         .createQueryBuilder()
         .where('Memos.userId = :userId', { userId: user.id });
 
-      const memosLength = await memosQb.getCount();
+      const memosCount = await memosQb.getCount();
 
-      const importantMemoLength = await memosQb
+      const importantMemoCount = await memosQb
         .andWhere('Memos.important = :important', { important: true })
         .getCount();
-
-      const getMemoLengthInCate = await memosQb
-        .select('Memos.cateId, COUNT(*) AS length')
-        .groupBy('Memos.cateId')
-        .getRawMany();
-
-      const getTagsInCate = await this.tagsRepository
-        .createQueryBuilder()
-        .select([
-          'MIN(Tags.id) AS id',
-          'Tags.tagName AS tagName',
-          'Tags.cateId AS cateId',
-        ])
-        .where('Tags.userId = :userId', { userId: user.id })
-        .groupBy('Tags.tagName, Tags.cateId')
-        .getRawMany();
-
-      const tagsLength = getTagsInCate.length;
-
-      const tagsInCate = getTagsInCate
-        .filter((tag) => tag.cateId !== null)
-        .map((tags) => ({ tagName: tags.tagName, cateId: tags.cateId }));
-
-      const memoLengthInCate = getMemoLengthInCate.map((inCate) => ({
-        cateId: inCate.cateId,
-        length: Number(inCate.length),
-      }));
 
       return {
         success: true,
         asideData: {
           cate,
-          tagsInCate,
-          importantMemoLength,
-          memosLength,
-          memoLengthInCate,
-          tagsLength,
+          cateCount,
+          importantMemoCount,
+          memosCount,
         },
       };
     } catch (e) {
@@ -114,23 +84,10 @@ export class MemoService {
         .where('Memos.userId = :userId', { userId: user.id })
         .orderBy('Memos.updateAt', 'DESC'); // updateAt 내림차순 정렬
 
-      const memosLength = await qb.getCount();
+      const memosCount = await qb.getCount();
 
-      const importantMemoLength = await qb
+      const importantMemoCount = await qb
         .andWhere('important = :important', { important: true })
-        .getCount();
-
-      const tagsLength = await this.tagsRepository
-        .createQueryBuilder()
-        .select(['MIN(id) AS id', 'tagName AS tagName', 'id AS cateId'])
-        .where('userId = :userId', { userId: user.id })
-        .groupBy('tagName, tag.cateId')
-        .orderBy('tagName, cateId, id')
-        .getCount();
-
-      const cateLength = await this.categoriesRepository
-        .createQueryBuilder()
-        .where('userId = :userId', { userId: user.id })
         .getCount();
 
       if (input.search) {
@@ -146,17 +103,15 @@ export class MemoService {
         return {
           success: true,
           memos: findSearch,
-          memosLength,
-          importantMemoLength,
-          tagsLength,
-          cateLength,
+          memosCount,
+          importantMemoCount,
         };
       }
       // 변수초기화 (important갯수를 반환해주기 위해서 where문의 조건이 변경되기 때문)
       qb.where('Memos.userId = :userId', { userId: user.id });
 
       if (input.cateQueryStr) {
-        qb.andWhere('Memo.cateId = :cateId', { cateId: input.cateQueryStr });
+        qb.andWhere('Memos.cateId = :cateId', { cateId: input.cateQueryStr });
       }
       if (input.menuQueryStr) {
         qb.andWhere('Memos.important = :important', { important: true });
@@ -170,10 +125,8 @@ export class MemoService {
       return {
         success: true,
         memos: result,
-        memosLength,
-        importantMemoLength,
-        tagsLength,
-        cateLength,
+        memosCount,
+        importantMemoCount,
       };
     } catch (e) {
       return { success: false, error: `${e}` };
@@ -260,17 +213,19 @@ export class MemoService {
         .execute();
 
       if (result.affected > 0) {
-        const importantMemoLength = await this.memoRepository
+        const importantMemoCount = await this.memoRepository
           .createQueryBuilder()
           .where('Memos.important = :important', { important: true })
           .getCount();
 
-        return { success: true, importantMemoLength };
+        return { success: true, importantMemoCount };
       }
     } catch (e) {
       return { success: false, error: `${e}` };
     }
   }
+
+  // 메모 ===============================================================
 
   async createMemo(
     input: CreateMemoInput,
@@ -280,6 +235,13 @@ export class MemoService {
       if (!input.content && !input.title) {
         return { success: false, error: '메모를 입력해주세요.' };
       }
+
+      const tags: Tags[] = input.tags.map((tag) => ({
+        tagName: tag.tagName,
+        user,
+        cate: { id: input.cateId || null },
+      }));
+
       const result = await this.memoRepository.save(
         this.memoRepository.create({
           title: input.title,
@@ -287,12 +249,10 @@ export class MemoService {
           important: input.important,
           cate: { id: input.cateId || null },
           user,
-          tag: input.tags || [],
+          tag: tags || [],
         }),
       );
-      console.log('스탭1');
 
-      console.log('스탭3');
       return {
         success: true,
         savedMemo: result,
@@ -319,14 +279,14 @@ export class MemoService {
         .execute();
 
       if (result.affected > 0) {
-        const importantMemoLength = await this.memoRepository
-          .createQueryBuilder('memos')
-          .where('memo.important = :important', { important: true })
+        const importantMemoCount = await this.memoRepository
+          .createQueryBuilder()
+          .where('important = :important', { important: true })
           .getCount();
 
         return {
           success: true,
-          importantMemoLength,
+          importantMemoCount,
         };
       }
     } catch (e) {

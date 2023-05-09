@@ -46,15 +46,15 @@ export interface Categories {
     'userId': number;
     /**
      * 
-     * @type {Memos}
+     * @type {Array<Memos>}
      * @memberof Categories
      */
-    'memo': Memos;
+    'memo': Array<Memos>;
     /**
      * 
-     * @type {Tags}
+     * @type {Array<Tags>}
      * @memberof Categories
      */
-    'tag': Tags;
+    'tag': Array<Tags>;
 }
 

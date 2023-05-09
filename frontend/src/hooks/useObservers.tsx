@@ -115,7 +115,7 @@ export const usePaginationObservers = () => {
                 menuQueryStr,
             })
                 .then((res) => {
-                    if (res.data.memos) {
+                    if (res.data.success) {
                         if (res.data.memos.length < limit.current) {
                             loadEndRef.current = true;
                         }

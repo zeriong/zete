@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../store";
 
 import {Api} from "../../libs/api";
-import {FuncButton} from "../funcBtn";
+import {FuncButton} from "../funcButton";
 /** 폼항목 */
 type FormData = {
     email: string;
@@ -154,12 +154,14 @@ export const SigninModal = () => {
                                                 </span>
                                             </div>
                                         </div>
-                                        <FuncButton className="w-full py-1 bg-orange-500 text-white mx-auto mt-3 text-center
-                                                    cursor-pointer text-[22px] items-center rounded-2xl"
-                                                    type="submit"
-                                                    text="로그인"
-                                                    disabled={!isValid}
-                                                    loading={`${loading}`}
+                                        <FuncButton
+                                            className="w-full py-1 bg-orange-500 text-white mx-auto mt-3 text-center cursor-pointer text-[22px] items-center rounded-2xl"
+                                            type="submit"
+                                            options={{
+                                                text: "로그인",
+                                                disabled: !isValid,
+                                                loading: loading,
+                                            }}
                                         />
                                         <button
                                             className="w-full py-1 bg-orange-500 text-white mx-auto mb-3 text-center

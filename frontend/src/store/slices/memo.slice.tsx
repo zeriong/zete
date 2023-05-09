@@ -2,7 +2,7 @@ import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {CombineData, memoSliceInitState} from "./constants";
 import {
     AsideData,
-    Categories,
+    Categories, CategoriesAndMemoCount, CateIdInput,
     CateInput,
     CreateCateInput,
     CreateMemoInput,
@@ -21,7 +21,7 @@ export const importantConverter = (memoId: number) => {
     Api().memo.changeImportant({memoId})
         .then((res) => {
             if (res.data) {
-                store.dispatch(memoSlice.actions.SET_IMPORTANT_LENGTH(Number(res.data.importantMemoLength)))
+                store.dispatch(memoSlice.actions.SET_IMPORTANT_LENGTH(Number(res.data.importantMemoCount)))
                 store.dispatch(memoSlice.actions.CHANGE_IMPORTANT(memoId));
             } else { console.log(res.data.error) }
         }).catch(e => console.log(e));
@@ -30,6 +30,7 @@ export const importantConverter = (memoId: number) => {
 export const loadAsideData = () => {
     Api().memo.getAsideData().then((res) => {
         if (res.data) {
+            console.log(res.data.asideData)
             store.dispatch(memoSlice.actions.SET_ASIDE_DATA(res.data.asideData))
         } else { console.log(res.data.error) }
     }).catch(e => console.log(e));
@@ -49,23 +50,46 @@ export const createCategory = (input: CreateCateInput) => {
         })
 }
 
+export const deleteCategory = (input: CateIdInput) => {
+    Api().memo.deleteCate(input)
+        .then((res) => {
+            if (res.data) {
+                if (res.data.success) {
+                    store.dispatch(memoSlice.actions.DELETE_CATE({
+                        importantMemoCount : res.data.importantMemoCount,
+                        cateId: input.cateId
+                    }))
+                } else { showAlert(res.data.error) }
+            }
+        })
+        .catch((e) => {
+            console.log(e)
+            showAlert("카테고리 삭제에 실패하였습니다.")
+        })
+}
+
 export const memoSlice = createSlice({
     name: 'memo',
     initialState: memoSliceInitState,
     reducers: {
         SET_ASIDE_DATA: (state: CombineData, action: PayloadAction<AsideData>) => {
             const { cate, ...payload } = action.payload;
-            return {
-                data: {
-                    ...state.data,
-                    ...payload,
-                    cate: cate.sort((a, b) => a.cateName > b.cateName ? 1 : -1),
-                },
-                searchInput: state.searchInput,
-            };
+            state.data.cate = cate.map(val => ({
+                ...val,
+                id: Number(val.id),
+                tag: val.tag.map(tag => ({
+                    ...tag,
+                    id: Number(tag.id),
+                    cateId: Number(tag.cateId),
+                })) || [],
+            }));
+            state.data.memosCount = payload.memosCount;
+            state.data.importantMemoCount = payload.importantMemoCount;
         },
-        ADD_CATE: (state: CombineData, action: PayloadAction<Categories>) => {
-            state.data.cateLength += 1;
+        SET_CATE: (state: CombineData, action: PayloadAction<Categories[]>) => {
+            state.data.cate = action.payload;
+        },
+        ADD_CATE: (state: CombineData, action: PayloadAction<CategoriesAndMemoCount>) => {
             state.data.cate = [...state.data.cate, action.payload]
                 .sort((a, b) => a.cateName > b.cateName ? 1 : -1);
         },
@@ -79,40 +103,33 @@ export const memoSlice = createSlice({
                 }
             }).sort((a, b) => a.cateName > b.cateName ? 1 : -1);
         },
-        DELETE_CATE: (state: CombineData, action: PayloadAction<{ importantMemoLength: number, cateId: number }>) => {
-            const { cateId, importantMemoLength } = action.payload;
-            const { memos, tagsInCate, cate, memoLengthInCate, memosLength } = state.data;
+        DELETE_CATE: (state: CombineData, action: PayloadAction<{ importantMemoCount: number, cateId: number }>) => {
+            const { cateId, importantMemoCount } = action.payload;
+            const { memos, cate } = state.data;
 
-            const targetLength = memoLengthInCate.filter(tags => tags.cateId === cateId).length;
+            const targetLength = cate.find(cate => cate.id === cateId).memoCount;
 
-            state.data.cateLength -= 1;
-            state.data.memosLength = memosLength - targetLength;
-            state.data.importantMemoLength = importantMemoLength;
+            state.data.memosCount -= targetLength;
+            state.data.importantMemoCount = importantMemoCount;
             state.data.memos = memos.filter(memo => memo.cateId !== cateId).sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
             state.data.cate = cate.filter(exists => exists.id !== cateId).sort((a, b) => a.cateName > b.cateName ? 1 : -1)
-            state.data.tagsInCate = tagsInCate.filter(tags => tags.cateId !== cateId).sort((a, b) => a.tagName > b.tagName ? 1 : -1);
         },
         SET_MEMO: (state: CombineData, action: PayloadAction<Memos[]>) => {
             state.data.memos = [...state.data.memos, ...action.payload]
                 .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
         },
         ADD_MEMO: (state: CombineData, action: PayloadAction<Memos>) => {
-            state.data.memosLength += 1;
+            state.data.memosCount += 1;
 
             if (action.payload.important) {
-                state.data.importantMemoLength += 1
-            }
-            if (action.payload.tag.length !== 0) {
-                state.data.tagsLength += action.payload.tag.length;
+                state.data.importantMemoCount += 1
             }
 
-            const addMemoInCateLength = state.data.memoLengthInCate.find(inCate => inCate.cateId === action.payload.cateId);
-            if (addMemoInCateLength) {
-                state.data.memoLengthInCate = [
-                    ...state.data.memoLengthInCate.filter(inCate => inCate.cateId !== addMemoInCateLength.cateId),
-                    { cateId: addMemoInCateLength.cateId, length: addMemoInCateLength.length + 1 }
-                ];
-            }
+            const addMemoInCateLength = state.data.cate.filter(inCate => {
+                return inCate.cateId === action.payload.cateId
+            });
+            console.log('리듀서 체크',action.payload.cateId)
+            console.log('리듀서 체크',addMemoInCateLength)
 
             const noExists = action.payload.tag?.filter(tag => !state.data.tagsInCate.some(inCate => inCate.tagName === tag.tagName)) || [];
             if (noExists.length !== 0) {
@@ -125,6 +142,7 @@ export const memoSlice = createSlice({
                 .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
         },
         SET_IMPORTANT_LENGTH: (state: CombineData, action: PayloadAction<number>) => {
+            console.log(action.payload)
             state.data.importantMemoLength = action.payload;
         },
         CHANGE_IMPORTANT: (state: CombineData, action: PayloadAction<number>) => {

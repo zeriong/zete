@@ -1,14 +1,10 @@
-import {Categories, MemoLengthInCate, Memos, TagNameAndCateId} from "../../openapi";
+import {CategoriesAndMemoCount, Memos} from "../../openapi";
 
 export interface Data {
-    cateLength: number;
-    memosLength: number;
-    importantMemoLength: number;
-    tagsLength: number;
-    memoLengthInCate: MemoLengthInCate[];
-    cate: Categories[];
+    memosCount: number;
+    importantMemoCount: number;
+    cate: CategoriesAndMemoCount[];
     memos: Memos[];
-    tagsInCate: TagNameAndCateId[];
 }
 export interface CombineData {
     data: Data;
@@ -16,14 +12,10 @@ export interface CombineData {
 }
 export const memoSliceInitState: CombineData = {
     data: {
-        cateLength: 0,
-        memosLength: 0,
-        importantMemoLength: 0,
-        tagsLength: 0,
-        memoLengthInCate: [],
+        memosCount: 0,
+        importantMemoCount: 0,
         cate: [],
         memos: [],
-        tagsInCate: [],
     },
     searchInput: '',
 }

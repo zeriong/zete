@@ -38,5 +38,5 @@ export class CreateCateOutput extends CoreOutput {
 
 export class ImportantMemoLengthOutput extends CoreOutput {
   @ApiProperty({ type: Number, required: false })
-  importantMemoLength?: number;
+  importantMemoCount?: number;
 }

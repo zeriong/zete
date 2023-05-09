@@ -7,7 +7,7 @@ import {CateModifyModal} from "../components/modals/cateModify.modal";
 import {Link, To} from "react-router-dom";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../../../assets/vectors";
-import {TagNameAndCateId} from "../../../openapi";
+import {Tags} from "../../../openapi";
 
 export const Aside = () => {
     const dispatch = useDispatch();
@@ -68,8 +68,7 @@ export const Aside = () => {
                         </p>
                         <ul className='grid gap-4px'>
                             {data.cate.map((cate, idx) => {
-                                const count = data.memoLengthInCate.find(find => find.cateId === cate.id)?.length || 0;
-                                const tags = data.tagsInCate.filter(find => find.cateId === cate.id) || []
+                                const count = data.memoLengthInCate.filter(inCate => inCate.cateId === cate.id)[0]?.length || 0;
                                     return (
                                         <CateItemList
                                             key={idx}
@@ -79,13 +78,13 @@ export const Aside = () => {
                                             cateName={cate.cateName}
                                             cateId={String(cate.id)}
                                             count={count}
-                                            tags={tags}
+                                            tags={[]}
                                         />
                                     )
                                 })
                             }
                         </ul>
-                        <CateModifyModal/>
+                        <CateModifyModal buttonText={data.cateLength > 0 ? '카테고리 수정' : '카테고리 추가'}/>
                     </div>
                 </CustomScroller>
             </nav>
@@ -93,7 +92,7 @@ export const Aside = () => {
     )
 }
 
-const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string, cateName: string, cateId: string, count: number, tags?: TagNameAndCateId[] }) => {
+const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string, cateName: string, cateId: string, count: number, tags?: Tags[] }) => {
     const { tagQueryStr, cateQueryStr, searchParams, menuQueryStr } = useHandleQueryStr();
 
     const isActive = useMemo(() => {
@@ -125,7 +124,7 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                     ${isActive ? 'bg-white' : 'group-hover:bg-white bg-zete-light-gray-300'}`}
                 >
                         <span className='relative bottom-1px'>
-                            {props.count}
+                            {props.count || 0}
                         </span>
                 </div>
             </Link>

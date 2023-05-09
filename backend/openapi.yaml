@@ -142,23 +142,17 @@ paths:
                 $ref: "#/components/schemas/CoreOutput"
       tags:
         - Auth
-  /memo/create:
+  /memo/sendContentData:
     post:
-      operationId: create
+      operationId: getAsideData
       parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateMemoInput"
       responses:
         default:
           description: ""
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateMemoOutput"
+                $ref: "#/components/schemas/AsideDataOutput"
       tags:
         - Memo
   /memo/createCate:
@@ -178,19 +172,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CreateCateOutput"
-      tags:
-        - Memo
-  /memo/sendContentData:
-    post:
-      operationId: getAsideData
-      parameters: []
-      responses:
-        default:
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AsideDataOutput"
       tags:
         - Memo
   /memo/updateOneCate:
@@ -248,6 +229,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetMemosOutput"
+      tags:
+        - Memo
+  /memo/create:
+    post:
+      operationId: create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMemoInput"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateMemoOutput"
       tags:
         - Memo
   /memo/changeImportant:
@@ -366,9 +366,13 @@ components:
         userId:
           type: number
         memo:
-          $ref: "#/components/schemas/Memos"
+          type: array
+          items:
+            $ref: "#/components/schemas/Memos"
         tag:
-          $ref: "#/components/schemas/Tags"
+          type: array
+          items:
+            $ref: "#/components/schemas/Tags"
       required:
         - id
         - cateName
@@ -397,11 +401,17 @@ components:
         refreshToken:
           type: string
         cate:
-          $ref: "#/components/schemas/Categories"
+          type: array
+          items:
+            $ref: "#/components/schemas/Categories"
         memos:
-          $ref: "#/components/schemas/Memos"
+          type: array
+          items:
+            $ref: "#/components/schemas/Memos"
         tags:
-          $ref: "#/components/schemas/Tags"
+          type: array
+          items:
+            $ref: "#/components/schemas/Tags"
       required:
         - id
         - createAt
@@ -499,35 +509,51 @@ components:
           type: string
       required:
         - success
-    TagNameInput:
+    CategoriesAndMemoCount:
       type: object
       properties:
-        tagName:
-          type: string
-      required:
-        - tagName
-    CreateMemoInput:
-      type: object
-      properties:
-        cateId:
+        id:
           type: number
+        cateName:
+          type: string
           nullable: true
-        title:
-          type: string
-        content:
-          type: string
-        important:
-          type: boolean
-        tags:
+        userId:
+          type: number
+        memo:
           type: array
           items:
-            $ref: "#/components/schemas/TagNameInput"
+            $ref: "#/components/schemas/Memos"
+        tag:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tags"
+        memoCount:
+          type: number
       required:
-        - cateId
-        - title
-        - content
-        - important
-    CreateMemoOutput:
+        - id
+        - cateName
+        - userId
+        - memo
+        - tag
+    AsideData:
+      type: object
+      properties:
+        memosCount:
+          type: number
+        importantMemoCount:
+          type: number
+        cateCount:
+          type: number
+        cate:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoriesAndMemoCount"
+      required:
+        - memosCount
+        - importantMemoCount
+        - cateCount
+        - cate
+    AsideDataOutput:
       type: object
       properties:
         error:
@@ -538,11 +564,11 @@ components:
           type: string
         success:
           type: boolean
-        savedMemo:
-          $ref: "#/components/schemas/Memos"
+        asideData:
+          $ref: "#/components/schemas/AsideData"
       required:
         - success
-        - savedMemo
+        - asideData
     CreateCateInput:
       type: object
       properties:
@@ -566,62 +592,6 @@ components:
       required:
         - success
         - savedCate
-    MemoLengthInCate:
-      type: object
-      properties:
-        cateId:
-          type: number
-        length:
-          type: number
-      required:
-        - cateId
-        - length
-    TagNameAndCateId:
-      type: object
-      properties:
-        cateId:
-          type: number
-        tagName:
-          type: string
-      required:
-        - cateId
-        - tagName
-    AsideData:
-      type: object
-      properties:
-        memosLength:
-          type: number
-        importantMemoLength:
-          type: number
-        tagsLength:
-          type: number
-        memoLengthInCate:
-          type: array
-          items:
-            $ref: "#/components/schemas/MemoLengthInCate"
-        tagsInCate:
-          type: array
-          items:
-            $ref: "#/components/schemas/TagNameAndCateId"
-        cate:
-          type: array
-          items:
-            $ref: "#/components/schemas/Categories"
-    AsideDataOutput:
-      type: object
-      properties:
-        error:
-          type: string
-        target:
-          type: string
-        message:
-          type: string
-        success:
-          type: boolean
-        asideData:
-          $ref: "#/components/schemas/AsideData"
-      required:
-        - success
     CateInput:
       type: object
       properties:
@@ -651,7 +621,7 @@ components:
           type: string
         success:
           type: boolean
-        importantMemoLength:
+        importantMemoCount:
           type: number
       required:
         - success
@@ -698,21 +668,64 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Memos"
-        memosLength:
+        memosCount:
           type: number
-        importantMemoLength:
+        importantMemoCount:
           type: number
-        tagsLength:
-          type: number
-        cateLength:
-          type: number
+        cate:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoriesAndMemoCount"
       required:
         - success
         - memos
-        - memosLength
-        - importantMemoLength
-        - tagsLength
-        - cateLength
+        - memosCount
+        - importantMemoCount
+        - cate
+    TagNameInput:
+      type: object
+      properties:
+        tagName:
+          type: string
+      required:
+        - tagName
+    CreateMemoInput:
+      type: object
+      properties:
+        cateId:
+          type: number
+          nullable: true
+        title:
+          type: string
+        content:
+          type: string
+        important:
+          type: boolean
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/TagNameInput"
+      required:
+        - cateId
+        - title
+        - content
+        - important
+    CreateMemoOutput:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        message:
+          type: string
+        success:
+          type: boolean
+        savedMemo:
+          $ref: "#/components/schemas/Memos"
+      required:
+        - success
+        - savedMemo
     MemoIdInput:
       type: object
       properties:

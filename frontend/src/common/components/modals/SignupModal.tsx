@@ -7,7 +7,7 @@ import {RootState} from "../../../store";
 
 import {Api} from "../../libs/api";
 import {Dialog, Transition } from "@headlessui/react";
-import {FuncButton} from "../funcBtn";
+import {FuncButton} from "../funcButton";
 
 /** 폼항목 */
 type FormData = {
@@ -209,12 +209,14 @@ export const SignupModal = () => {
                                                 {errors.mobile && '휴대전화번호를 입력해주세요.'}
                                             </p>
                                         </div>
-                                        <FuncButton className="w-full py-1 bg-orange-500 text-white mx-auto text-center
-                                         cursor-pointer text-[22px] items-center rounded-2xl"
-                                                    text="회원가입"
-                                                    type="submit"
-                                                    disabled={!isValid}
-                                                    loading={`${loading}`}
+                                        <FuncButton
+                                            type="submit"
+                                            className="w-full py-1 bg-orange-500 text-white mx-auto text-center cursor-pointer text-[22px] items-center rounded-2xl"
+                                            options={{
+                                                text: "회원가입",
+                                                disabled: !isValid,
+                                                loading: loading,
+                                            }}
                                         />
                                     </form>
                                 </Dialog.Panel>

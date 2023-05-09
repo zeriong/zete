@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useForm} from "react-hook-form";
 import {Api} from "../../../common/libs/api";
-import {FuncButton} from "../../../common/components/funcBtn";
+import {FuncButton} from "../../../common/components/funcButton";
 import {SET_ALERT} from "../../../store/slices/alert.slice";
 import {useNavigate} from "react-router-dom";
 
@@ -171,12 +171,14 @@ export const ProfileModify = () => {
                                 </span>
                         </div>
                     </div>
-                    <FuncButton type="submit"
-                            className="mt-8 w-full py-2 flex justify-center mb-3 cursor-pointer text-[22px]
-                            items-center bg-orange-500 rounded-2xl text-white"
-                                text="프로필 변경하기"
-                                disabled={!isValid}
-                                loading={`${loading}`}
+                    <FuncButton
+                        type="submit"
+                        className="mt-8 w-full py-2 flex justify-center mb-3 cursor-pointer text-[22px] items-center bg-orange-500 rounded-2xl text-white"
+                        options={{
+                            text: "프로필 변경하기",
+                            disabled: !isValid,
+                            loading: loading,
+                        }}
                     />
                 </div>
             </form>

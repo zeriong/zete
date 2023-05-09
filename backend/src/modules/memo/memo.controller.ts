@@ -25,7 +25,7 @@ import {
   CateInput,
 } from './dtos/cate.dto';
 import { AsideDataOutput } from './dtos/asideData.dto';
-import { Memos } from '../../entities/memos.entity';
+import { Categories } from '../../entities/categories.entity';
 
 @Controller('memo')
 @ApiTags('Memo')
@@ -33,13 +33,10 @@ import { Memos } from '../../entities/memos.entity';
 export class MemoController {
   constructor(private readonly memoService: MemoService) {}
 
-  @ApiResponse({ type: CreateMemoOutput })
-  @Post('create')
-  create(
-    @Req() req,
-    @Body() input: CreateMemoInput,
-  ): Promise<CreateMemoOutput> {
-    return this.memoService.createMemo(input, req.user);
+  @ApiResponse({ type: AsideDataOutput })
+  @Post('sendContentData')
+  getAsideData(@Req() req): Promise<AsideDataOutput> {
+    return this.memoService.getAsideData(req.user);
   }
 
   @ApiResponse({ type: CreateCateOutput })
@@ -49,12 +46,6 @@ export class MemoController {
     @Body() input: CreateCateInput,
   ): Promise<CreateCateOutput> {
     return this.memoService.createCategory(input, req.user);
-  }
-
-  @ApiResponse({ type: AsideDataOutput })
-  @Post('sendContentData')
-  getAsideData(@Req() req): Promise<AsideDataOutput> {
-    return this.memoService.getAsideData(req.user);
   }
 
   @ApiResponse({ type: CoreOutput })
@@ -76,6 +67,15 @@ export class MemoController {
   @Patch('get')
   get(@Req() req, @Body() input: GetMemosInput): Promise<GetMemosOutput> {
     return this.memoService.getMemos(input, req.user);
+  }
+
+  @ApiResponse({ type: CreateMemoOutput })
+  @Post('create')
+  create(
+    @Req() req,
+    @Body() input: CreateMemoInput,
+  ): Promise<CreateMemoOutput> {
+    return this.memoService.createMemo(input, req.user);
   }
 
   @ApiResponse({ type: ImportantMemoLengthOutput })

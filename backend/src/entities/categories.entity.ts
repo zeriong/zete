@@ -16,23 +16,23 @@ import { Tags } from './tags.entity';
 export class Categories {
   @ApiProperty({ type: Number })
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
-  id: number;
+  id?: number;
 
   @ApiProperty({ nullable: true })
   @Column({ type: 'tinytext' }) //tinytext: 	255
-  cateName: string;
+  cateName?: string;
 
   @ManyToOne(() => User, (user) => user.cate, { onDelete: 'CASCADE' })
-  user: User;
+  user?: User;
   @ApiProperty({ type: Number })
   @RelationId((cate: Categories) => cate.user)
-  userId: number;
+  userId?: number;
 
-  @ApiProperty({ type: Memos })
+  @ApiProperty({ type: [Memos] })
   @OneToMany(() => Memos, (memos) => memos.cate, { cascade: true })
-  memo: Memos[];
+  memo?: Memos[];
 
-  @ApiProperty({ type: Tags })
+  @ApiProperty({ type: [Tags] })
   @OneToMany(() => Tags, (tags) => tags.cate, { cascade: true })
-  tag: Tags[];
+  tag?: Tags[];
 }

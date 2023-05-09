@@ -15,6 +15,7 @@ models/aside-data-output.ts
 models/aside-data.ts
 models/cate-id-input.ts
 models/cate-input.ts
+models/categories-and-memo-count.ts
 models/categories.ts
 models/core-output.ts
 models/create-account-dto.ts
@@ -31,9 +32,7 @@ models/index.ts
 models/login-input.ts
 models/login-output.ts
 models/memo-id-input.ts
-models/memo-length-in-cate.ts
 models/memos.ts
-models/tag-name-and-cate-id.ts
 models/tag-name-input.ts
 models/tags.ts
 models/update-account-dto.ts

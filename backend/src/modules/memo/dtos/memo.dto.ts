@@ -4,12 +4,13 @@ import { Memos } from '../../../entities/memos.entity';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 import { Tags } from '../../../entities/tags.entity';
 import { CateIdInput } from './cate.dto';
+import { CategoriesAndMemoCount } from './asideData.dto';
 
 export class TagNameInput {
   @ApiProperty()
   @Validator.IsOptional()
   @Validator.IsString()
-  tagName: string;
+  tagName?: string;
 }
 
 export class MemoIdInput {
@@ -63,7 +64,7 @@ export class CreateMemoInput extends CateIdInput {
 
   @ApiProperty({ type: [TagNameInput], required: false })
   @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
-  tags?: Array<TagNameInput>;
+  tags?: TagNameInput[];
 }
 
 export class CreateMemoOutput extends CoreOutput {
@@ -73,17 +74,14 @@ export class CreateMemoOutput extends CoreOutput {
 
 export class GetMemosOutput extends CoreOutput {
   @ApiProperty({ type: [Memos] })
-  memos?: Array<Memos>;
+  memos?: Memos[];
 
   @ApiProperty({ type: Number })
-  memosLength?: number;
+  memosCount?: number;
 
   @ApiProperty({ type: Number })
-  importantMemoLength?: number;
+  importantMemoCount?: number;
 
-  @ApiProperty({ type: Number })
-  tagsLength?: number;
-
-  @ApiProperty({ type: Number })
-  cateLength?: number;
+  @ApiProperty({ type: [CategoriesAndMemoCount] })
+  cate?: CategoriesAndMemoCount[];
 }

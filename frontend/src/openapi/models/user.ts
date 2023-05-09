@@ -79,21 +79,21 @@ export interface User {
     'refreshToken'?: string;
     /**
      * 
-     * @type {Categories}
+     * @type {Array<Categories>}
      * @memberof User
      */
-    'cate': Categories;
+    'cate': Array<Categories>;
     /**
      * 
-     * @type {Memos}
+     * @type {Array<Memos>}
      * @memberof User
      */
-    'memos': Memos;
+    'memos': Array<Memos>;
     /**
      * 
-     * @type {Tags}
+     * @type {Array<Tags>}
      * @memberof User
      */
-    'tags': Tags;
+    'tags': Array<Tags>;
 }
 
