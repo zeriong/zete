@@ -26,10 +26,23 @@ export const MemoMain = () => {
 
     const horizonScroll = useHorizontalScroll();
 
+    const dataRefresh = () => {
+        refreshMemos({
+            offset: 0,
+            limit: data.memos.length,
+            search: '',
+            menuQueryStr,
+            tagQueryStr,
+            cateQueryStr: Number(cateQueryStr),
+        });
+        loadAsideData();
+    }
+
     const memoModifier = (memoId) => {
         setCurrentMemoId(memoId)
         searchParams.set('modal', 'memoModify');
         setSearchParams(searchParams);
+        dataRefresh();
     }
 
     const convertCols = (n:number) => {
@@ -60,20 +73,6 @@ export const MemoMain = () => {
     useEffect(()=> {
         masonryCallBack();
     },[masonryCallBack])
-
-    useEffect(() => {
-        if (searchParams.get('modal')) {
-            console.log('감지')
-            refreshMemos({
-                offset: 0,
-                limit: data.memos.length,
-                search: '',
-                cateQueryStr: Number(cateQueryStr),
-                tagQueryStr,
-                menuQueryStr,
-            })
-        }
-    },[searchParams])
 
     return (
         loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (

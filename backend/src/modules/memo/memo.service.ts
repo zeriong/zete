@@ -10,6 +10,7 @@ import {
   GetMemosInput,
   GetMemosOutput,
   CreateMemoInput,
+  UpdateMemoInput,
 } from './dtos/memo.dto';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
 import { User } from '../../entities/user.entity';
@@ -196,6 +197,8 @@ export class MemoService {
 
       if (result.affected > 0) {
         return { success: true };
+      } else {
+        return { success: false, error: '해당카테고리는 존재하지 않습니다.' };
       }
     } catch (e) {
       return { success: false, error: `${e}` };
@@ -268,6 +271,43 @@ export class MemoService {
       };
     }
   }
+
+  async updateMemo(input: UpdateMemoInput, user: User): Promise<CoreOutput> {
+    try {
+      if (!input.memo.content && !input.memo.title) {
+        return { success: false, error: '메모를 입력해주세요.' };
+      }
+
+      if (input.newTags.length > 0) {
+        const newTags = input.newTags.map((tag) => ({
+          ...tag,
+          user,
+        }));
+
+        await this.tagsRepository.save(
+          newTags.map((tag) => this.tagsRepository.create(tag)),
+        );
+      }
+
+      const saveMemo = await this.memoRepository
+        .createQueryBuilder()
+        .update(input.memo)
+        .where('id = :id AND userId = :userId', {
+          id: input.memo.id,
+          userId: user.id,
+        })
+        .execute();
+
+      if (saveMemo.affected > 0) {
+        return { success: true };
+      } else {
+        return { success: false, error: '해당메모는 존재하지 않습니다.' };
+      }
+    } catch (e) {
+      return { success: false, error: `${e}` };
+    }
+  }
+
   async changeImportant(
     input: MemoIdInput,
     user: User,
@@ -288,10 +328,9 @@ export class MemoService {
           .where('important = :important', { important: true })
           .getCount();
 
-        return {
-          success: true,
-          importantMemoCount,
-        };
+        return { success: true, importantMemoCount };
+      } else {
+        return { success: false, error: '해당메모는 존재하지 않습니다.' };
       }
     } catch (e) {
       return {

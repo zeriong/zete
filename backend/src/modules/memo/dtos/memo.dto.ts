@@ -85,3 +85,13 @@ export class GetMemosOutput extends CoreOutput {
   @ApiProperty({ type: [CategoriesAndMemoCount] })
   cate?: CategoriesAndMemoCount[];
 }
+
+export class UpdateMemoInput {
+  @ApiProperty({ type: Memos })
+  @Validator.IsObject()
+  memo?: Memos;
+
+  @ApiProperty({ type: [Tags] })
+  @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
+  newTags?: Tags[];
+}

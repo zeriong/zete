@@ -250,6 +250,25 @@ paths:
                 $ref: "#/components/schemas/CreateMemoOutput"
       tags:
         - Memo
+  /memo/update:
+    post:
+      operationId: update
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMemoInput"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - Memo
   /memo/changeImportant:
     post:
       operationId: changeImportant
@@ -316,11 +335,7 @@ components:
         cateId:
           type: number
       required:
-        - id
         - tagName
-        - userId
-        - memoId
-        - cateId
     Memos:
       type: object
       properties:
@@ -726,6 +741,18 @@ components:
       required:
         - success
         - savedMemo
+    UpdateMemoInput:
+      type: object
+      properties:
+        memo:
+          $ref: "#/components/schemas/Memos"
+        newTags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tags"
+      required:
+        - memo
+        - newTags
     MemoIdInput:
       type: object
       properties:

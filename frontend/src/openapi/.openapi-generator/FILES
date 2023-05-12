@@ -36,4 +36,5 @@ models/memos.ts
 models/tag-name-input.ts
 models/tags.ts
 models/update-account-dto.ts
+models/update-memo-input.ts
 models/user.ts

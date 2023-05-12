@@ -14,7 +14,7 @@ import { User } from './user.entity';
 
 @Entity({ name: 'tags' })
 export class Tags {
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id?: number;
 
@@ -24,19 +24,19 @@ export class Tags {
 
   @ManyToOne(() => User, (user) => user.tags, { onDelete: 'CASCADE' })
   user?: User;
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   @RelationId((tags: Tags) => tags.user)
   userId?: number;
 
   @ManyToOne(() => Memos, (memo) => memo.tag, { onDelete: 'CASCADE' })
   memo?: Memos;
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   @RelationId((tags: Tags) => tags.memo)
   memoId?: number;
 
   @ManyToOne(() => Categories, (cate) => cate.tag, { onDelete: 'CASCADE' })
   cate?: Categories;
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   @RelationId((tags: Tags) => tags.cate)
   cateId?: number;
 }

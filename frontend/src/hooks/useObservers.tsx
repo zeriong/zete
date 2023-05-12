@@ -18,9 +18,9 @@ export const usePaginationObservers = () => {
 
     const [isReset,setIsReset] = useState<boolean>(false);
     const [retryObs,setRetryObs] = useState<boolean>(false);
-    const [isModifyMemoModal,setIsModifyMemoModal] = useState<boolean>(false);
+    const [isRefreshMemos,setIsRefreshMemos] = useState<boolean>(false);
 
-    const { menuQueryStr, cateQueryStr, tagQueryStr, searchParams } = useHandleQueryStr();
+    const { menuQueryStr, cateQueryStr, tagQueryStr, modalQueryStr, searchParams } = useHandleQueryStr();
     const { searchInput, data } = useSelector((state: RootState) => state.memo);
 
     const handleInterval = () => {
@@ -81,28 +81,16 @@ export const usePaginationObservers = () => {
     // 20분마다 데이터 최신화
     useEffect(() => {
         console.log('변경감지!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-        if (searchParams.get('modal') === 'memoModify') {
-            setIsModifyMemoModal(true);
+        if (modalQueryStr) {
+            setIsRefreshMemos(true);
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         } else {
-            setIsModifyMemoModal(false);
+            setIsRefreshMemos(false);
             clearInterval(intervalRef.current);
             handleInterval();
         }
     },[searchParams]);
-
-    // 메모수정 직전과 수정 후에 최신화된 데이터로변경
-    useEffect(() => {
-        refreshMemos({
-            offset: 0,
-            limit: data.memos.length,
-            search: '',
-            menuQueryStr,
-            tagQueryStr,
-            cateQueryStr: Number(cateQueryStr),
-        })
-    },[isModifyMemoModal])
 
     // 검색창 입력시 데이터로드
     useEffect(() => {

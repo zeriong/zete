@@ -14,7 +14,9 @@ import {
   CreateMemoOutput,
   MemoIdInput,
   GetMemosInput,
-  GetMemosOutput, CreateMemoInput
+  GetMemosOutput,
+  CreateMemoInput,
+  UpdateMemoInput,
 } from './dtos/memo.dto';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import {
@@ -26,6 +28,7 @@ import {
 } from './dtos/cate.dto';
 import { AsideDataOutput } from './dtos/asideData.dto';
 import { Categories } from '../../entities/categories.entity';
+import { Memos } from '../../entities/memos.entity';
 
 @Controller('memo')
 @ApiTags('Memo')
@@ -76,6 +79,12 @@ export class MemoController {
     @Body() input: CreateMemoInput,
   ): Promise<CreateMemoOutput> {
     return this.memoService.createMemo(input, req.user);
+  }
+
+  @ApiResponse({ type: CoreOutput })
+  @Post('update')
+  update(@Req() req, @Body() input: UpdateMemoInput): Promise<CoreOutput> {
+    return this.memoService.updateMemo(input, req.user);
   }
 
   @ApiResponse({ type: ImportantMemoLengthOutput })

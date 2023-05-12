@@ -23,4 +23,5 @@ export * from './memos';
 export * from './tag-name-input';
 export * from './tags';
 export * from './update-account-dto';
+export * from './update-memo-input';
 export * from './user';

@@ -14,7 +14,6 @@ import {showAlert} from "./alert.slice";
 export const resetMemos = () => store.dispatch(memoSlice.actions.RESET_MEMOS());
 export const resetSearch = () => store.dispatch(memoSlice.actions.RESET_SEARCH());
 export const setSearch = (value: string) => store.dispatch(memoSlice.actions.SET_SEARCH(value));
-export const changeIsPagingRetry = () => store.dispatch(memoSlice.actions.CHANGE_IS_PAGING_RETRY());
 
 export const importantConverter = (memoId: number) => {
     Api().memo.changeImportant({memoId})
@@ -35,17 +34,15 @@ export const loadAsideData = () => {
 }
 
 export const refreshMemos = (input: RefreshMemos) => {
-    (async () => {
-        await Api().memo.get(input)
-            .then((res) => {
-                    console.log('refreshMemos - 데이터체크', res.data)
-                    if (res.data.success) {
-                        console.log('refreshMemos - 로드데이터',res.data);
-                        store.dispatch(memoSlice.actions.REFRESH_MEMO(res.data.memos));
-                    } else { console.log(res.data.error) }
-            })
-            .catch(e => console.log(e))
-    })()
+    Api().memo.get(input)
+        .then((res) => {
+            console.log('refreshMemos - 데이터체크', res.data)
+            if (res.data.success) {
+                console.log('refreshMemos - 로드데이터',res.data);
+                store.dispatch(memoSlice.actions.REFRESH_MEMO(res.data.memos));
+            } else { console.log(res.data.error) }
+        })
+        .catch(e => console.log(e))
 }
 
 export const createCategory = (input: CreateCateInput) => {
@@ -127,7 +124,13 @@ export const memoSlice = createSlice({
             state.data.cate = cate.filter(exists => exists.id !== cateId) || [];
         },
         SET_MEMO: (state: CombineData, action: PayloadAction<Memos[]>) => {
-            state.data.memos = [...state.data.memos, ...action.payload];
+            state.data.memos = [...state.data.memos, ...action.payload.map((memos) => {
+                if (memos.cateId !== null) {
+                    memos.cateId = Number(memos.cateId);
+                    return memos
+                }
+                return memos;
+            })];
         },
         ADD_MEMO: (state: CombineData, action: PayloadAction<Memos>) => {
             state.data.memos = [...state.data.memos, action.payload]
@@ -158,10 +161,7 @@ export const memoSlice = createSlice({
         RESET_SEARCH: (state: CombineData) => {
             state.searchInput = '';
         },
-        CHANGE_IS_PAGING_RETRY: (state: CombineData) => {
-            state.isPagingRetry = !state.isPagingRetry;
-        },
     },
 });
 
-export const { ADD_CATE, DELETE_CATE, ADD_MEMO, SET_MEMO, UPDATE_CATE } = memoSlice.actions;
+export const { ADD_MEMO, SET_MEMO, UPDATE_CATE } = memoSlice.actions;

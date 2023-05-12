@@ -25,7 +25,7 @@ export interface Tags {
      * @type {number}
      * @memberof Tags
      */
-    'id': number;
+    'id'?: number;
     /**
      * 
      * @type {string}
@@ -37,18 +37,18 @@ export interface Tags {
      * @type {number}
      * @memberof Tags
      */
-    'userId': number;
+    'userId'?: number;
     /**
      * 
      * @type {number}
      * @memberof Tags
      */
-    'memoId': number;
+    'memoId'?: number;
     /**
      * 
      * @type {number}
      * @memberof Tags
      */
-    'cateId': number;
+    'cateId'?: number;
 }
 

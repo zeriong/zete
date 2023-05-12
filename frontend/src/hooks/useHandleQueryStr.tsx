@@ -7,6 +7,7 @@ export const useHandleQueryStr = () => {
         menuQueryStr: searchParams.get('menu'),
         cateQueryStr: searchParams.get('cate'),
         tagQueryStr: searchParams.get('tag'),
+        modalQueryStr: searchParams.get('modal'),
         searchParams, setSearchParams
     }
 };

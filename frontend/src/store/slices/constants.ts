@@ -16,7 +16,6 @@ export interface Data {
 export interface CombineData {
     data: Data;
     searchInput: string;
-    isPagingRetry: boolean;
 }
 export const memoSliceInitState: CombineData = {
     data: {
@@ -26,5 +25,4 @@ export const memoSliceInitState: CombineData = {
         memos: [],
     },
     searchInput: '',
-    isPagingRetry: false,
 }

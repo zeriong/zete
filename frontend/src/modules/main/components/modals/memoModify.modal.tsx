@@ -2,6 +2,7 @@ import React, {Fragment, useEffect, useRef, useState} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {useHandleQueryStr} from "../../../../hooks/useHandleQueryStr";
 import {
+    CategoryIcon,
     CheckIcon,
     CloseIcon,
     FillStarIcon,
@@ -14,6 +15,11 @@ import {handleInputChange, handleResizeHeight, uniqueKey} from "../../../../comm
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {useHorizontalScroll} from "../../../../hooks/useHorizontalScroll";
+import {showAlert} from "../../../../store/slices/alert.slice";
+import {loadAsideData, refreshMemos} from "../../../../store/slices/memo.slice";
+import {useForm} from "react-hook-form";
+import {Memos, UpdateMemoInput} from "../../../../openapi";
+import {Api} from "../../../../common/libs/api";
 
 export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
@@ -21,167 +27,114 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const tagsInput = useRef<HTMLInputElement>(null);
     const tagsRef = useRef([]);
 
-    const { searchParams, setSearchParams } = useHandleQueryStr();
     const { data } = useSelector((state:RootState) => state.memo);
-    const { cateQueryStr, tagQueryStr, menuQueryStr } = useHandleQueryStr();
+    const {
+        searchParams,
+        setSearchParams,
+        cateQueryStr,
+        tagQueryStr,
+        menuQueryStr,
+        modalQueryStr,
+    } = useHandleQueryStr();
 
     const dispatch = useDispatch();
     const horizonScroll = useHorizontalScroll();
 
     const [isShow, setIsShow] = useState<boolean>(false);
-    const [memoValue, setMemoValue] = useState<string>('');
-    const [titleValue, setTitleValue] = useState<string>('');
-    const [tagValue, setTagValue] = useState<string>('');
     const [isImportant, setIsImportant] = useState<boolean>(false);
-    const [tagNames, setTagNames] = useState<string[]>([]);
-    const [selectedCateId, setSelectedCateId] = useState<number|'undefined'>('undefined');
-    const [selectedCateName, setSelectedCateName] = useState<string>('');
+
+    const form = useForm<UpdateMemoInput>();
+    const cateIdForm = useForm<{ cateId: string }>();
 
     const closeModal = () => {
-        if (searchParams.get('modal') === 'memoModify') {
-            searchParams.delete('modal');
-            setSearchParams(searchParams);
-        }
-        setIsShow(false);
+        searchParams.delete('modal');
+        setSearchParams(searchParams);
     }
 
-    const tagsInputAutoResize = (e) => {
-        setTagValue(e.currentTarget.value);
-        handleInputChange(tagsInput);
+    const dataRefresh = () => {
+        refreshMemos({
+            offset: 0,
+            limit: data.memos.length,
+            search: '',
+            menuQueryStr,
+            tagQueryStr,
+            cateQueryStr: Number(cateQueryStr),
+        });
+        loadAsideData();
     }
 
-    const handleKeyDown = (e) => {
-        if (e.shiftKey && e.key === 'Enter') {
-            const startPos = e.target.selectionStart;
-            const endPos = e.target.selectionEnd;
-            const value = e.target.value;
-            e.target.value = value.substring(0, startPos) + '\n' + value.substring(endPos, value.length);
-            e.target.selectionStart = startPos + 1;
-            e.target.selectionEnd = startPos + 1;
-            e.preventDefault();
-        } else if (e.key === 'Enter') {
-            memoTextarea.current.focus();
-            e.preventDefault();
-        }
-        handleResizeHeight(titleTextarea);
-    }
-
-    const importantHandler = () => setIsImportant(!isImportant);
-    const memoOnChange = (e) => setMemoValue(e.target.value);
-    const titleOnChange = (e) => setTitleValue(e.target.value);
+    const handleImportant = () => setIsImportant(!isImportant);
 
     const memoModifier = () => {
-        if (!titleValue && !memoValue) {
-            return alert('제목이나 내용을 입력해주세요.')
+        closeModal();
+        if (!form.getValues('memo.title') && !form.getValues('memo.content')) {
+            dataRefresh();
+            return showAlert('제목이나 내용을 입력하지 않아 수정이 취소되었습니다.');
         }
 
-        const content = memoValue.replace(/\n/g, '<br/>'); // innerHTML해주기 위함
-        const categoryId = selectedCateId
-
-        const newData = {
-            categoryId,
-            important: isImportant,
-            title: titleValue,
-            content,
-            tagNames, // 키와 키값이 같으므로 tags: tags, => tags,
-            memoId,
+        let targetMemo = data.memos.find(memo => memo.id === memoId);
+        const leftTags = data.cate.filter(cate => cate.tag);
+        console.log(targetMemo,'바뀌기 전~~~~~~~~!!~~~~~~~~!!')
+        if (targetMemo.cateId === null) {
+            targetMemo = { ...targetMemo, tag: [] };
         }
+        console.log(targetMemo,'바뀐지 체크!!~~~~~~~~!!')
 
-        // dispatch(UPDATE_MEMO(newData));
-        // setData();
+        // Api().memo.update({...form.getValues()})
+        //     .then((res)=>{
+        //         if (res.data.success) {
+        //             dataRefresh();
+        //         } else {
+        //             showAlert(res.data.error);
+        //         }
+        //     }).catch(e => console.log(e));
     }
 
-    const addTags = (e: React.FormEvent<HTMLFormElement>) => {
-        const validate = tagNames.filter(names => names === tagValue)
+    const handleAddTagFormSubmit = (e) => {
         e.preventDefault();
-        setTagValue('');
-        tagsInput.current.style.width = '50px';
+        const input = e.target[0];
+        const tags = form.getValues('memo.tag') || [];
 
-        if (tagValue && validate.length === 0) {
-            setTagNames(prev => [...prev, tagValue])
+        const exists = tags.find(tag => tag.tagName === input.value);
+        if (!exists) {
+            form.setValue('memo.tag', [ ...tags, { tagName: input.value } ]);
+            input.value = ''
+        } else {
+            showAlert('이미 존재하는 태그명 입니다.', 'error')
         }
     }
 
-    const deleteTag = (name) => {
-        const filter = tagNames.filter(tagName => tagName !== name);
-        setTagNames(filter)
-    }
-
-    const handleSelectChange = (event) => {
-        if (event.target.value === '전체메모') {
-            setSelectedCateName('전체메모');
-            setSelectedCateId('undefined');
-            return
+    const handleDeleteTag = (tagName) => {
+        const tags = form.getValues('memo.tag');
+        if (tags) {
+            form.setValue('memo.tag', tags.filter(tag => tag.tagName !== tagName))
         }
-        // const selectedCate = tableData.categories.filter(cate => cate.cateName === event.target.value);
-        // setSelectedCateId(selectedCate[0].cateId);
-        // setSelectedCateName(selectedCate[0].cateName);
     }
 
     useEffect(() => {
-        let newSelectedCateId: number|'undefined' = 'undefined';
-        let newSelectedCateName: string = '전체메모';
-
-        if (menuQueryStr) setIsImportant(true);
-        else setIsImportant(false);
-
-        if (cateQueryStr) {
-            // const defaultSelectedCate = tableData.categories.filter(cate => cate.cateName === cateQueryStr)[0];
-            // if (defaultSelectedCate) {
-            //     newSelectedCateId = defaultSelectedCate.cateId;
-            //     newSelectedCateName = defaultSelectedCate.cateName;
-            // }
-        }
-
-        if ((!cateQueryStr && !menuQueryStr) || menuQueryStr) {
-            newSelectedCateId = 'undefined';
-            newSelectedCateName = '전체메모';
-        }
-
-        setSelectedCateName(newSelectedCateName);
-        setSelectedCateId(newSelectedCateId);
-    },[cateQueryStr, menuQueryStr])
-
-    useEffect(() => {
-        if (searchParams.get("modal") === "memoModify") {
-            setIsShow(true);
+        if (modalQueryStr) {
+            const targetMemo = data.memos.find(find => find.id === memoId);
+            if (targetMemo) {
+                const tags = targetMemo.tag.map(tag => ({ tagName: tag.tagName }));
+                form.setValue('memo.tag', tags);
+                form.setValue('memo.title', targetMemo.title);
+                form.setValue('memo.content', targetMemo.content);
+                setIsShow(true);
+                setIsImportant(targetMemo.important);
+            } else {
+                closeModal();
+            }
         } else {
             setIsShow(false);
         }
-
-        // if (tableData?.cateMemos) {
-        //     const cateMemo = tableData.cateMemos.find(cateMemo => cateMemo.memoId === memoId);
-        //     if (cateMemo) {
-        //         const currentData = data?.map(data => data.memos).flat().filter(data => data.memoId === memoId);
-        //         const currentMemoVal = currentData[0]?.content.replace(/<br\/>/g, '\n');
-        //         setMemoValue(currentMemoVal);
-        //         setTitleValue(currentData[0].title);
-        //         setIsImportant(currentData[0].important);
-        //         setTagNames(currentData[0].tags.map(tag => tag.tagName))
-        //     }
-        // }
-
-    }, [searchParams])
-
-    useEffect(() => {
-        if (menuQueryStr) setIsImportant(true);
-        else setIsImportant(false);
-        if (tagQueryStr) {
-            tagsRef.current[0] = tagQueryStr;
-            setTagNames([tagQueryStr])
-        } // 첫번째 배열에 쿼리에 적힌 테그추가
-        if (!tagQueryStr) setTagNames([]);
-    },[tagQueryStr, cateQueryStr])
+    },[modalQueryStr])
 
     return (
         <Transition appear show={isShow} as={Fragment}>
             <Dialog
                 as="div"
                 className="relative z-40"
-                onClose={() => {
-                    closeModal();
-                    memoModifier();
-                }}
+                onClose={memoModifier}
             >
                 <Transition.Child
                     as={Fragment}
@@ -217,30 +170,30 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                         <div className='w-full h-full'>
                                             <div className='flex justify-between items-center pb-8px border-b border-zete-memo-border h-full'>
                                                 <textarea
-                                                    ref={titleTextarea}
+                                                    {...form.register('memo.title', {
+                                                        required: false,
+                                                        maxLength: 64,
+                                                    })}
                                                     rows={1}
-                                                    value={titleValue}
-                                                    onChange={titleOnChange}
-                                                    onKeyDown={handleKeyDown}
                                                     placeholder='제목'
                                                     className='resize-none w-full pr-6px max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
                                                 />
                                                 {
                                                     menuQueryStr ? <FillStarIcon/> :
                                                         isImportant ? (
-                                                            <FillStarIcon onClick={importantHandler}/>
+                                                            <FillStarIcon onClick={handleImportant}/>
                                                         ) : (
-                                                            <StarIcon onClick={importantHandler}/>
+                                                            <StarIcon onClick={handleImportant}/>
                                                         )
                                                 }
                                             </div>
                                             <div className='h-full w-full pt-9px'>
                                                 <textarea
-                                                    id='modifyMemo'
-                                                    ref={memoTextarea}
+                                                    {...form.register('memo.content', {
+                                                        required: false,
+                                                        maxLength: 65535,
+                                                    })}
                                                     rows={1}
-                                                    value={memoValue}
-                                                    onChange={memoOnChange}
                                                     placeholder='메모 작성...'
                                                     className='resize-none h-[280px] w-full bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
                                                 />
@@ -249,53 +202,27 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                         <label htmlFor='modifyMemo' className='w-full h-full grow'/>
                                         <div className='w-full h-full'>
                                             <div ref={horizonScroll} className='flex w-full h-full relative border-b border-zete-memo-border pb-8px overflow-y-hidden memo-custom-vertical-scroll'>
-                                                {
-                                                    tagNames.map((name, idx) => {
-                                                        return name === tagQueryStr ? (
-                                                            <div key={uniqueKey() + idx} className='relative flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
-                                                                <span className='font-light text-11 text-zete-dark-400'>
-                                                                    {name}
-                                                                </span>
-                                                            </div>
-                                                        ) : (
-                                                            <div key={idx} className='relative flex items-center pl-9px pr-21px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
-                                                                <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
-                                                                    {name}
-                                                                </span>
-                                                                <button
-                                                                    className='absolute right-2px group rounded-full grid place-content-center hover:bg-zete-dark-300 hover:bg-opacity-50 w-14px h-14px'
-                                                                    onClick={() => deleteTag(name)}
-                                                                >
-                                                                    <CloseIcon className='w-10px fill-zete-dark-400 group-hover:fill-white'/>
-                                                                </button>
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
+                                                {form.watch('memo.tag')?.map((tag, idx) => (
+                                                    <div key={idx} className='relative flex items-center pl-9px pr-21px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                                                        <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
+                                                            {tag.tagName}
+                                                        </span>
+                                                        <button
+                                                            className='absolute right-2px group rounded-full grid place-content-center hover:bg-zete-dark-300 hover:bg-opacity-50 w-14px h-14px'
+                                                            onClick={() => handleDeleteTag(tag.tagName)}
+                                                        >
+                                                            <CloseIcon className='w-10px fill-zete-dark-400 group-hover:fill-white'/>
+                                                        </button>
+                                                    </div>
+                                                ))}
                                                 <div className='h-full w-full text-zete-dark-400'>
-                                                    <select
-                                                        value={selectedCateName}
-                                                        onChange={handleSelectChange}
-                                                    >
-                                                        <option>전체메모</option>
-                                                        {
-                                                            // tableData.categories.map((cate, idx) => {
-                                                            //     return (
-                                                            //         <option key={uniqueKey() + idx}>
-                                                            //             {cate.cateName}
-                                                            //         </option>
-                                                            //     )
-                                                            // })
-                                                        }
-                                                    </select>
                                                     <form
                                                         className='relative flex items-center text-zete-dark-400 text-12'
-                                                        onSubmit={addTags}
+                                                        onSubmit={handleAddTagFormSubmit}
                                                     >
                                                         <input
                                                             ref={tagsInput}
-                                                            value={tagValue}
-                                                            onChange={tagsInputAutoResize}
+                                                            onChange={() => handleInputChange(tagsInput)}
                                                             placeholder='태그추가'
                                                             className='min-w-[50px] w-50px px-2px placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
                                                         />
@@ -306,12 +233,19 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                 </div>
                                             </div>
                                             <div className='flex justify-between items-center pt-10px'>
-                                                <div className='flex gap-10px items-center'>
-                                                    <div className='bg-zete-primary-300 p-5px rounded-[4px]'>
-                                                        <StickerMemoIcon className='cursor-pointer'/>
-                                                    </div>
-                                                    <CheckIcon className='cursor-pointer'/>
-                                                    <SearchIcon className='cursor-pointer'/>
+                                                <div className='flex items-center border border-zete-memo-border rounded-md px-2 py-1'>
+                                                    <CategoryIcon className='w-18px opacity-75 mr-0.5'/>
+                                                    <select
+                                                        {...cateIdForm.register('cateId', { required: true })}
+                                                        className='w-[130px] text-[13px] text-gray-500 bg-transparent'
+                                                    >
+                                                        <option value={0}>전체메모</option>
+                                                        {data.cate.map((cate, idx) => (
+                                                            <option key={idx} value={cate.id}>
+                                                                {cate.cateName}
+                                                            </option>
+                                                        ))}
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>

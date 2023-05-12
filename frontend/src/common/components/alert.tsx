@@ -40,11 +40,11 @@ export const Alert = () => {
     return (
         <div
             className={`${color()}
-            bg-sky-200 flex items-center justify-center absolute w-auto h-10 px-3 z-20
+            bg-sky-200 flex items-center justify-center absolute w-auto h-10 px-3 z-[100]
             rounded-lg transition-all duration-300 ease-in-out ${isShow ? "top-64px opacity-100" : "opacity-0 top-0"}`}
             ref={alarm}
         >
-            <div className={`w-full font-bold text-gray-700 ${color() === "bg-green-500" ? "text-white" : ""}`}>
+            <div className={`w-full font-bold text-gray-700 ${color() === "bg-green-500" && "text-white"}`}>
                 <span>{alert.message}</span>
             </div>
         </div>
