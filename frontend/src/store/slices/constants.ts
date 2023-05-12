@@ -1,5 +1,12 @@
 import {CategoriesAndMemoCount, Memos} from "../../openapi";
-
+export interface RefreshMemos {
+    search: string;
+    offset: number;
+    limit: number;
+    cateQueryStr: number;
+    tagQueryStr: string;
+    menuQueryStr: string;
+}
 export interface Data {
     memosCount: number;
     importantMemoCount: number;
@@ -9,6 +16,7 @@ export interface Data {
 export interface CombineData {
     data: Data;
     searchInput: string;
+    isPagingRetry: boolean;
 }
 export const memoSliceInitState: CombineData = {
     data: {
@@ -18,4 +26,5 @@ export const memoSliceInitState: CombineData = {
         memos: [],
     },
     searchInput: '',
+    isPagingRetry: false,
 }

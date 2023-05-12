@@ -1,10 +1,10 @@
-import React, {Fragment, useEffect, useRef, useState} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from "../../../../assets/vectors";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import CustomScroller from "../../../../common/components/customScroller";
-import {createCategory, deleteCategory, loadMemoCategories, UPDATE_CATE} from "../../../../store/slices/memo.slice";
+import {createCategory, deleteCategory, loadAsideData, UPDATE_CATE} from "../../../../store/slices/memo.slice";
 import {Api} from "../../../../common/libs/api";
 import {showAlert} from "../../../../store/slices/alert.slice";
 import {ConfirmButton} from "../../../../common/components/confirmButton";
@@ -86,7 +86,7 @@ export const CateModifyModal = (props: { buttonText: string }) => {
     useEffect(() => {
         if (isShow) {
             // 모달 오픈시 카테고리 목록 갱신
-            loadMemoCategories()
+            loadAsideData();
         }
     },[isShow])
 
@@ -172,10 +172,12 @@ export const CateModifyModal = (props: { buttonText: string }) => {
                                                                         onSubmit={(event) => {
                                                                             event.preventDefault()
 
+                                                                            // 서브밋이벤트의 타겟은 form내부 input, button 등 몇번째요소의 벨류인지 적어주어야 함.
                                                                             const input = event.target[0]
                                                                             handleUpdateFormSubmit(val.id, val.cateName, input)
                                                                         }}
                                                                         onBlur={(event) => {
+                                                                            // form에서의 onBlur타겟은 인풋이 몇개가 있든 가장 첫번째인풋을 타겟함
                                                                             const input = event.target
                                                                             handleUpdateFormSubmit(val.id, val.cateName, input)
                                                                         }}

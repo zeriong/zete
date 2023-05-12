@@ -1,12 +1,10 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {CombineData, memoSliceInitState} from "./constants";
+import {CombineData, memoSliceInitState, RefreshMemos} from "./constants";
 import {
     AsideData,
     Categories, CategoriesAndMemoCount, CateIdInput,
     CateInput,
     CreateCateInput,
-    CreateMemoInput,
-    CreateMemoOutput,
     Memos
 } from "../../openapi";
 import {store} from "../index";
@@ -16,6 +14,7 @@ import {showAlert} from "./alert.slice";
 export const resetMemos = () => store.dispatch(memoSlice.actions.RESET_MEMOS());
 export const resetSearch = () => store.dispatch(memoSlice.actions.RESET_SEARCH());
 export const setSearch = (value: string) => store.dispatch(memoSlice.actions.SET_SEARCH(value));
+export const changeIsPagingRetry = () => store.dispatch(memoSlice.actions.CHANGE_IS_PAGING_RETRY());
 
 export const importantConverter = (memoId: number) => {
     Api().memo.changeImportant({memoId})
@@ -30,10 +29,23 @@ export const importantConverter = (memoId: number) => {
 export const loadAsideData = () => {
     Api().memo.getAsideData().then((res) => {
         if (res.data) {
-            console.log(res.data.asideData)
             store.dispatch(memoSlice.actions.SET_ASIDE_DATA(res.data.asideData))
         } else { console.log(res.data.error) }
     }).catch(e => console.log(e));
+}
+
+export const refreshMemos = (input: RefreshMemos) => {
+    (async () => {
+        await Api().memo.get(input)
+            .then((res) => {
+                    console.log('refreshMemos - 데이터체크', res.data)
+                    if (res.data.success) {
+                        console.log('refreshMemos - 로드데이터',res.data);
+                        store.dispatch(memoSlice.actions.REFRESH_MEMO(res.data.memos));
+                    } else { console.log(res.data.error) }
+            })
+            .catch(e => console.log(e))
+    })()
 }
 
 export const createCategory = (input: CreateCateInput) => {
@@ -77,11 +89,11 @@ export const memoSlice = createSlice({
             state.data.cate = cate.map(val => ({
                 ...val,
                 id: Number(val.id),
-                tag: val.tag.map(tag => ({
-                    ...tag,
-                    id: Number(tag.id),
-                    cateId: Number(tag.cateId),
-                })) || [],
+                tag: val.tag.map(tag => {
+                    tag.id = Number(tag.id);
+                    tag.cateId = Number(tag.cateId);
+                    return tag
+                }) || [],
             }));
             state.data.memosCount = payload.memosCount;
             state.data.importantMemoCount = payload.importantMemoCount;
@@ -111,40 +123,23 @@ export const memoSlice = createSlice({
 
             state.data.memosCount -= targetLength;
             state.data.importantMemoCount = importantMemoCount;
-            state.data.memos = memos.filter(memo => memo.cateId !== cateId).sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
-            state.data.cate = cate.filter(exists => exists.id !== cateId).sort((a, b) => a.cateName > b.cateName ? 1 : -1)
+            state.data.memos = memos.filter(memo => memo.cateId !== cateId) || [];
+            state.data.cate = cate.filter(exists => exists.id !== cateId) || [];
         },
         SET_MEMO: (state: CombineData, action: PayloadAction<Memos[]>) => {
-            state.data.memos = [...state.data.memos, ...action.payload]
-                .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
+            state.data.memos = [...state.data.memos, ...action.payload];
         },
         ADD_MEMO: (state: CombineData, action: PayloadAction<Memos>) => {
-            state.data.memosCount += 1;
-
-            if (action.payload.important) {
-                state.data.importantMemoCount += 1
-            }
-
-            const addMemoInCateLength = state.data.cate.filter(inCate => {
-                return inCate.cateId === action.payload.cateId
-            });
-            console.log('리듀서 체크',action.payload.cateId)
-            console.log('리듀서 체크',addMemoInCateLength)
-
-            const noExists = action.payload.tag?.filter(tag => !state.data.tagsInCate.some(inCate => inCate.tagName === tag.tagName)) || [];
-            if (noExists.length !== 0) {
-                state.data.tagsInCate = [...state.data.tagsInCate, ...noExists.map(exists => ({
-                    cateId: exists.cateId, tagName: exists.tagName
-                }))];
-            }
-
             state.data.memos = [...state.data.memos, action.payload]
                 .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
+            loadAsideData();
         },
-        SET_IMPORTANT_LENGTH: (state: CombineData, action: PayloadAction<number>) => {
-            console.log(action.payload)
-            state.data.importantMemoLength = action.payload;
+        REFRESH_MEMO: (state: CombineData, action: PayloadAction<Memos[]>) => {
+            state.data.memos = action.payload
+                .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
+            loadAsideData();
         },
+        SET_IMPORTANT_LENGTH: (state: CombineData, action: PayloadAction<number>) => { state.data.importantMemoCount = action.payload; },
         CHANGE_IMPORTANT: (state: CombineData, action: PayloadAction<number>) => {
             state.data.memos = state.data.memos.map((memos) => {
                 if (memos.id === action.payload) {
@@ -154,9 +149,18 @@ export const memoSlice = createSlice({
                 }
             }).sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
         },
-        SET_SEARCH: (state: CombineData, action: PayloadAction<string>) => { state.searchInput = action.payload },
-        RESET_MEMOS: (state: CombineData) => { state.data.memos = [] },
-        RESET_SEARCH: (state: CombineData) => { state.searchInput = '' },
+        SET_SEARCH: (state: CombineData, action: PayloadAction<string>) => {
+            state.searchInput = action.payload;
+        },
+        RESET_MEMOS: (state: CombineData) => {
+            state.data.memos = [];
+        },
+        RESET_SEARCH: (state: CombineData) => {
+            state.searchInput = '';
+        },
+        CHANGE_IS_PAGING_RETRY: (state: CombineData) => {
+            state.isPagingRetry = !state.isPagingRetry;
+        },
     },
 });
 

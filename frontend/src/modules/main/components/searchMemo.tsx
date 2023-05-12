@@ -17,7 +17,6 @@ export const SearchMemo = () => {
 
     useEffect(() => {
         clearTimeout(timeout.current);
-        timeout.current = null;
         timeout.current = setTimeout(() => setSearch(searchVal), 300);
     },[searchVal]);
 

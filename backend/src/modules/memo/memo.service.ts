@@ -35,6 +35,8 @@ export class MemoService {
     private readonly tagsRepository: Repository<Tags>,
   ) {}
 
+  // getData =====================================================
+
   async getAsideData(user: User): Promise<AsideDataOutput> {
     try {
       const cateQb = await this.categoriesRepository
@@ -87,12 +89,12 @@ export class MemoService {
       const memosCount = await qb.getCount();
 
       const importantMemoCount = await qb
+        .clone()
         .andWhere('important = :important', { important: true })
         .getCount();
 
       if (input.search) {
         const findSearch = await qb
-          .where('Memos.userId = :userId', { userId: user.id })
           .andWhere('Memos.title LIKE :search OR Memos.content LIKE :search', {
             search: `%${input.search}%`,
           })
@@ -117,7 +119,7 @@ export class MemoService {
         qb.andWhere('Memos.important = :important', { important: true });
       }
       if (input.tagQueryStr) {
-        qb.andWhere('tag.tagName = :tagName', { tagName: input.tagQueryStr });
+        qb.andWhere('tags.tagName = :tagName', { tagName: input.tagQueryStr });
       }
 
       const result = await qb.skip(input.offset).take(input.limit).getMany();
@@ -132,6 +134,8 @@ export class MemoService {
       return { success: false, error: `${e}` };
     }
   }
+
+  // Category =======================================================================
 
   async createCategory(
     input: CreateCateInput,
@@ -225,7 +229,7 @@ export class MemoService {
     }
   }
 
-  // 메모 ===============================================================
+  // Memo ===============================================================
 
   async createMemo(
     input: CreateMemoInput,

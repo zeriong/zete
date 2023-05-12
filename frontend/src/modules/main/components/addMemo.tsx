@@ -58,7 +58,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                 if (res.data.success) {
                     console.log('메모추가데이터',res.data)
                     dispatch(ADD_MEMO({...res.data.savedMemo}));
-                    form.reset({ title: '', content: '', cateId: null, tags: [] });
+                    form.reset({ title: '', content: '', cateId: Number(cateQueryStr) || 0, tags: [] });
                     setIsImportant(false);
                     // memoTextarea.current.style.height = 'auto';
                     // titleTextarea.current.style.height = 'auto';
@@ -101,7 +101,6 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
             className='relative min-w-0 w-full browser-width-900px:w-[300px] min-h-[212px] h-fit flex flex-col justify-between
             border border-zete-light-gray-500 rounded-[8px] px-18px pb-10px pt-12px bg-zete-primary-200 memo-shadow'
         >
-            <div className='p-50px bg-black text-white fixed top-[300px] z-50' onClick={() => console.log('타이틀벨류',form.getValues('title'),'컨텐트베류',form.getValues('content'))}>test</div>
             <div className='w-full h-full flex flex-col min-h-[212px]'>
                 <div className='w-full h-full'>
                     <div className='flex justify-between items-center pb-8px border-b border-zete-memo-border h-full'>

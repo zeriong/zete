@@ -1,6 +1,6 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {useSelector} from "react-redux";
-import {RootState} from "../../../store";
+import {RootState, store} from "../../../store";
 import {AddMemo} from "../components/addMemo";
 import Masonry from "react-masonry-css";
 import CustomScroller from "../../../common/components/customScroller";
@@ -11,7 +11,7 @@ import {subUniqueKey} from "../../../common/libs/common.lib";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
 import {MemoModifyModal} from "../components/modals/memoModify.modal";
 import {SavedMemoMenuPopover} from "../components/popovers/savedMemoMenu.popover";
-import {importantConverter} from "../../../store/slices/memo.slice";
+import {importantConverter, loadAsideData, memoSlice, refreshMemos} from "../../../store/slices/memo.slice";
 import {useCloneDivObserver, usePaginationObservers} from "../../../hooks/useObservers";
 
 export const MemoMain = () => {
@@ -20,9 +20,9 @@ export const MemoMain = () => {
 
     const { loading } = useSelector((state: RootState) => (state.user));
     const { data } = useSelector((state: RootState) => state.memo);
-    const { menuQueryStr, searchParams, setSearchParams } = useHandleQueryStr();
+    const { menuQueryStr, searchParams, cateQueryStr, tagQueryStr, setSearchParams } = useHandleQueryStr();
     const { paginationDivObsRef } = usePaginationObservers();
-    const { cloneMainRef, cloneRef } = useCloneDivObserver()
+    const { cloneRef, cloneMainRef } = useCloneDivObserver();
 
     const horizonScroll = useHorizontalScroll();
 
@@ -34,6 +34,10 @@ export const MemoMain = () => {
 
     const convertCols = (n:number) => {
         if (!data.memos) return
+        if (menuQueryStr) {
+            if (n > data.memos.length) return data.memos.length;
+            if (n < data.memos.length) return n
+        }
         if (n > data.memos.length+1) return data.memos.length+1;
         if (n < data.memos.length+1) return n
         else return n;
@@ -57,6 +61,20 @@ export const MemoMain = () => {
         masonryCallBack();
     },[masonryCallBack])
 
+    useEffect(() => {
+        if (searchParams.get('modal')) {
+            console.log('감지')
+            refreshMemos({
+                offset: 0,
+                limit: data.memos.length,
+                search: '',
+                cateQueryStr: Number(cateQueryStr),
+                tagQueryStr,
+                menuQueryStr,
+            })
+        }
+    },[searchParams])
+
     return (
         loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
             <>
@@ -71,7 +89,7 @@ export const MemoMain = () => {
                 <CustomScroller>
                     <section className='relative top-0 flex gap-28px w-full p-16px browser-width-900px:p-30px'>
                         {!menuQueryStr && (
-                            <div ref={cloneMainRef} className='absolute left-30px top-30px mb-16px browser-width-900px:mb-30px z-20'>
+                            <div ref={cloneRef} className='absolute left-16px top-16px mb-16px mb-16px browser-width-900px:mb-30px browser-width-900px:left-30px browser-width-900px:top-30px z-20'>
                                 <AddMemo/>
                             </div>
                         )}
@@ -82,7 +100,7 @@ export const MemoMain = () => {
                             columnClassName='my-masonry-grid_column'
                         >
                             {!menuQueryStr && (
-                                <div ref={cloneRef} className='mb-16px browser-width-900px:mb-30px browser-width-900px:w-[300px] min-h-[234px]'/>
+                                <div ref={cloneMainRef} className='mb-16px w-full browser-width-900px:mb-30px browser-width-900px:w-[300px] min-h-[234px]'/>
                             )}
                             {data.memos &&
                                 data.memos?.map((val) => (

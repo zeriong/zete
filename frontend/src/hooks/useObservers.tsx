@@ -1,9 +1,10 @@
-import {useEffect, useRef, useState} from "react";
-import {loadAsideData, resetMemos, resetSearch, SET_MEMO} from "../store/slices/memo.slice";
+import React, {useEffect, useRef, useState} from "react";
+import {loadAsideData, refreshMemos, resetMemos, SET_MEMO} from "../store/slices/memo.slice";
 import {Api} from "../common/libs/api";
 import {useHandleQueryStr} from "./useHandleQueryStr";
+import {AppDispatch, RootState} from "../store";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../store";
+import {sendRefreshAccessToken} from "../store/slices/auth.slice";
 
 export const usePaginationObservers = () => {
     const loadEndRef = useRef(false); // 모든 데이터로드시 true
@@ -12,28 +13,30 @@ export const usePaginationObservers = () => {
     const offset = useRef<number>(0);
     const obsRef = useRef<IntersectionObserver>(null);
     const paginationDivObsRef = useRef(null);
-    const dataLengthRef = useRef<{
-        importantMemoLength: number;
-        memosLength: number;
-        tagsLength: number;
-    }>(null);
+    const intervalRef = useRef<NodeJS.Timeout>(null);
+    const timeoutRef = useRef<NodeJS.Timeout>(null);
 
     const [isReset,setIsReset] = useState<boolean>(false);
     const [retryObs,setRetryObs] = useState<boolean>(false);
-    const [payloadLength,setPayloadLength] = useState<{
-        importantMemoLength: number;
-        memosLength: number;
-        tagsLength: number;
-    }>({
-        importantMemoLength: 0,
-        memosLength: 0,
-        tagsLength: 0,
-    });
+    const [isModifyMemoModal,setIsModifyMemoModal] = useState<boolean>(false);
 
-    const { menuQueryStr, cateQueryStr, tagQueryStr } = useHandleQueryStr();
+    const { menuQueryStr, cateQueryStr, tagQueryStr, searchParams } = useHandleQueryStr();
     const { searchInput, data } = useSelector((state: RootState) => state.memo);
 
-    const dispatch = useDispatch();
+    const handleInterval = () => {
+        intervalRef.current = setInterval(() => {
+            console.log('20분경과, 데이터 최신화');
+            obsRef.current.disconnect();
+            offset.current = 0;
+            loadEndRef.current = false;
+            resetMemos();
+            setIsReset(true);
+            loadAsideData();
+            // 1200000ms = 20min
+        },1200000);
+    }
+
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleLoadMore = () => offset.current += limit.current;
 
@@ -54,13 +57,14 @@ export const usePaginationObservers = () => {
 
     // url 변경시 옵저버 초기화
     useEffect(() => {
+        // 메모수정 끝나면 데이터 최신화
         obsRef.current.disconnect();
-
+        clearTimeout(timeoutRef.current);
         if (!isReset) {
-            resetMemos();
-            offset.current = 0;
-            setIsReset(true);
             loadEndRef.current = false;
+            offset.current = 0;
+            resetMemos();
+            setIsReset(true);
         }
     },[menuQueryStr, cateQueryStr, tagQueryStr]);
 
@@ -74,72 +78,75 @@ export const usePaginationObservers = () => {
         }
     },[isReset]);
 
+    // 20분마다 데이터 최신화
+    useEffect(() => {
+        console.log('변경감지!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        if (searchParams.get('modal') === 'memoModify') {
+            setIsModifyMemoModal(true);
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        } else {
+            setIsModifyMemoModal(false);
+            clearInterval(intervalRef.current);
+            handleInterval();
+        }
+    },[searchParams]);
+
+    // 메모수정 직전과 수정 후에 최신화된 데이터로변경
+    useEffect(() => {
+        refreshMemos({
+            offset: 0,
+            limit: data.memos.length,
+            search: '',
+            menuQueryStr,
+            tagQueryStr,
+            cateQueryStr: Number(cateQueryStr),
+        })
+    },[isModifyMemoModal])
+
     // 검색창 입력시 데이터로드
     useEffect(() => {
+        clearTimeout(timeoutRef.current);
         obsRef.current.disconnect();
         offset.current = 0;
         preventRef.current = true;
         loadEndRef.current = false;
         resetMemos();
         setRetryObs(!retryObs);
-    },[searchInput])
-
-    // aside정보 서버데이터와 비교 후 리로드
-    useEffect(() => {
-        console.log('데이터변경 체크1')
-        // if (dataLengthRef.current) {
-        //     dataLengthRef.current = {
-        //         importantMemoLength: data.importantMemoLength,
-        //         memosLength: data.memosLength,
-        //         tagsLength: data.tagsLength,
-        //     };
-        //
-        //     console.log('데이터변경 체크')
-        //
-        //     if (dataLengthRef.current !== payloadLength) {
-        //         console.log('무한루프는 아닐거야');
-        //         loadAsideData();
-        //     }
-        // }
-    },[data.memos, dataLengthRef.current])
+    },[searchInput]);
 
     const loadMemos = () => {
         (async () => {
-            const cateId = cateQueryStr === '' ? null : Number(cateQueryStr)
             await Api().memo.get({
                 search: searchInput,
                 offset: offset.current,
                 limit: limit.current,
-                cateQueryStr: cateId,
+                cateQueryStr: Number(cateQueryStr) || null,
                 tagQueryStr,
                 menuQueryStr,
             })
                 .then((res) => {
-                    if (res.data.success) {
-                        if (res.data.memos.length < limit.current) {
+                    timeoutRef.current = setTimeout(() => {
+                        console.log('useObs - 데이터체크', res.data)
+                        if (res.data.success) {
+                            clearInterval(intervalRef.current);
+                            handleInterval();
+
+                            if (res.data.memos.length < limit.current) {
+                                loadEndRef.current = true;
+                            }
+                            handleLoadMore();
+                            console.log(res.data,'useObs - 로드데이터');
+                            if (res.data.memos.length === limit.current) setRetryObs(!retryObs);
+
+                            preventRef.current = true;
+
+                            dispatch(SET_MEMO(res.data.memos));
+                        } else if (!res.data.memos) {
                             loadEndRef.current = true;
-                        }
-
-                        handleLoadMore();
-                        console.log(res.data,'로드데이터');
-
-                        setPayloadLength({
-                            importantMemoLength: res.data.importantMemoLength,
-                            memosLength: res.data.memosLength,
-                            tagsLength: res.data.tagsLength,
-                        });
-
-                        if (res.data.memos.length === limit.current) {
-                            setRetryObs(!retryObs)
-                        }
-
-                        preventRef.current = true;
-
-                        dispatch(SET_MEMO(res.data.memos));
-                    } else if (!res.data.memos) {
-                        loadEndRef.current = true;
-                        preventRef.current = true;
-                    } else { console.log(res.data.error) }
+                            preventRef.current = true;
+                        } else { console.log(res.data.error) }
+                    },50)
                 })
                 .catch(e => console.log(e))
         })()
@@ -151,20 +158,19 @@ export const useCloneDivObserver = () => {
     const cloneMainRef = useRef(null);
     const cloneRef = useRef(null);
 
-    const [changeHeight, setChangeHeight] = useState(0);
-
     useEffect(() => { //addMemo-clone-box 옵저버생성
         if (cloneMainRef.current) {
-            const obsRef = new ResizeObserver(() => setChangeHeight(cloneMainRef.current.offsetHeight));
-            obsRef.observe(cloneMainRef.current);
-            return () => obsRef.disconnect();
+            const observer = new ResizeObserver((entries) => {
+                entries.forEach(entry => {
+                    cloneRef.current.style.height = `${entry.contentRect.height}px`;
+                    cloneRef.current.style.width = `${entry.contentRect.width}px`;
+                });
+            })
+            observer.observe(cloneMainRef.current);
+
+            return () => observer.disconnect();
         }
     },[cloneMainRef.current]);
-
-    useEffect(() => { //addMemo-clone-box 변경감지
-        if (!cloneRef.current) return;
-        cloneRef.current.style.height = `${changeHeight}px`;
-    }, [changeHeight]);
 
     return { cloneMainRef, cloneRef }
 }

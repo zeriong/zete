@@ -4,6 +4,8 @@ import {FuncButton} from "./funcButton";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     options: {
+        foreignSetOpen?: boolean,
+        setForeignSetOpen?: React.Dispatch<React.SetStateAction<boolean>>,
         subject: string,
         subtitle?: string,
         confirmText: string,
@@ -19,10 +21,17 @@ export const ConfirmButton = (props: ButtonProps) => {
     const [input, setInput] = useState('')
 
     function closeModal() {
-        setIsOpen(false)
+        if (props.options.setForeignSetOpen) {
+            props.options.setForeignSetOpen(false);
+        } else {
+            setIsOpen(false);
+        }
     }
 
     function openModal() {
+        if (props.options.setForeignSetOpen) {
+            props.options.setForeignSetOpen(true);
+        }
         setIsOpen(true)
     }
 
@@ -32,10 +41,14 @@ export const ConfirmButton = (props: ButtonProps) => {
 
     return (
         <>
-            <button {...Object.fromEntries(Object.entries(props).filter(([key]) => key !== 'options'))} type="button" onClick={openModal}>
+            <button
+                {...Object.fromEntries(Object.entries(props).filter(([key]) => key !== 'options'))}
+                type="button"
+                onClick={openModal}
+            >
                 {props.children}
             </button>
-            <Transition appear show={isOpen} as={Fragment}>
+            <Transition appear show={props.options.foreignSetOpen || isOpen} as={Fragment}>
                 <Dialog as="div" className="relative z-[100]" onClose={closeModal}>
                     <Transition.Child
                         as={Fragment}
@@ -46,10 +59,13 @@ export const ConfirmButton = (props: ButtonProps) => {
                         leaveFrom="opacity-100"
                         leaveTo="opacity-0"
                     >
-                        <div className="fixed inset-0 bg-black bg-opacity-40" />
+                        <div className="fixed inset-0 bg-black bg-opacity-40"/>
                     </Transition.Child>
-
-                    <div className="fixed inset-0 overflow-y-auto">
+                    <div
+                        className="fixed inset-0 overflow-y-auto"
+                        // 부모요소에 걸린 이벤트 상속방지
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="flex min-h-full items-center justify-center p-4 text-center">
                             <Transition.Child
                                 as={Fragment}
@@ -81,28 +97,19 @@ export const ConfirmButton = (props: ButtonProps) => {
                                         )}
                                     </div>
                                     <div className="grid grid-cols-2 text-sm font-medium">
-                                        <>
-                                            <FuncButton
-                                                type="button"
-                                                options={{ disabled: Boolean(props.options.isMatchText) ? input !== props.options.matchText : false, loading: false, text: props.options.confirmText }}
-                                                className={`py-3 ${(String(props.options.isNegative) === "true") ? 'bg-red-500 bg-opacity-80 text-white' : 'bg-blue-500 bg-opacity-90 text-white'}`}
-                                                onClick={() => {
-                                                    if (props.options.confirmCallback) {
-                                                        props.options.confirmCallback()
-                                                    }
-                                                    closeModal()
-                                                }}
-                                            />
-                                            <button
-                                                type="button"
-                                                className="ml-[1px] py-3 bg-gray-200"
-                                                onClick={() => {
-                                                    setIsOpen(false)
-                                                }}
-                                            >
-                                                닫기
-                                            </button>
-                                        </>
+                                        <FuncButton
+                                            type="button"
+                                            options={{ disabled: Boolean(props.options.isMatchText) ? input !== props.options.matchText : false, loading: false, text: props.options.confirmText }}
+                                            className={`py-3 ${(String(props.options.isNegative) === "true") ? 'bg-red-500 bg-opacity-80 text-white' : 'bg-blue-500 bg-opacity-90 text-white'}`}
+                                            onClick={closeModal}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="ml-[1px] py-3 bg-gray-200"
+                                            onClick={closeModal}
+                                        >
+                                            닫기
+                                        </button>
                                     </div>
                                 </Dialog.Panel>
                             </Transition.Child>

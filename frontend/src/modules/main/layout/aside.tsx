@@ -36,15 +36,15 @@ export const Aside = () => {
         <>
             <section
                 className={`${showMenu ? "opacity-50 visible" : "opacity-0 invisible"}
-                z-10 w-full h-full left-0 top-0 fixed bg-black opacity-0 hidden max-md:block ease-in-out duration-300`}
+                z-50 w-full h-full left-0 top-0 fixed bg-black opacity-0 hidden max-md:block ease-in-out duration-300`}
                 onClick={toggleMenu}
             />
             <nav
                 className={`${showMenu ? "left-0" : "-left-asideWidth"}
-                fixed w-asideWidth bg-white z-20 ease-in-out duration-300 pt-headerHeight h-full overflow-auto scroll-hidden border-r border-zete-light-gray-400`}
+                fixed w-asideWidth bg-white z-50 md:z-20 ease-in-out duration-300 pt-0 md:pt-headerHeight h-full overflow-auto scroll-hidden border-r border-zete-light-gray-400`}
             >
                 <CustomScroller>
-                    <div className="flex flex-col h-full w-full min-h-[600px] p-14px text-zete-dark-500 font-light text-14">
+                    <div className="flex flex-col h-full min-h-full w-full p-14px text-zete-dark-500 font-light text-14">
                         <ul className='flex flex-col justify-center gap-4px'>
                             <CateItemList
                                 to={{ pathname: '/memo' }}
@@ -52,7 +52,7 @@ export const Aside = () => {
                                 iconClassName='mr-14px w-20px'
                                 cateName='전체메모'
                                 cateId={null}
-                                count={data.memosLength}
+                                count={data.memosCount}
                             />
                             <CateItemList
                                 to={{ pathname: '/memo', search: '?menu=important' }}
@@ -60,7 +60,7 @@ export const Aside = () => {
                                 iconClassName='mr-14px w-20px'
                                 cateName='중요메모'
                                 cateId={null}
-                                count={data.importantMemoLength}
+                                count={data.importantMemoCount}
                             />
                         </ul>
                         <p className='text-zete-dark-300 text-11 font-light pb-14px pt-17px pl-12px'>
@@ -68,7 +68,6 @@ export const Aside = () => {
                         </p>
                         <ul className='grid gap-4px'>
                             {data.cate.map((cate, idx) => {
-                                const count = data.memoLengthInCate.filter(inCate => inCate.cateId === cate.id)[0]?.length || 0;
                                     return (
                                         <CateItemList
                                             key={idx}
@@ -77,14 +76,14 @@ export const Aside = () => {
                                             iconClassName='mr-10px mt-4px min-w-[21px]'
                                             cateName={cate.cateName}
                                             cateId={String(cate.id)}
-                                            count={count}
-                                            tags={[]}
+                                            count={cate.memoCount}
+                                            tags={cate.tag}
                                         />
                                     )
                                 })
                             }
                         </ul>
-                        <CateModifyModal buttonText={data.cateLength > 0 ? '카테고리 수정' : '카테고리 추가'}/>
+                        <CateModifyModal buttonText={data.cate.length > 0 ? '카테고리 수정' : '카테고리 추가'}/>
                     </div>
                 </CustomScroller>
             </nav>
