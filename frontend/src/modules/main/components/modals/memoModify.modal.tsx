@@ -11,15 +11,20 @@ import {
     StarIcon,
     StickerMemoIcon
 } from "../../../../assets/vectors";
-import {handleInputChange, handleResizeHeight, uniqueKey} from "../../../../common/libs/common.lib";
+import {handleInputChange, handleResizeHeight} from "../../../../common/libs/common.lib";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../../../store";
+import {RootState, store} from "../../../../store";
 import {useHorizontalScroll} from "../../../../hooks/useHorizontalScroll";
 import {showAlert} from "../../../../store/slices/alert.slice";
-import {loadAsideData, refreshMemos} from "../../../../store/slices/memo.slice";
+import {refreshTargetMemo} from "../../../../store/slices/memo.slice";
 import {useForm} from "react-hook-form";
-import {Memos, UpdateMemoInput} from "../../../../openapi";
+import {UpdateMemoInput} from "../../../../openapi";
 import {Api} from "../../../../common/libs/api";
+
+interface UpdateFormInterface {
+    update: UpdateMemoInput;
+    cateId: string;
+}
 
 export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
@@ -31,8 +36,6 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const {
         searchParams,
         setSearchParams,
-        cateQueryStr,
-        tagQueryStr,
         menuQueryStr,
         modalQueryStr,
     } = useHandleQueryStr();
@@ -43,48 +46,54 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const [isShow, setIsShow] = useState<boolean>(false);
     const [isImportant, setIsImportant] = useState<boolean>(false);
 
-    const form = useForm<UpdateMemoInput>();
-    const cateIdForm = useForm<{ cateId: string }>();
+    const form = useForm<UpdateFormInterface>();
 
     const closeModal = () => {
         searchParams.delete('modal');
         setSearchParams(searchParams);
     }
 
-    const dataRefresh = () => {
-        refreshMemos({
-            offset: 0,
-            limit: data.memos.length,
-            search: '',
-            menuQueryStr,
-            tagQueryStr,
-            cateQueryStr: Number(cateQueryStr),
-        });
-        loadAsideData();
-    }
-
     const handleImportant = () => setIsImportant(!isImportant);
 
     const memoModifier = () => {
         closeModal();
-        if (!form.getValues('memo.title') && !form.getValues('memo.content')) {
-            dataRefresh();
-            return showAlert('제목이나 내용을 입력하지 않아 수정이 취소되었습니다.');
+        if (!form.getValues('update.memo.title') && !form.getValues('update.memo.content')) {
+            return showAlert('메모내용이 존재하지않아 수정이 취소되었습니다.');
         }
 
-        let targetMemo = data.memos.find(memo => memo.id === memoId);
-        const leftTags = data.cate.filter(cate => cate.tag);
-        console.log(targetMemo,'바뀌기 전~~~~~~~~!!~~~~~~~~!!')
-        if (targetMemo.cateId === null) {
-            targetMemo = { ...targetMemo, tag: [] };
-        }
-        console.log(targetMemo,'바뀐지 체크!!~~~~~~~~!!')
+        const targetMemo = data.memos.find(memo => memo.id === memoId);
+        const cateId = isNaN(Number(form.getValues('cateId'))) ? null : Number(form.getValues('cateId'));
+        const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags').some(inputTag => inputTag.tagName === tag.tagName)).length
+        if (
+            form.getValues('update.memo.title') === targetMemo.title &&
+            form.getValues('update.memo.content') === targetMemo.content &&
+            isImportant === targetMemo.important &&
+            changedTagLength === targetMemo.tag.length
+        ) return console.log('변경사항없음');
 
-        // Api().memo.update({...form.getValues()})
+        // 삭제, 추가할 태그분류 + 수정데이터 가공
+        const newTags = form.getValues('update.newTags')
+            .filter(tag => !targetMemo.tag.some(target => target.tagName === tag.tagName))
+            .map(tag => ({ tagName: tag.tagName }));
+
+        const deleteTagIds = targetMemo.tag
+            .filter(target => !form.getValues('update.newTags').some(tag => tag.tagName === target.tagName))
+            .map(tag => tag.id);
+
+        const memo = {
+            id: targetMemo.id,
+            cateId,
+            title: form.getValues('update.memo.title'),
+            content: form.getValues('update.memo.content'),
+            important: isImportant,
+        }
+
+        // Api().memo.update({memo, newTags, deleteTagIds})
         //     .then((res)=>{
         //         if (res.data.success) {
-        //             dataRefresh();
+        //             refreshTargetMemo(memoId);
         //         } else {
+        //             console.log(res.data.error);
         //             showAlert(res.data.error);
         //         }
         //     }).catch(e => console.log(e));
@@ -93,11 +102,11 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const handleAddTagFormSubmit = (e) => {
         e.preventDefault();
         const input = e.target[0];
-        const tags = form.getValues('memo.tag') || [];
+        const tags = form.getValues('update.newTags') || [];
 
         const exists = tags.find(tag => tag.tagName === input.value);
         if (!exists) {
-            form.setValue('memo.tag', [ ...tags, { tagName: input.value } ]);
+            form.setValue('update.newTags', [ ...tags, { tagName: input.value } ]);
             input.value = ''
         } else {
             showAlert('이미 존재하는 태그명 입니다.', 'error')
@@ -105,21 +114,23 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     }
 
     const handleDeleteTag = (tagName) => {
-        const tags = form.getValues('memo.tag');
+        const tags = form.getValues('update.newTags');
         if (tags) {
-            form.setValue('memo.tag', tags.filter(tag => tag.tagName !== tagName))
+            form.setValue('update.newTags', tags.filter(tag => tag.tagName !== tagName))
         }
     }
 
     useEffect(() => {
         if (modalQueryStr) {
+            setIsShow(true);
             const targetMemo = data.memos.find(find => find.id === memoId);
             if (targetMemo) {
                 const tags = targetMemo.tag.map(tag => ({ tagName: tag.tagName }));
-                form.setValue('memo.tag', tags);
-                form.setValue('memo.title', targetMemo.title);
-                form.setValue('memo.content', targetMemo.content);
-                setIsShow(true);
+                form.setValue('update.newTags', tags);
+                form.setValue('update.memo.title', targetMemo.title);
+                form.setValue('update.memo.content', targetMemo.content);
+                form.setValue('cateId', String(targetMemo.cateId));
+
                 setIsImportant(targetMemo.important);
             } else {
                 closeModal();
@@ -127,7 +138,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         } else {
             setIsShow(false);
         }
-    },[modalQueryStr])
+    },[modalQueryStr, data])
 
     return (
         <Transition appear show={isShow} as={Fragment}>
@@ -170,7 +181,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                         <div className='w-full h-full'>
                                             <div className='flex justify-between items-center pb-8px border-b border-zete-memo-border h-full'>
                                                 <textarea
-                                                    {...form.register('memo.title', {
+                                                    {...form.register('update.memo.title', {
                                                         required: false,
                                                         maxLength: 64,
                                                     })}
@@ -189,7 +200,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                             </div>
                                             <div className='h-full w-full pt-9px'>
                                                 <textarea
-                                                    {...form.register('memo.content', {
+                                                    {...form.register('update.memo.content', {
                                                         required: false,
                                                         maxLength: 65535,
                                                     })}
@@ -202,7 +213,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                         <label htmlFor='modifyMemo' className='w-full h-full grow'/>
                                         <div className='w-full h-full'>
                                             <div ref={horizonScroll} className='flex w-full h-full relative border-b border-zete-memo-border pb-8px overflow-y-hidden memo-custom-vertical-scroll'>
-                                                {form.watch('memo.tag')?.map((tag, idx) => (
+                                                {form.watch('update.newTags')?.map((tag, idx) => (
                                                     <div key={idx} className='relative flex items-center pl-9px pr-21px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                                         <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
                                                             {tag.tagName}
@@ -236,7 +247,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                 <div className='flex items-center border border-zete-memo-border rounded-md px-2 py-1'>
                                                     <CategoryIcon className='w-18px opacity-75 mr-0.5'/>
                                                     <select
-                                                        {...cateIdForm.register('cateId', { required: true })}
+                                                        {...form.register('cateId', { required: true })}
                                                         className='w-[130px] text-[13px] text-gray-500 bg-transparent'
                                                     >
                                                         <option value={0}>전체메모</option>

@@ -27,6 +27,7 @@ models/create-memo-input.ts
 models/create-memo-output.ts
 models/get-memos-input.ts
 models/get-memos-output.ts
+models/get-one-memo-output.ts
 models/important-memo-length-output.ts
 models/index.ts
 models/login-input.ts
@@ -37,4 +38,5 @@ models/tag-name-input.ts
 models/tags.ts
 models/update-account-dto.ts
 models/update-memo-input.ts
+models/update-memo-object.ts
 models/user.ts

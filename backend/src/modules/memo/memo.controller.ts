@@ -17,6 +17,7 @@ import {
   GetMemosOutput,
   CreateMemoInput,
   UpdateMemoInput,
+  GetOneMemoOutput,
 } from './dtos/memo.dto';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import {
@@ -70,6 +71,12 @@ export class MemoController {
   @Patch('get')
   get(@Req() req, @Body() input: GetMemosInput): Promise<GetMemosOutput> {
     return this.memoService.getMemos(input, req.user);
+  }
+
+  @ApiResponse({ type: GetOneMemoOutput })
+  @Patch('getOne')
+  getOne(@Req() req, @Body() input: MemoIdInput): Promise<GetOneMemoOutput> {
+    return this.memoService.getOneMemo(input, req.user);
   }
 
   @ApiResponse({ type: CreateMemoOutput })

@@ -4,7 +4,7 @@ import {
     AsideData,
     Categories, CategoriesAndMemoCount, CateIdInput,
     CateInput,
-    CreateCateInput,
+    CreateCateInput, MemoIdInput,
     Memos
 } from "../../openapi";
 import {store} from "../index";
@@ -39,7 +39,19 @@ export const refreshMemos = (input: RefreshMemos) => {
             console.log('refreshMemos - 데이터체크', res.data)
             if (res.data.success) {
                 console.log('refreshMemos - 로드데이터',res.data);
-                store.dispatch(memoSlice.actions.REFRESH_MEMO(res.data.memos));
+                store.dispatch(memoSlice.actions.REFRESH_MEMOS(res.data.memos));
+            } else { console.log(res.data.error) }
+        })
+        .catch(e => console.log(e))
+}
+
+export const refreshTargetMemo = (input: number) => {
+    Api().memo.getOne({ memoId: input })
+        .then((res) => {
+            console.log('getOneMemo - 데이터체크', res.data)
+            if (res.data.success) {
+                console.log('getOneMemo - 로드데이터',res.data);
+                store.dispatch(memoSlice.actions.REFRESH_TARGET_MEMO(res.data.memo));
             } else { console.log(res.data.error) }
         })
         .catch(e => console.log(e))
@@ -137,9 +149,20 @@ export const memoSlice = createSlice({
                 .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
             loadAsideData();
         },
-        REFRESH_MEMO: (state: CombineData, action: PayloadAction<Memos[]>) => {
+        REFRESH_MEMOS: (state: CombineData, action: PayloadAction<Memos[]>) => {
             state.data.memos = action.payload
                 .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
+            loadAsideData();
+        },
+        REFRESH_TARGET_MEMO: (state: CombineData, action: PayloadAction<Memos>) => {
+            state.data.memos = state.data.memos.map((memo) => {
+                if (memo.id === action.payload.id) {
+                    memo = action.payload;
+                    memo.cateId = memo.cateId === null ? null : Number(memo.cateId);
+                    return memo;
+                }
+                return memo;
+            }).sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
             loadAsideData();
         },
         SET_IMPORTANT_LENGTH: (state: CombineData, action: PayloadAction<number>) => { state.data.importantMemoCount = action.payload; },

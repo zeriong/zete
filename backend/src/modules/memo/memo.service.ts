@@ -11,6 +11,7 @@ import {
   GetMemosOutput,
   CreateMemoInput,
   UpdateMemoInput,
+  GetOneMemoOutput,
 } from './dtos/memo.dto';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
 import { User } from '../../entities/user.entity';
@@ -131,6 +132,23 @@ export class MemoService {
         memosCount,
         importantMemoCount,
       };
+    } catch (e) {
+      return { success: false, error: `${e}` };
+    }
+  }
+
+  async getOneMemo(input: MemoIdInput, user: User): Promise<GetOneMemoOutput> {
+    try {
+      const memo = await this.memoRepository
+        .createQueryBuilder()
+        .leftJoinAndSelect('Memos.tag', 'tags')
+        .where('Memos.userId = :userId AND Memos.id = :memoId', {
+          userId: user.id,
+          memoId: input.memoId,
+        })
+        .getOne();
+
+      return { success: true, memo };
     } catch (e) {
       return { success: false, error: `${e}` };
     }
@@ -277,10 +295,15 @@ export class MemoService {
       if (!input.memo.content && !input.memo.title) {
         return { success: false, error: '메모를 입력해주세요.' };
       }
+      if (input.deleteTagIds.length > 0) {
+        input.deleteTagIds.forEach((id) => this.tagsRepository.delete(id));
+      }
 
       if (input.newTags.length > 0) {
         const newTags = input.newTags.map((tag) => ({
           ...tag,
+          memo: { id: input.memo.id },
+          cate: { id: input.memo.cateId },
           user,
         }));
 
@@ -289,16 +312,21 @@ export class MemoService {
         );
       }
 
-      const saveMemo = await this.memoRepository
+      const updateMemo = await this.memoRepository
         .createQueryBuilder()
-        .update(input.memo)
-        .where('id = :id AND userId = :userId', {
-          id: input.memo.id,
+        .update({
+          cate: { id: input.memo.cateId },
+          title: input.memo.title,
+          content: input.memo.content,
+          important: input.memo.important,
+        })
+        .where('userId = :userId AND id = :id', {
           userId: user.id,
+          id: input.memo.id,
         })
         .execute();
 
-      if (saveMemo.affected > 0) {
+      if (updateMemo.affected > 0) {
         return { success: true };
       } else {
         return { success: false, error: '해당메모는 존재하지 않습니다.' };

@@ -86,12 +86,46 @@ export class GetMemosOutput extends CoreOutput {
   cate?: CategoriesAndMemoCount[];
 }
 
-export class UpdateMemoInput {
+export class GetOneMemoOutput extends CoreOutput {
   @ApiProperty({ type: Memos })
-  @Validator.IsObject()
   memo?: Memos;
+}
+
+export class UpdateMemoObject {
+  @ApiProperty({ type: Number })
+  @Validator.IsNumber()
+  id: number;
+
+  @ApiProperty({ required: false })
+  @Validator.IsOptional()
+  @Validator.IsString()
+  title?: string;
+
+  @ApiProperty({ type: Boolean })
+  @Validator.IsBoolean()
+  important: boolean;
+
+  @ApiProperty({ required: false })
+  @Validator.IsOptional()
+  @Validator.IsString()
+  content?: string;
+
+  @ApiProperty({ nullable: true })
+  @Validator.IsOptional()
+  @Validator.IsNumber()
+  cateId?: number | null;
+}
+
+export class UpdateMemoInput {
+  @ApiProperty({ type: UpdateMemoObject })
+  @Validator.IsObject()
+  memo?: UpdateMemoObject;
 
   @ApiProperty({ type: [Tags] })
   @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
   newTags?: Tags[];
+
+  @ApiProperty({ type: [Number] })
+  @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
+  deleteTagIds?: number[];
 }

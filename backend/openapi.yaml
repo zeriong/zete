@@ -231,6 +231,25 @@ paths:
                 $ref: "#/components/schemas/GetMemosOutput"
       tags:
         - Memo
+  /memo/getOne:
+    patch:
+      operationId: getOne
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemoIdInput"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetOneMemoOutput"
+      tags:
+        - Memo
   /memo/create:
     post:
       operationId: create
@@ -367,9 +386,7 @@ components:
         - createAt
         - updateAt
         - important
-        - userId
         - cateId
-        - tag
     Categories:
       type: object
       properties:
@@ -697,6 +714,29 @@ components:
         - memosCount
         - importantMemoCount
         - cate
+    MemoIdInput:
+      type: object
+      properties:
+        memoId:
+          type: number
+      required:
+        - memoId
+    GetOneMemoOutput:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        message:
+          type: string
+        success:
+          type: boolean
+        memo:
+          $ref: "#/components/schemas/Memos"
+      required:
+        - success
+        - memo
     TagNameInput:
       type: object
       properties:
@@ -741,25 +781,41 @@ components:
       required:
         - success
         - savedMemo
+    UpdateMemoObject:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        important:
+          type: boolean
+        content:
+          type: string
+        cateId:
+          type: number
+          nullable: true
+      required:
+        - id
+        - important
+        - cateId
     UpdateMemoInput:
       type: object
       properties:
         memo:
-          $ref: "#/components/schemas/Memos"
+          $ref: "#/components/schemas/UpdateMemoObject"
         newTags:
           type: array
           items:
             $ref: "#/components/schemas/Tags"
+        deleteTagIds:
+          type: array
+          items:
+            type: number
       required:
         - memo
         - newTags
-    MemoIdInput:
-      type: object
-      properties:
-        memoId:
-          type: number
-      required:
-        - memoId
+        - deleteTagIds
     CreateCompletionInputObj:
       type: object
       properties:

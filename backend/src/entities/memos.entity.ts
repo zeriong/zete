@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  RelationId,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Tags } from './tags.entity';
 import { User } from './user.entity';
@@ -27,7 +21,7 @@ export class Memos extends coreEntity {
 
   @ManyToOne(() => User, (user) => user.memos, { onDelete: 'CASCADE' })
   user: User;
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   @RelationId((memos: Memos) => memos.user)
   userId: number;
 
@@ -37,7 +31,7 @@ export class Memos extends coreEntity {
   @RelationId((memo: Memos) => memo.cate)
   cateId: number;
 
-  @ApiProperty({ type: [Tags] })
+  @ApiProperty({ type: [Tags], required: false })
   @OneToMany(() => Tags, (tags) => tags.memo, { cascade: true })
   tag: Tags[];
 }

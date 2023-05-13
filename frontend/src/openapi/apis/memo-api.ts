@@ -42,6 +42,8 @@ import { GetMemosInput } from '../models';
 // @ts-ignore
 import { GetMemosOutput } from '../models';
 // @ts-ignore
+import { GetOneMemoOutput } from '../models';
+// @ts-ignore
 import { ImportantMemoLengthOutput } from '../models';
 // @ts-ignore
 import { MemoIdInput } from '../models';
@@ -259,6 +261,41 @@ export const MemoApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
+         * @param {MemoIdInput} memoIdInput 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOne: async (memoIdInput: MemoIdInput, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'memoIdInput' is not null or undefined
+            assertParamExists('getOne', 'memoIdInput', memoIdInput)
+            const localVarPath = `/memo/getOne`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(memoIdInput, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {UpdateMemoInput} updateMemoInput 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -398,6 +435,16 @@ export const MemoApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {MemoIdInput} memoIdInput 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getOne(memoIdInput: MemoIdInput, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetOneMemoOutput>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getOne(memoIdInput, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {UpdateMemoInput} updateMemoInput 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -478,6 +525,15 @@ export const MemoApiFactory = function (configuration?: Configuration, basePath?
          */
         getAsideData(options?: any): AxiosPromise<AsideDataOutput> {
             return localVarFp.getAsideData(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {MemoIdInput} memoIdInput 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOne(memoIdInput: MemoIdInput, options?: any): AxiosPromise<GetOneMemoOutput> {
+            return localVarFp.getOne(memoIdInput, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -570,6 +626,17 @@ export class MemoApi extends BaseAPI {
      */
     public getAsideData(options?: AxiosRequestConfig) {
         return MemoApiFp(this.configuration).getAsideData(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {MemoIdInput} memoIdInput 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MemoApi
+     */
+    public getOne(memoIdInput: MemoIdInput, options?: AxiosRequestConfig) {
+        return MemoApiFp(this.configuration).getOne(memoIdInput, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

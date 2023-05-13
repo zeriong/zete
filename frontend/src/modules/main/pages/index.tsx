@@ -11,38 +11,56 @@ import {subUniqueKey} from "../../../common/libs/common.lib";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
 import {MemoModifyModal} from "../components/modals/memoModify.modal";
 import {SavedMemoMenuPopover} from "../components/popovers/savedMemoMenu.popover";
-import {importantConverter, loadAsideData, memoSlice, refreshMemos} from "../../../store/slices/memo.slice";
+import {
+    importantConverter,
+    loadAsideData,
+    memoSlice,
+    refreshMemos,
+    refreshTargetMemo
+} from "../../../store/slices/memo.slice";
 import {useCloneDivObserver, usePaginationObservers} from "../../../hooks/useObservers";
 
 export const MemoMain = () => {
+    const intervalRef = useRef<NodeJS.Timeout>(null);
+
     const [masonryCols,setMasonryCols] = useState<{}>({})
     const [currentMemoId,setCurrentMemoId] = useState<number>(0);
 
     const { loading } = useSelector((state: RootState) => (state.user));
     const { data } = useSelector((state: RootState) => state.memo);
-    const { menuQueryStr, searchParams, cateQueryStr, tagQueryStr, setSearchParams } = useHandleQueryStr();
     const { paginationDivObsRef } = usePaginationObservers();
     const { cloneRef, cloneMainRef } = useCloneDivObserver();
+    const {
+        modalQueryStr,
+        menuQueryStr,
+        searchParams,
+        cateQueryStr,
+        tagQueryStr,
+        setSearchParams
+    } = useHandleQueryStr();
 
     const horizonScroll = useHorizontalScroll();
 
-    const dataRefresh = () => {
-        refreshMemos({
-            offset: 0,
-            limit: data.memos.length,
-            search: '',
-            menuQueryStr,
-            tagQueryStr,
-            cateQueryStr: Number(cateQueryStr),
-        });
-        loadAsideData();
+    const handleInterval = () => {
+        intervalRef.current = setInterval(() => {
+            console.log('20분경과, 데이터 최신화');
+            refreshMemos({
+                offset: 0,
+                limit: data.memos.length,
+                search: '',
+                menuQueryStr,
+                tagQueryStr,
+                cateQueryStr: Number(cateQueryStr),
+            })
+            // 1200000ms = 20min
+        },1200000);
     }
 
     const memoModifier = (memoId) => {
         setCurrentMemoId(memoId)
         searchParams.set('modal', 'memoModify');
         setSearchParams(searchParams);
-        dataRefresh();
+        refreshTargetMemo(memoId);
     }
 
     const convertCols = (n:number) => {
@@ -72,7 +90,19 @@ export const MemoMain = () => {
 
     useEffect(()=> {
         masonryCallBack();
-    },[masonryCallBack])
+    },[masonryCallBack]);
+
+    // 20분마다 데이터 최신화
+    useEffect(() => {
+        console.log('변경감지!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        if (modalQueryStr) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        } else {
+            clearInterval(intervalRef.current);
+            handleInterval();
+        }
+    },[searchParams, data]);
 
     return (
         loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
@@ -129,7 +159,7 @@ export const MemoMain = () => {
                                                     </div>
                                                     <div className='flex w-full items-center pt-16px pr-26px'>
                                                         <div ref={horizonScroll} className='flex w-full h-full relative py-4px overflow-y-hidden memo-custom-vertical-scroll'>
-                                                            {val.tag.map((val, idx) => (
+                                                            {val.tag?.map((val, idx) => (
                                                                 <div key={idx} className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                                                         <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
                                                                             {val.tagName}

@@ -64,7 +64,7 @@ export interface Memos {
      * @type {number}
      * @memberof Memos
      */
-    'userId': number;
+    'userId'?: number;
     /**
      * 
      * @type {number}
@@ -76,6 +76,6 @@ export interface Memos {
      * @type {Array<Tags>}
      * @memberof Memos
      */
-    'tag': Array<Tags>;
+    'tag'?: Array<Tags>;
 }
 

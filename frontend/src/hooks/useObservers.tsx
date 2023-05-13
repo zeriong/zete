@@ -4,7 +4,6 @@ import {Api} from "../common/libs/api";
 import {useHandleQueryStr} from "./useHandleQueryStr";
 import {AppDispatch, RootState} from "../store";
 import {useDispatch, useSelector} from "react-redux";
-import {sendRefreshAccessToken} from "../store/slices/auth.slice";
 
 export const usePaginationObservers = () => {
     const loadEndRef = useRef(false); // 모든 데이터로드시 true
@@ -13,28 +12,13 @@ export const usePaginationObservers = () => {
     const offset = useRef<number>(0);
     const obsRef = useRef<IntersectionObserver>(null);
     const paginationDivObsRef = useRef(null);
-    const intervalRef = useRef<NodeJS.Timeout>(null);
     const timeoutRef = useRef<NodeJS.Timeout>(null);
 
     const [isReset,setIsReset] = useState<boolean>(false);
     const [retryObs,setRetryObs] = useState<boolean>(false);
-    const [isRefreshMemos,setIsRefreshMemos] = useState<boolean>(false);
 
-    const { menuQueryStr, cateQueryStr, tagQueryStr, modalQueryStr, searchParams } = useHandleQueryStr();
-    const { searchInput, data } = useSelector((state: RootState) => state.memo);
-
-    const handleInterval = () => {
-        intervalRef.current = setInterval(() => {
-            console.log('20분경과, 데이터 최신화');
-            obsRef.current.disconnect();
-            offset.current = 0;
-            loadEndRef.current = false;
-            resetMemos();
-            setIsReset(true);
-            loadAsideData();
-            // 1200000ms = 20min
-        },1200000);
-    }
+    const { menuQueryStr, cateQueryStr, tagQueryStr } = useHandleQueryStr();
+    const { searchInput } = useSelector((state: RootState) => state.memo);
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -78,20 +62,6 @@ export const usePaginationObservers = () => {
         }
     },[isReset]);
 
-    // 20분마다 데이터 최신화
-    useEffect(() => {
-        console.log('변경감지!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-        if (modalQueryStr) {
-            setIsRefreshMemos(true);
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-        } else {
-            setIsRefreshMemos(false);
-            clearInterval(intervalRef.current);
-            handleInterval();
-        }
-    },[searchParams]);
-
     // 검색창 입력시 데이터로드
     useEffect(() => {
         clearTimeout(timeoutRef.current);
@@ -117,9 +87,6 @@ export const usePaginationObservers = () => {
                     timeoutRef.current = setTimeout(() => {
                         console.log('useObs - 데이터체크', res.data)
                         if (res.data.success) {
-                            clearInterval(intervalRef.current);
-                            handleInterval();
-
                             if (res.data.memos.length < limit.current) {
                                 loadEndRef.current = true;
                             }
