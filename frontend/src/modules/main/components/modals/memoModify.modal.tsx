@@ -23,7 +23,7 @@ import {Api} from "../../../../common/libs/api";
 
 interface UpdateFormInterface {
     update: UpdateMemoInput;
-    cateId: string;
+    cateId: number | null;
 }
 
 export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
@@ -57,13 +57,15 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
 
     const memoModifier = () => {
         closeModal();
-        if (!form.getValues('update.memo.title') && !form.getValues('update.memo.content')) {
-            return showAlert('메모내용이 존재하지않아 수정이 취소되었습니다.');
+        if (form.getValues('update.memo.title') === '' && form.getValues('update.memo.content') === '') {
+            return showAlert('메모수정이 취소되었습니다.');
         }
 
         const targetMemo = data.memos.find(memo => memo.id === memoId);
         const cateId = isNaN(Number(form.getValues('cateId'))) ? null : Number(form.getValues('cateId'));
         const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags').some(inputTag => inputTag.tagName === tag.tagName)).length
+
+        // 수정사항이 없는 경우 요청X
         if (
             form.getValues('update.memo.title') === targetMemo.title &&
             form.getValues('update.memo.content') === targetMemo.content &&
@@ -71,14 +73,23 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             changedTagLength === targetMemo.tag.length
         ) return console.log('변경사항없음');
 
-        // 삭제, 추가할 태그분류 + 수정데이터 가공
-        const newTags = form.getValues('update.newTags')
-            .filter(tag => !targetMemo.tag.some(target => target.tagName === tag.tagName))
-            .map(tag => ({ tagName: tag.tagName }));
+        // 삭제, 추가할 태그분류
+        let newTags: { tagName: string }[];
+        let deleteTagIds: number[];
 
-        const deleteTagIds = targetMemo.tag
-            .filter(target => !form.getValues('update.newTags').some(tag => tag.tagName === target.tagName))
-            .map(tag => tag.id);
+        // 카테고리 변경시 태그의 소속 변경
+        if (targetMemo.cateId !== cateId) {
+            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
+            deleteTagIds = targetMemo.tag.map(tag => tag.id);
+        } else {
+            newTags = form.getValues('update.newTags')
+                .filter(tag => !targetMemo.tag.some(target => target.tagName === tag.tagName))
+                .map(tag => ({ tagName: tag.tagName }));
+
+            deleteTagIds = targetMemo.tag
+                .filter(target => !form.getValues('update.newTags').some(tag => tag.tagName === target.tagName))
+                .map(tag => tag.id);
+        }
 
         const memo = {
             id: targetMemo.id,
@@ -88,15 +99,15 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             important: isImportant,
         }
 
-        // Api().memo.update({memo, newTags, deleteTagIds})
-        //     .then((res)=>{
-        //         if (res.data.success) {
-        //             refreshTargetMemo(memoId);
-        //         } else {
-        //             console.log(res.data.error);
-        //             showAlert(res.data.error);
-        //         }
-        //     }).catch(e => console.log(e));
+        Api().memo.updateMemo({memo, newTags, deleteTagIds})
+            .then((res)=>{
+                if (res.data.success) {
+                    refreshTargetMemo(memoId);
+                } else {
+                    console.log(res.data.error);
+                    showAlert(res.data.error);
+                }
+            }).catch(e => console.log(e));
     }
 
     const handleAddTagFormSubmit = (e) => {
@@ -129,7 +140,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                 form.setValue('update.newTags', tags);
                 form.setValue('update.memo.title', targetMemo.title);
                 form.setValue('update.memo.content', targetMemo.content);
-                form.setValue('cateId', String(targetMemo.cateId));
+                form.setValue('cateId', targetMemo.cateId === null ? 0 : targetMemo.cateId);
 
                 setIsImportant(targetMemo.important);
             } else {

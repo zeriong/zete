@@ -17,7 +17,7 @@ type FormData = {
 
 export const SigninModal = () => {
 
-    /** 쿼리를 이용한 모달 팝업 컨트롤 */
+    // 쿼리를 이용한 모달 팝업 컨트롤
     const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState(false);
     const navigate = useNavigate();
@@ -47,7 +47,7 @@ export const SigninModal = () => {
         console.log(typeof loading)
     },[searchParams]);
 
-    /** 폼 컨트롤 */
+    // 폼 컨트롤
     const {
         reset,
         setValue,
@@ -60,7 +60,7 @@ export const SigninModal = () => {
     const [PwShow, setPwShow] = useState(false);
     const [occurError, setOccurError] = useState('');
 
-    /** submit */
+    // submit
     const onSubmit = handleSubmit(async () => {
         const {email,password} = getValues();
         await Api().auth.login(
@@ -89,7 +89,7 @@ export const SigninModal = () => {
     return (
         <>
             <Transition appear show={isShow} as={Fragment}>
-                <Dialog as="div" className="relative z-20" onClose={closeModal}>
+                <Dialog as="div" className="relative z-30" onClose={closeModal}>
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
@@ -112,20 +112,20 @@ export const SigninModal = () => {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-6 md:p-8 text-left align-middle shadow-xl transition-all">
-                                    <div className="text-[28px] font-bold">
+                                <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-24px md:p-32px text-left align-middle shadow-xl transition-all">
+                                    <div className="text-28 font-bold">
                                         로그인
                                     </div>
-                                    <div className="h-[20px] relative top-4 text-red-500">
+                                    <div className="h-20px relative top-16px text-red-500">
                                         {occurError}
                                     </div>
                                     <form
-                                        className="flex flex-col mx-auto mt-8 gap-y-4"
+                                        className="flex flex-col mx-auto mt-32px gap-y-16px"
                                         onSubmit={onSubmit}
                                     >
                                         <div>
                                             <input
-                                                className="border border-gray-400 rounded px-2 py-1 w-full"
+                                                className="border border-gray-400 rounded px-8px py-4px w-full"
                                                 {...register("email", {
                                                     required: true,
                                                     minLength: 6,
@@ -134,28 +134,31 @@ export const SigninModal = () => {
                                                 })}
                                                 placeholder="이메일을 입력해주세요."
                                             />
-                                            <p className="mt-1 text-red-500 text-xs font-normal h-3">
+                                            <p className="mt-1 text-red-500 text-12 font-normal h-12px">
                                                 {errors.email && '이메일을 입력해주시기 바랍니다.'}
                                             </p>
                                         </div>
                                         <div>
                                             <input
-                                                className="border border-gray-400 rounded px-2 py-1 w-full"
+                                                className="border border-gray-400 rounded px-8px py-4px w-full"
                                                 {...register("password", { required: true,  minLength: 8, maxLength: 100 })}
                                                 type={ PwShow ? "text" : "password" }
                                                 placeholder="비밀번호를 입력해주세요."
                                             />
                                             <div className="flex justify-between">
-                                                <p className="mt-1 text-red-500 text-xs font-normal h-3">
+                                                <p className="mt-1 text-red-500 text-12 font-normal h-12px">
                                                     {errors.password && '비밀번호는 최소 8자 이상입니다.'}
                                                 </p>
-                                                <span onClick={()=>{setPwShow(!PwShow)}} className='cursor-pointer h-3 text-xs bg-gray-400 h-fit text-gray-100 px-2 mr-1'>
+                                                <span
+                                                    onClick={()=>{setPwShow(!PwShow)}}
+                                                    className='cursor-pointer text-12 bg-gray-600 h-fit text-gray-100 px-8px mr-4px'
+                                                >
                                                     { PwShow ? "비밀번호 숨김" : "비밀번호 확인" }
                                                 </span>
                                             </div>
                                         </div>
                                         <FuncButton
-                                            className="w-full py-1 bg-orange-500 text-white mx-auto mt-3 text-center cursor-pointer text-[22px] items-center rounded-2xl"
+                                            className="w-full py-4px bg-orange-500 text-white mx-auto mt-12px text-center cursor-pointer text-22 items-center rounded-[16px]"
                                             type="submit"
                                             options={{
                                                 text: "로그인",
@@ -164,8 +167,8 @@ export const SigninModal = () => {
                                             }}
                                         />
                                         <button
-                                            className="w-full py-1 bg-orange-500 text-white mx-auto mb-3 text-center
-                                            cursor-pointer text-[22px] items-center rounded-2xl"
+                                            className="w-full py-4px bg-orange-500 text-white mx-auto mb-12px text-center
+                                            cursor-pointer text-22 items-center rounded-[16px]"
                                             type="button"
                                             onClick={() => {
                                                 setRouterQuery("modal","sign-up")

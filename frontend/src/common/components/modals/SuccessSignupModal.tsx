@@ -46,16 +46,18 @@ export const SuccessSignupModal = () => {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-6 md:p-8 text-left align-middle shadow-xl transition-all">
-                                    <div className="text-2xl mb-5">
+                                <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-24px md:p-32px text-left align-middle shadow-xl transition-all">
+                                    <div className="text-24 mb-20px">
                                         회원가입 성공!
                                     </div>
-                                    <div className="mb-6">
+                                    <div className="mb-24px">
                                         Zeriong Kepp 서비스를 무료로 이용해보세요.
                                     </div>
-                                    <div className="w-[160px] flex justify-center cursor-pointer
-                                    rounded-2xl p-1 bg-orange-500 text-white m-auto"
-                                    onClick={closeModal}>
+                                    <div
+                                        className="w-[160px] flex justify-center cursor-pointer
+                                        rounded-16px p-4px bg-orange-500 text-white m-auto"
+                                        onClick={closeModal}
+                                    >
                                         확인
                                     </div>
                                 </Dialog.Panel>

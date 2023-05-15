@@ -1,17 +1,9 @@
-import {CategoriesAndMemoCount, Memos} from "../../openapi";
-export interface RefreshMemos {
-    search: string;
-    offset: number;
-    limit: number;
-    cateQueryStr: number;
-    tagQueryStr: string;
-    menuQueryStr: string;
-}
+import {CategoriesAndMemoCount, Memo} from "../../openapi";
 export interface Data {
     memosCount: number;
     importantMemoCount: number;
     cate: CategoriesAndMemoCount[];
-    memos: Memos[];
+    memos: Memo[];
 }
 export interface CombineData {
     data: Data;

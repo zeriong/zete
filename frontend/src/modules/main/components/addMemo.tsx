@@ -53,11 +53,14 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
             return
         }
 
-        Api().memo.create({...form.getValues(), important: isImportant})
+        Api().memo.createMemo({...form.getValues(), important: isImportant})
             .then((res) => {
                 if (res.data.success) {
                     console.log('메모추가데이터',res.data)
-                    dispatch(ADD_MEMO({...res.data.savedMemo}));
+                    if (Number(res.data.savedMemo.cateId) === Number(cateQueryStr) || cateQueryStr === null) {
+                        dispatch(ADD_MEMO({...res.data.savedMemo}));
+                    }
+
                     form.reset({ title: '', content: '', cateId: Number(cateQueryStr) || 0, tags: [] });
                     setIsImportant(false);
                     // memoTextarea.current.style.height = 'auto';

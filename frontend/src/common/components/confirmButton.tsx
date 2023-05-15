@@ -1,6 +1,7 @@
 import React, {Fragment, ReactNode, useEffect, useState} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {FuncButton} from "./funcButton";
+import * as DOMPurify from "dompurify";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     options: {
@@ -76,36 +77,49 @@ export const ConfirmButton = (props: ButtonProps) => {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel className="w-full max-w-[320px] transform overflow-hidden rounded-lg bg-white align-middle shadow-xl transition-all">
-                                    <div className="px-4 py-4">
-                                        <p className="font-bold text-lg" dangerouslySetInnerHTML={{ __html: props.options.subject }}></p>
+                                <Dialog.Panel className="w-full max-w-[320px] transform overflow-hidden rounded-[8px] bg-white align-middle shadow-xl transition-all">
+                                    <div className="px-16px py-16px">
+                                        <p
+                                            className="font-bold text-18"
+                                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(props.options.subject) }}
+                                        />
                                         {props.options.subtitle && (
-                                            <p className="font-light text-[15px] text-gray-600 mt-2" dangerouslySetInnerHTML={{ __html: props.options.subtitle }}></p>
+                                            <p
+                                                className="font-light text-15 text-gray-600 mt-32px"
+                                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(props.options.subtitle) }}
+                                            />
                                         )}
                                         {Boolean(props.options.isMatchText) && (
-                                            <div className="mt-3">
-                                                <p className="text-[11px] text-gray-500 text-opacity-90 pl-0.5 mb-0.5">{`아래 입력창에 "${props.options.matchText}"를 입력해주세요`}</p>
+                                            <div className="mt-12px">
+                                                <p className="text-11 text-gray-500 text-opacity-90 pl-2px mb-2px">
+                                                    {`아래 입력창에 "${props.options.matchText}"를 입력해주세요`}
+                                                </p>
                                                 <input
                                                     value={input}
                                                     onChange={(data) => {
                                                         setInput(data.target.value)
                                                     }}
                                                     placeholder={props.options.matchText}
-                                                    className="w-full text-center border border-gray-300 rounded-md px-2 py-1 placeholder:text-gray-400 placeholder:font-light placeholder:text-opacity-80"
+                                                    className="w-full text-center border border-gray-300 rounded-[6px] px-8px py-4px placeholder:text-gray-400 placeholder:font-light placeholder:text-opacity-80"
                                                 />
                                             </div>
                                         )}
                                     </div>
-                                    <div className="grid grid-cols-2 text-sm font-medium">
+                                    <div className="grid grid-cols-2 text-14 font-medium">
                                         <FuncButton
                                             type="button"
                                             options={{ disabled: Boolean(props.options.isMatchText) ? input !== props.options.matchText : false, loading: false, text: props.options.confirmText }}
-                                            className={`py-3 ${(String(props.options.isNegative) === "true") ? 'bg-red-500 bg-opacity-80 text-white' : 'bg-blue-500 bg-opacity-90 text-white'}`}
-                                            onClick={closeModal}
+                                            className={`py-12px ${props.options.isNegative ? 'bg-red-500 bg-opacity-80 text-white' : 'bg-blue-500 bg-opacity-90 text-white'}`}
+                                            onClick={() => {
+                                                if (props.options.confirmCallback) {
+                                                    props.options.confirmCallback();
+                                                }
+                                                closeModal();
+                                            }}
                                         />
                                         <button
                                             type="button"
-                                            className="ml-[1px] py-3 bg-gray-200"
+                                            className="ml-1px py-12px bg-gray-200"
                                             onClick={closeModal}
                                         >
                                             닫기

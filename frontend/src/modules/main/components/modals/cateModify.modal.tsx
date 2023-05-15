@@ -199,6 +199,7 @@ export const CateModifyModal = (props: { buttonText: string }) => {
                                                                                 confirmText: "삭제",
                                                                                 isNegative: true,
                                                                                 confirmCallback: () => {
+                                                                                    console.log('돼야하는데 왜 안될까?')
                                                                                     deleteCategory({cateId: val.id})
                                                                                 }
                                                                             }}

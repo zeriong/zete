@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Categories } from '../../entities/categories.entity';
-import { Tags } from '../../entities/tags.entity';
-import { Memos } from '../../entities/memos.entity';
+import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Category } from '../../entities/categories.entity';
+import { Tag } from '../../entities/tags.entity';
+import { Memo } from '../../entities/memos.entity';
 import {
   CreateMemoOutput,
   MemoIdInput,
@@ -29,12 +29,12 @@ export class MemoService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Categories)
-    private readonly categoriesRepository: Repository<Categories>,
-    @InjectRepository(Memos)
-    private readonly memoRepository: Repository<Memos>,
-    @InjectRepository(Tags)
-    private readonly tagsRepository: Repository<Tags>,
+    @InjectRepository(Category)
+    private readonly categoriesRepository: Repository<Category>,
+    @InjectRepository(Memo)
+    private readonly memoRepository: Repository<Memo>,
+    @InjectRepository(Tag)
+    private readonly tagsRepository: Repository<Tag>,
   ) {}
 
   // getData =====================================================
@@ -43,24 +43,24 @@ export class MemoService {
     try {
       const cateQb = await this.categoriesRepository
         .createQueryBuilder()
-        .where('Categories.userId = :userId', { userId: user.id });
+        .where('Category.userId = :userId', { userId: user.id });
 
       const cateCount = await cateQb.getCount();
 
       const cate = await cateQb
-        .leftJoinAndSelect('Categories.tag', 'tag')
-        .loadRelationCountAndMap('Categories.memoCount', 'Categories.memo')
-        .groupBy('Categories.id, tag.tagName')
+        .leftJoinAndSelect('Category.tag', 'tag')
+        .loadRelationCountAndMap('Category.memoCount', 'Category.memo')
+        .groupBy('Category.id, tag.tagName')
         .getMany();
 
       const memosQb = await this.memoRepository
         .createQueryBuilder()
-        .where('Memos.userId = :userId', { userId: user.id });
+        .where('Memo.userId = :userId', { userId: user.id });
 
       const memosCount = await memosQb.getCount();
 
       const importantMemoCount = await memosQb
-        .andWhere('Memos.important = :important', { important: true })
+        .andWhere('Memo.important = :important', { important: true })
         .getCount();
 
       return {
@@ -84,9 +84,9 @@ export class MemoService {
     try {
       const qb = this.memoRepository
         .createQueryBuilder()
-        .leftJoinAndSelect('Memos.tag', 'tags')
-        .where('Memos.userId = :userId', { userId: user.id })
-        .orderBy('Memos.updateAt', 'DESC'); // updateAt 내림차순 정렬
+        .leftJoinAndSelect('Memo.tag', 'tags')
+        .where('Memo.userId = :userId', { userId: user.id })
+        .orderBy('Memo.updateAt', 'DESC'); // updateAt 내림차순 정렬
 
       const memosCount = await qb.getCount();
 
@@ -95,36 +95,27 @@ export class MemoService {
         .andWhere('important = :important', { important: true })
         .getCount();
 
+      let findSearch: SelectQueryBuilder<Memo>;
       if (input.search) {
-        const findSearch = await qb
-          .andWhere('Memos.title LIKE :search OR Memos.content LIKE :search', {
+        findSearch = await qb
+          .clone()
+          .andWhere('Memo.title LIKE :search OR Memo.content LIKE :search', {
             search: `%${input.search}%`,
-          })
-          .skip(input.offset)
-          .take(input.limit)
-          .getMany();
-
-        return {
-          success: true,
-          memos: findSearch,
-          memosCount,
-          importantMemoCount,
-        };
+          });
       }
-      // 변수초기화 (important갯수를 반환해주기 위해서 where문의 조건이 변경되기 때문)
-      qb.where('Memos.userId = :userId', { userId: user.id });
-
       if (input.cateQueryStr) {
-        qb.andWhere('Memos.cateId = :cateId', { cateId: input.cateQueryStr });
+        qb.andWhere('Memo.cateId = :cateId', { cateId: input.cateQueryStr });
       }
       if (input.menuQueryStr) {
-        qb.andWhere('Memos.important = :important', { important: true });
+        qb.andWhere('Memo.important = :important', { important: true });
       }
       if (input.tagQueryStr) {
         qb.andWhere('tags.tagName = :tagName', { tagName: input.tagQueryStr });
       }
 
-      const result = await qb.skip(input.offset).take(input.limit).getMany();
+      const result = input.search
+        ? await findSearch.skip(input.offset).take(input.limit).getMany()
+        : await qb.skip(input.offset).take(input.limit).getMany();
 
       return {
         success: true,
@@ -141,8 +132,8 @@ export class MemoService {
     try {
       const memo = await this.memoRepository
         .createQueryBuilder()
-        .leftJoinAndSelect('Memos.tag', 'tags')
-        .where('Memos.userId = :userId AND Memos.id = :memoId', {
+        .leftJoinAndSelect('Memo.tag', 'tags')
+        .where('Memo.userId = :userId AND Memo.id = :memoId', {
           userId: user.id,
           memoId: input.memoId,
         })
@@ -240,7 +231,7 @@ export class MemoService {
       if (result.affected > 0) {
         const importantMemoCount = await this.memoRepository
           .createQueryBuilder()
-          .where('Memos.important = :important', { important: true })
+          .where('Memo.important = :important', { important: true })
           .getCount();
 
         return { success: true, importantMemoCount };
@@ -261,7 +252,7 @@ export class MemoService {
         return { success: false, error: '메모를 입력해주세요.' };
       }
 
-      const tags: Tags[] = input.tags.map((tag) => ({
+      const tags: Tag[] = input.tags.map((tag) => ({
         tagName: tag.tagName,
         user,
         cate: { id: input.cateId || null },
@@ -330,6 +321,31 @@ export class MemoService {
         return { success: true };
       } else {
         return { success: false, error: '해당메모는 존재하지 않습니다.' };
+      }
+    } catch (e) {
+      return { success: false, error: `${e}` };
+    }
+  }
+
+  async deleteMemo(input: MemoIdInput, user: User): Promise<CoreOutput> {
+    try {
+      if (!input.memoId) {
+        return { success: false, error: '이미 삭제된 메모입니다.' };
+      }
+
+      const deleteMemo = await this.memoRepository
+        .createQueryBuilder()
+        .delete()
+        .where('userId = :userId AND id = :id', {
+          userId: user.id,
+          id: input.memoId,
+        })
+        .execute();
+
+      if (deleteMemo.affected > 0) {
+        return { success: true, message: '메모가 삭제되었습니다.' };
+      } else {
+        return { success: false, error: '메모삭제에 실패했습니다.' };
       }
     } catch (e) {
       return { success: false, error: `${e}` };

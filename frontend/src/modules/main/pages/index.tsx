@@ -107,14 +107,6 @@ export const MemoMain = () => {
     return (
         loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
             <>
-                <div
-                    className='p-30px fixed left-1/2 top-1/2 bg-black text-white z-50'
-                    onClick={() => {
-                        console.log(data)
-                    }}
-                >
-                    show redux
-                </div>
                 <CustomScroller>
                     <section className='relative top-0 flex gap-28px w-full p-16px browser-width-900px:p-30px'>
                         {!menuQueryStr && (
@@ -123,7 +115,6 @@ export const MemoMain = () => {
                             </div>
                         )}
                         <Masonry
-                            key={subUniqueKey()}
                             breakpointCols={masonryCols}
                             className='my-masonry-grid flex gap-x-16px browser-width-900px:gap-x-30px w-full browser-width-900px:w-auto'
                             columnClassName='my-masonry-grid_column'
@@ -188,8 +179,8 @@ export const MemoMain = () => {
                             <MemoModifyModal memoId={currentMemoId}/>
                         </>
                     </section>
-                    <div className='relative w-full h-1px bg-blue-500'>
-                        <div ref={paginationDivObsRef} className='absolute left-0 bottom-0 w-1px h-[500px] bg-red-500'/>
+                    <div className='relative w-full h-1px'>
+                        <div ref={paginationDivObsRef} className='absolute left-0 bottom-0 w-1px h-[500px]'/>
                     </div>
                 </CustomScroller>
             </>

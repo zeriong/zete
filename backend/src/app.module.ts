@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { OpenAiModule } from './modules/openAi/openAi.module';
-import { Categories } from './entities/categories.entity';
-import { Tags } from './entities/tags.entity';
-import { Memos } from './entities/memos.entity';
+import { Category } from './entities/categories.entity';
+import { Tag } from './entities/tags.entity';
+import { Memo } from './entities/memos.entity';
 import { UserModule } from './modules/user/user.module';
 import { MemoModule } from './modules/memo/memo.module';
 
@@ -45,7 +45,7 @@ import { MemoModule } from './modules/memo/memo.module';
       synchronize: process.env.NODE_ENV !== 'production',
       //logging: process.env.NODE_ENV !== 'production',
       logging: false,
-      entities: [User, Categories, Memos, Tags],
+      entities: [User, Category, Memo, Tag],
     }),
     /*
     ServeStaticModule.forRoot({

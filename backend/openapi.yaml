@@ -142,8 +142,8 @@ paths:
                 $ref: "#/components/schemas/CoreOutput"
       tags:
         - Auth
-  /memo/sendContentData:
-    post:
+  /memo/getAsideData:
+    get:
       operationId: getAsideData
       parameters: []
       responses:
@@ -153,63 +153,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AsideDataOutput"
-      tags:
-        - Memo
-  /memo/createCate:
-    post:
-      operationId: createCate
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateCateInput"
-      responses:
-        default:
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CreateCateOutput"
-      tags:
-        - Memo
-  /memo/updateOneCate:
-    post:
-      operationId: updateCategory
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CateInput"
-      responses:
-        default:
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CoreOutput"
-      tags:
-        - Memo
-  /memo:
-    delete:
-      operationId: deleteCate
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CateIdInput"
-      responses:
-        default:
-          description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ImportantMemoLengthOutput"
       tags:
         - Memo
   /memo/get:
@@ -250,9 +193,66 @@ paths:
                 $ref: "#/components/schemas/GetOneMemoOutput"
       tags:
         - Memo
-  /memo/create:
+  /memo/createCategory:
     post:
-      operationId: create
+      operationId: createCategory
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCateInput"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCateOutput"
+      tags:
+        - Memo
+  /memo/updateOneCate:
+    patch:
+      operationId: updateCategory
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CateInput"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - Memo
+  /memo/deleteCategory:
+    delete:
+      operationId: deleteCategory
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CateIdInput"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportantMemoLengthOutput"
+      tags:
+        - Memo
+  /memo/createMemo:
+    post:
+      operationId: createMemo
       parameters: []
       requestBody:
         required: true
@@ -269,9 +269,9 @@ paths:
                 $ref: "#/components/schemas/CreateMemoOutput"
       tags:
         - Memo
-  /memo/update:
-    post:
-      operationId: update
+  /memo/updateMemo:
+    patch:
+      operationId: updateMemo
       parameters: []
       requestBody:
         required: true
@@ -288,8 +288,27 @@ paths:
                 $ref: "#/components/schemas/CoreOutput"
       tags:
         - Memo
+  /memo/deleteMemo:
+    delete:
+      operationId: deleteMemo
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemoIdInput"
+      responses:
+        default:
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreOutput"
+      tags:
+        - Memo
   /memo/changeImportant:
-    post:
+    patch:
       operationId: changeImportant
       parameters: []
       requestBody:
@@ -340,7 +359,7 @@ components:
       bearerFormat: JWT
       type: http
   schemas:
-    Tags:
+    Tag:
       type: object
       properties:
         id:
@@ -355,7 +374,7 @@ components:
           type: number
       required:
         - tagName
-    Memos:
+    Memo:
       type: object
       properties:
         id:
@@ -380,14 +399,14 @@ components:
         tag:
           type: array
           items:
-            $ref: "#/components/schemas/Tags"
+            $ref: "#/components/schemas/Tag"
       required:
         - id
         - createAt
         - updateAt
         - important
         - cateId
-    Categories:
+    Category:
       type: object
       properties:
         id:
@@ -400,11 +419,11 @@ components:
         memo:
           type: array
           items:
-            $ref: "#/components/schemas/Memos"
+            $ref: "#/components/schemas/Memo"
         tag:
           type: array
           items:
-            $ref: "#/components/schemas/Tags"
+            $ref: "#/components/schemas/Tag"
       required:
         - id
         - cateName
@@ -435,15 +454,15 @@ components:
         cate:
           type: array
           items:
-            $ref: "#/components/schemas/Categories"
-        memos:
+            $ref: "#/components/schemas/Category"
+        memo:
           type: array
           items:
-            $ref: "#/components/schemas/Memos"
-        tags:
+            $ref: "#/components/schemas/Memo"
+        tag:
           type: array
           items:
-            $ref: "#/components/schemas/Tags"
+            $ref: "#/components/schemas/Tag"
       required:
         - id
         - createAt
@@ -453,8 +472,8 @@ components:
         - name
         - mobile
         - cate
-        - memos
-        - tags
+        - memo
+        - tag
     CreateAccountDto:
       type: object
       properties:
@@ -554,11 +573,11 @@ components:
         memo:
           type: array
           items:
-            $ref: "#/components/schemas/Memos"
+            $ref: "#/components/schemas/Memo"
         tag:
           type: array
           items:
-            $ref: "#/components/schemas/Tags"
+            $ref: "#/components/schemas/Tag"
         memoCount:
           type: number
       required:
@@ -601,62 +620,6 @@ components:
       required:
         - success
         - asideData
-    CreateCateInput:
-      type: object
-      properties:
-        cateName:
-          type: string
-      required:
-        - cateName
-    CreateCateOutput:
-      type: object
-      properties:
-        error:
-          type: string
-        target:
-          type: string
-        message:
-          type: string
-        success:
-          type: boolean
-        savedCate:
-          $ref: "#/components/schemas/Categories"
-      required:
-        - success
-        - savedCate
-    CateInput:
-      type: object
-      properties:
-        cateId:
-          type: number
-        cateName:
-          type: string
-      required:
-        - cateId
-        - cateName
-    CateIdInput:
-      type: object
-      properties:
-        cateId:
-          type: number
-          nullable: true
-      required:
-        - cateId
-    ImportantMemoLengthOutput:
-      type: object
-      properties:
-        error:
-          type: string
-        target:
-          type: string
-        message:
-          type: string
-        success:
-          type: boolean
-        importantMemoCount:
-          type: number
-      required:
-        - success
     GetMemosInput:
       type: object
       properties:
@@ -699,7 +662,7 @@ components:
         memos:
           type: array
           items:
-            $ref: "#/components/schemas/Memos"
+            $ref: "#/components/schemas/Memo"
         memosCount:
           type: number
         importantMemoCount:
@@ -733,10 +696,66 @@ components:
         success:
           type: boolean
         memo:
-          $ref: "#/components/schemas/Memos"
+          $ref: "#/components/schemas/Memo"
       required:
         - success
         - memo
+    CreateCateInput:
+      type: object
+      properties:
+        cateName:
+          type: string
+      required:
+        - cateName
+    CreateCateOutput:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        message:
+          type: string
+        success:
+          type: boolean
+        savedCate:
+          $ref: "#/components/schemas/Category"
+      required:
+        - success
+        - savedCate
+    CateInput:
+      type: object
+      properties:
+        cateId:
+          type: number
+        cateName:
+          type: string
+      required:
+        - cateId
+        - cateName
+    CateIdInput:
+      type: object
+      properties:
+        cateId:
+          type: number
+          nullable: true
+      required:
+        - cateId
+    ImportantMemoLengthOutput:
+      type: object
+      properties:
+        error:
+          type: string
+        target:
+          type: string
+        message:
+          type: string
+        success:
+          type: boolean
+        importantMemoCount:
+          type: number
+      required:
+        - success
     TagNameInput:
       type: object
       properties:
@@ -777,7 +796,7 @@ components:
         success:
           type: boolean
         savedMemo:
-          $ref: "#/components/schemas/Memos"
+          $ref: "#/components/schemas/Memo"
       required:
         - success
         - savedMemo
@@ -807,7 +826,7 @@ components:
         newTags:
           type: array
           items:
-            $ref: "#/components/schemas/Tags"
+            $ref: "#/components/schemas/Tag"
         deleteTagIds:
           type: array
           items:

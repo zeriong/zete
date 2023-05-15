@@ -2,14 +2,27 @@ import { Popover, Transition} from "@headlessui/react";
 import React, {Fragment, useRef, useState} from "react";
 import {DeleteIcon, EditIcon, ThreeDotMenuIcon} from "../../../../assets/vectors";
 import {ConfirmButton} from "../../../../common/components/confirmButton";
+import {deleteMemo, refreshMemos} from "../../../../store/slices/memo.slice";
+import {RootState, store} from "../../../../store";
+import {useSelector} from "react-redux";
+import {useHandleQueryStr} from "../../../../hooks/useHandleQueryStr";
 
 export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
+    const { menuQueryStr, tagQueryStr, cateQueryStr } = useHandleQueryStr();
+    const { data } = useSelector((state: RootState) => state.memo);
+
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleDeleteMemo = (event) => {
-        event.stopPropagation();
-        // dispatch(DELETE_MEMO(memoId));
-        // setData();
+    const handleDeleteMemo = () => {
+        deleteMemo(memoId);
+        refreshMemos({
+            offset: 0,
+            limit: data.memos.length,
+            search: '',
+            menuQueryStr,
+            tagQueryStr,
+            cateQueryStr: Number(cateQueryStr),
+        });
     }
 
     const handleConfirmModal = (event) => {
@@ -34,7 +47,7 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                             leaveFrom="opacity-100 translate-y-0"
                             leaveTo="opacity-0 translate-y-1"
                         >
-                            <Popover.Panel className="absolute z-10 mt-3 left-0 bottom-[130%] px-0 w-[150px]" static>
+                            <Popover.Panel className="absolute z-10 mt-3 right-0 bottom-[130%] px-0 w-[150px]" static>
                                 <ul className="relative bg-white py-6px text-14 font-normal text-start text-zete-dark-300 cursor-default overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 whitespace-nowrap">
                                     <li className='flex items-center cursor-pointer py-5px px-12px hover:bg-black hover:bg-opacity-5'>
                                         <>
@@ -70,7 +83,8 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                     confirmText: "삭제",
                     isNegative: true,
                     confirmCallback: () => {
-                        handleDeleteMemo(memoId);
+                        console.log('됩니다~')
+                        handleDeleteMemo();
                     }
                 }}
                 className='absolute z-50'

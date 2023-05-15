@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Patch,
   Post,
   Req,
@@ -28,8 +29,6 @@ import {
   CateInput,
 } from './dtos/cate.dto';
 import { AsideDataOutput } from './dtos/asideData.dto';
-import { Categories } from '../../entities/categories.entity';
-import { Memos } from '../../entities/memos.entity';
 
 @Controller('memo')
 @ApiTags('Memo')
@@ -37,34 +36,11 @@ import { Memos } from '../../entities/memos.entity';
 export class MemoController {
   constructor(private readonly memoService: MemoService) {}
 
+  // get data -----------------------------------------------------
   @ApiResponse({ type: AsideDataOutput })
-  @Post('sendContentData')
+  @Get('getAsideData')
   getAsideData(@Req() req): Promise<AsideDataOutput> {
     return this.memoService.getAsideData(req.user);
-  }
-
-  @ApiResponse({ type: CreateCateOutput })
-  @Post('createCate')
-  createCate(
-    @Req() req,
-    @Body() input: CreateCateInput,
-  ): Promise<CreateCateOutput> {
-    return this.memoService.createCategory(input, req.user);
-  }
-
-  @ApiResponse({ type: CoreOutput })
-  @Post('updateOneCate')
-  updateCategory(@Req() req, @Body() input: CateInput): Promise<CoreOutput> {
-    return this.memoService.updateCategory(input, req.user);
-  }
-
-  @ApiResponse({ type: ImportantMemoLengthOutput })
-  @Delete()
-  deleteCate(
-    @Req() req,
-    @Body() input: CateIdInput,
-  ): Promise<ImportantMemoLengthOutput> {
-    return this.memoService.deleteCategory(input, req.user);
   }
 
   @ApiResponse({ type: GetMemosOutput })
@@ -79,9 +55,35 @@ export class MemoController {
     return this.memoService.getOneMemo(input, req.user);
   }
 
+  // category -----------------------------------------------------
+  @ApiResponse({ type: CreateCateOutput })
+  @Post('createCategory')
+  createCategory(
+    @Req() req,
+    @Body() input: CreateCateInput,
+  ): Promise<CreateCateOutput> {
+    return this.memoService.createCategory(input, req.user);
+  }
+
+  @ApiResponse({ type: CoreOutput })
+  @Patch('updateOneCate')
+  updateCategory(@Req() req, @Body() input: CateInput): Promise<CoreOutput> {
+    return this.memoService.updateCategory(input, req.user);
+  }
+
+  @ApiResponse({ type: ImportantMemoLengthOutput })
+  @Delete('deleteCategory')
+  deleteCategory(
+    @Req() req,
+    @Body() input: CateIdInput,
+  ): Promise<ImportantMemoLengthOutput> {
+    return this.memoService.deleteCategory(input, req.user);
+  }
+
+  // memo -----------------------------------------------------
   @ApiResponse({ type: CreateMemoOutput })
-  @Post('create')
-  create(
+  @Post('createMemo')
+  createMemo(
     @Req() req,
     @Body() input: CreateMemoInput,
   ): Promise<CreateMemoOutput> {
@@ -89,13 +91,19 @@ export class MemoController {
   }
 
   @ApiResponse({ type: CoreOutput })
-  @Post('update')
-  update(@Req() req, @Body() input: UpdateMemoInput): Promise<CoreOutput> {
+  @Patch('updateMemo')
+  updateMemo(@Req() req, @Body() input: UpdateMemoInput): Promise<CoreOutput> {
     return this.memoService.updateMemo(input, req.user);
   }
 
+  @ApiResponse({ type: CoreOutput })
+  @Delete('deleteMemo')
+  deleteMemo(@Req() req, @Body() input: MemoIdInput) {
+    return this.memoService.deleteMemo(input, req.user);
+  }
+
   @ApiResponse({ type: ImportantMemoLengthOutput })
-  @Post('changeImportant')
+  @Patch('changeImportant')
   changeImportant(
     @Req() req,
     @Body() input: MemoIdInput,

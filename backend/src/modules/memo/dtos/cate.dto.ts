@@ -1,7 +1,7 @@
 import * as Validator from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
-import { Categories } from '../../../entities/categories.entity';
+import { Category } from '../../../entities/categories.entity';
 
 export class CateInput {
   @ApiProperty({ type: Number })
@@ -32,8 +32,8 @@ export class CateIdInput {
 }
 
 export class CreateCateOutput extends CoreOutput {
-  @ApiProperty({ type: Categories })
-  savedCate?: Categories;
+  @ApiProperty({ type: Category })
+  savedCate?: Category;
 }
 
 export class ImportantMemoLengthOutput extends CoreOutput {

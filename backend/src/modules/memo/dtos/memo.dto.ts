@@ -1,8 +1,8 @@
 import * as Validator from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Memos } from '../../../entities/memos.entity';
+import { Memo } from '../../../entities/memos.entity';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
-import { Tags } from '../../../entities/tags.entity';
+import { Tag } from '../../../entities/tags.entity';
 import { CateIdInput } from './cate.dto';
 import { CategoriesAndMemoCount } from './asideData.dto';
 
@@ -68,13 +68,13 @@ export class CreateMemoInput extends CateIdInput {
 }
 
 export class CreateMemoOutput extends CoreOutput {
-  @ApiProperty({ type: Memos })
-  savedMemo?: Memos;
+  @ApiProperty({ type: Memo })
+  savedMemo?: Memo;
 }
 
 export class GetMemosOutput extends CoreOutput {
-  @ApiProperty({ type: [Memos] })
-  memos?: Memos[];
+  @ApiProperty({ type: [Memo] })
+  memos?: Memo[];
 
   @ApiProperty({ type: Number })
   memosCount?: number;
@@ -87,8 +87,8 @@ export class GetMemosOutput extends CoreOutput {
 }
 
 export class GetOneMemoOutput extends CoreOutput {
-  @ApiProperty({ type: Memos })
-  memo?: Memos;
+  @ApiProperty({ type: Memo })
+  memo?: Memo;
 }
 
 export class UpdateMemoObject {
@@ -121,9 +121,9 @@ export class UpdateMemoInput {
   @Validator.IsObject()
   memo?: UpdateMemoObject;
 
-  @ApiProperty({ type: [Tags] })
+  @ApiProperty({ type: [Tag] })
   @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
-  newTags?: Tags[];
+  newTags?: Tag[];
 
   @ApiProperty({ type: [Number] })
   @Validator.IsArray({ message: '잘못된 태그형식입니다.' })

@@ -7,7 +7,7 @@ import {CateModifyModal} from "../components/modals/cateModify.modal";
 import {Link, To} from "react-router-dom";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../../../assets/vectors";
-import {Tags} from "../../../openapi";
+import {Tag} from "../../../openapi";
 
 export const Aside = () => {
     const dispatch = useDispatch();
@@ -91,7 +91,7 @@ export const Aside = () => {
     )
 }
 
-const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string, cateName: string, cateId: string, count: number, tags?: Tags[] }) => {
+const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string, cateName: string, cateId: string, count: number, tags?: Tag[] }) => {
     const { tagQueryStr, cateQueryStr, searchParams, menuQueryStr } = useHandleQueryStr();
 
     const isActive = useMemo(() => {

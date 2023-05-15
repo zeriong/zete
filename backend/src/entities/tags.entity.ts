@@ -6,14 +6,14 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Memos } from './memos.entity';
+import { Memo } from './memos.entity';
 import { coreEntity } from '../common/entities/core.entity';
-import { Categories } from './categories.entity';
+import { Category } from './categories.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from './user.entity';
 
-@Entity({ name: 'tags' })
-export class Tags {
+@Entity({ name: 'tag' })
+export class Tag {
   @ApiProperty({ type: Number, required: false })
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id?: number;
@@ -22,21 +22,21 @@ export class Tags {
   @Column()
   tagName?: string;
 
-  @ManyToOne(() => User, (user) => user.tags, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.tag, { onDelete: 'CASCADE' })
   user?: User;
   @ApiProperty({ type: Number, required: false })
-  @RelationId((tags: Tags) => tags.user)
+  @RelationId((tags: Tag) => tags.user)
   userId?: number;
 
-  @ManyToOne(() => Memos, (memo) => memo.tag, { onDelete: 'CASCADE' })
-  memo?: Memos;
+  @ManyToOne(() => Memo, (memo) => memo.tag, { onDelete: 'CASCADE' })
+  memo?: Memo;
   @ApiProperty({ type: Number, required: false })
-  @RelationId((tags: Tags) => tags.memo)
+  @RelationId((tags: Tag) => tags.memo)
   memoId?: number;
 
-  @ManyToOne(() => Categories, (cate) => cate.tag, { onDelete: 'CASCADE' })
-  cate?: Categories;
+  @ManyToOne(() => Category, (cate) => cate.tag, { onDelete: 'CASCADE' })
+  cate?: Category;
   @ApiProperty({ type: Number, required: false })
-  @RelationId((tags: Tags) => tags.cate)
+  @RelationId((tags: Tag) => tags.cate)
   cateId?: number;
 }

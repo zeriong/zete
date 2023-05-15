@@ -1,8 +1,8 @@
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Categories } from '../../../entities/categories.entity';
-import { Memos } from '../../../entities/memos.entity';
-import { Tags } from '../../../entities/tags.entity';
+import { Category } from '../../../entities/categories.entity';
+import { Memo } from '../../../entities/memos.entity';
+import { Tag } from '../../../entities/tags.entity';
 
 export class CategoriesAndMemoCount {
   @ApiProperty({ type: Number })
@@ -14,11 +14,11 @@ export class CategoriesAndMemoCount {
   @ApiProperty({ type: Number })
   userId?: number;
 
-  @ApiProperty({ type: [Memos] })
-  memo?: Memos[];
+  @ApiProperty({ type: [Memo] })
+  memo?: Memo[];
 
-  @ApiProperty({ type: [Tags] })
-  tag?: Tags[];
+  @ApiProperty({ type: [Tag] })
+  tag?: Tag[];
 
   @ApiProperty({ type: Number, required: false })
   memoCount?: number;

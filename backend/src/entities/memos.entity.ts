@@ -1,12 +1,12 @@
 import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Tags } from './tags.entity';
+import { Tag } from './tags.entity';
 import { User } from './user.entity';
 import { coreEntity } from '../common/entities/core.entity';
-import { Categories } from './categories.entity';
+import { Category } from './categories.entity';
 
-@Entity({ name: 'memos' })
-export class Memos extends coreEntity {
+@Entity({ name: 'memo' })
+export class Memo extends coreEntity {
   @ApiProperty({ required: false })
   @Column({ type: 'varchar', length: 64 })
   title: string;
@@ -19,19 +19,19 @@ export class Memos extends coreEntity {
   @Column({ type: 'boolean' }) //text: 	65,535
   important: boolean;
 
-  @ManyToOne(() => User, (user) => user.memos, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.memo, { onDelete: 'CASCADE' })
   user: User;
   @ApiProperty({ type: Number, required: false })
-  @RelationId((memos: Memos) => memos.user)
+  @RelationId((memos: Memo) => memos.user)
   userId: number;
 
-  @ManyToOne(() => Categories, (cate) => cate.memo, { onDelete: 'CASCADE' })
-  cate: Categories;
+  @ManyToOne(() => Category, (cate) => cate.memo, { onDelete: 'CASCADE' })
+  cate: Category;
   @ApiProperty({ nullable: true, type: Number })
-  @RelationId((memo: Memos) => memo.cate)
+  @RelationId((memo: Memo) => memo.cate)
   cateId: number;
 
-  @ApiProperty({ type: [Tags], required: false })
-  @OneToMany(() => Tags, (tags) => tags.memo, { cascade: true })
-  tag: Tags[];
+  @ApiProperty({ type: [Tag], required: false })
+  @OneToMany(() => Tag, (tags) => tags.memo, { cascade: true })
+  tag: Tag[];
 }

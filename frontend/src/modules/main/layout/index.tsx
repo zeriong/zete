@@ -8,6 +8,7 @@ import {Aside} from "./aside";
 import {CategoryIcon, TagIcon} from "../../../assets/vectors";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {SearchMemo} from "../components/searchMemo";
+import {loadAsideData} from "../../../store/slices/memo.slice";
 export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
@@ -18,6 +19,7 @@ export const MemoLayout = () => {
 
     useEffect(() => {
         dispatch(sendMyProfile());
+        loadAsideData();
     }, [dispatch])
 
     const categoryName = useMemo(() => {
