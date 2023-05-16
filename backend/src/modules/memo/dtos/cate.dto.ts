@@ -1,7 +1,7 @@
 import * as Validator from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
-import { Category } from '../../../entities/categories.entity';
+import { Category } from '../../../entities/category.entity';
 
 export class CateInput {
   @ApiProperty({ type: Number })

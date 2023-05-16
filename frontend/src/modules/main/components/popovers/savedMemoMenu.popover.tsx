@@ -1,9 +1,9 @@
 import { Popover, Transition} from "@headlessui/react";
-import React, {Fragment, useRef, useState} from "react";
+import React, {Fragment, useState} from "react";
 import {DeleteIcon, EditIcon, ThreeDotMenuIcon} from "../../../../assets/vectors";
 import {ConfirmButton} from "../../../../common/components/confirmButton";
 import {deleteMemo, refreshMemos} from "../../../../store/slices/memo.slice";
-import {RootState, store} from "../../../../store";
+import {RootState} from "../../../../store";
 import {useSelector} from "react-redux";
 import {useHandleQueryStr} from "../../../../hooks/useHandleQueryStr";
 
@@ -21,7 +21,7 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
             search: '',
             menuQueryStr,
             tagQueryStr,
-            cateQueryStr: Number(cateQueryStr),
+            cateQueryStr: Number(cateQueryStr) || null,
         });
     }
 

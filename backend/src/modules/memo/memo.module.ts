@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Category } from '../../entities/categories.entity';
-import { Memo } from '../../entities/memos.entity';
-import { Tag } from '../../entities/tags.entity';
+import { Category } from '../../entities/category.entity';
+import { Memo } from '../../entities/memo.entity';
+import { Tag } from '../../entities/tag.entity';
 import { MemoService } from './memo.service';
 import { MemoController } from './memo.controller';
 import { User } from '../../entities/user.entity';

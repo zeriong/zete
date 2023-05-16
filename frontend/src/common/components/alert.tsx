@@ -6,7 +6,7 @@ import {AlarmIcon} from "../../assets/vectors";
 
 export const Alert = () => {
     const { alerts } = useSelector((state:RootState) => state.alert);
-    const [alert, setAlert] = useState<IAlertObject>({type: "", message: ""});
+    const [alert, setAlert] = useState<IAlertObject>({ message: "" });
     const [isShow, setIsShow] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
     const alarm = useRef<HTMLDivElement>(null);
@@ -15,15 +15,15 @@ export const Alert = () => {
     const showAlert = () => {
         alarm.current.style.display = 'flex';
         if (!isRunning && store.getState().alert.alerts.length > 0) {
-            setIsRunning(true)
-            setAlert(store.getState().alert.alerts[store.getState().alert.alerts.length - 1])
-            setIsShow(true)
+            setIsRunning(true);
+            setAlert(store.getState().alert.alerts[store.getState().alert.alerts.length - 1]);
+            setIsShow(true);
             setTimeout(() => {
-                setIsShow(false)
+                setIsShow(false);
                 setTimeout(() => {
-                    dispatch(DELETE_ALERT())
-                    setIsRunning(false)
-                    showAlert()
+                    dispatch(DELETE_ALERT());
+                    setIsRunning(false);
+                    showAlert();
                     alarm.current.style.display = 'none';
                 }, 300);
             }, 3000);
@@ -31,12 +31,12 @@ export const Alert = () => {
     }
 
     useEffect(() => {
-        showAlert()
+        showAlert();
     }, [alerts]);
 
     return (
         <div
-            className={`bg-[#202124] flex items-center justify-center fixed w-auto h-40px p-30px z-[200] left-26px
+            className={`bg-[#202124] flex items-center justify-center fixed h-40px pl-20px pr-26px py-30px z-[200] left-26px
             rounded-[4px] transition-all duration-300 ease-in-out ${isShow ? "bottom-26px opacity-100" : "opacity-0 bottom-0"}`}
             ref={alarm}
         >

@@ -3,20 +3,17 @@ import {Dialog, Transition} from "@headlessui/react";
 import {useHandleQueryStr} from "../../../../hooks/useHandleQueryStr";
 import {
     CategoryIcon,
-    CheckIcon,
     CloseIcon,
     FillStarIcon,
     PlusIcon,
-    SearchIcon,
     StarIcon,
-    StickerMemoIcon
 } from "../../../../assets/vectors";
-import {handleInputChange, handleResizeHeight} from "../../../../common/libs/common.lib";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState, store} from "../../../../store";
+import {handleInputChange} from "../../../../common/libs/common.lib";
+import {useSelector} from "react-redux";
+import {RootState} from "../../../../store";
 import {useHorizontalScroll} from "../../../../hooks/useHorizontalScroll";
 import {showAlert} from "../../../../store/slices/alert.slice";
-import {refreshTargetMemo} from "../../../../store/slices/memo.slice";
+import {refreshMemos, refreshTargetMemo} from "../../../../store/slices/memo.slice";
 import {useForm} from "react-hook-form";
 import {UpdateMemoInput} from "../../../../openapi";
 import {Api} from "../../../../common/libs/api";
@@ -28,9 +25,7 @@ interface UpdateFormInterface {
 
 export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
-    const titleTextarea = useRef<HTMLTextAreaElement>(null);
     const tagsInput = useRef<HTMLInputElement>(null);
-    const tagsRef = useRef([]);
 
     const { data } = useSelector((state:RootState) => state.memo);
     const {
@@ -38,9 +33,10 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         setSearchParams,
         menuQueryStr,
         modalQueryStr,
+        cateQueryStr,
+        tagQueryStr,
     } = useHandleQueryStr();
 
-    const dispatch = useDispatch();
     const horizonScroll = useHorizontalScroll();
 
     const [isShow, setIsShow] = useState<boolean>(false);
@@ -62,23 +58,28 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         }
 
         const targetMemo = data.memos.find(memo => memo.id === memoId);
-        const cateId = isNaN(Number(form.getValues('cateId'))) ? null : Number(form.getValues('cateId'));
+        const cateId = form.getValues('cateId') === 0 ? null : Number(form.getValues('cateId'));
         const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags').some(inputTag => inputTag.tagName === tag.tagName)).length
 
         // 수정사항이 없는 경우 요청X
         if (
             form.getValues('update.memo.title') === targetMemo.title &&
             form.getValues('update.memo.content') === targetMemo.content &&
+            cateId === targetMemo.cateId &&
             isImportant === targetMemo.important &&
-            changedTagLength === targetMemo.tag.length
-        ) return console.log('변경사항없음');
+            (changedTagLength === targetMemo.tag.length ||
+            (targetMemo.tag.length === 0 && form.getValues('update.newTags').length === 0))
+        ) return
 
         // 삭제, 추가할 태그분류
         let newTags: { tagName: string }[];
         let deleteTagIds: number[];
 
         // 카테고리 변경시 태그의 소속 변경
-        if (targetMemo.cateId !== cateId) {
+        if (targetMemo.tag.length === 0) {
+            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
+            deleteTagIds = [];
+        } else if (targetMemo.cateId !== cateId) {
             newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
             deleteTagIds = targetMemo.tag.map(tag => tag.id);
         } else {
@@ -94,8 +95,8 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         const memo = {
             id: targetMemo.id,
             cateId,
-            title: form.getValues('update.memo.title'),
-            content: form.getValues('update.memo.content'),
+            title: form.getValues('update.memo.title').replace(/\n/g, '<br/>'),
+            content: form.getValues('update.memo.content').replace(/\n/g, '<br/>'),
             important: isImportant,
         }
 
@@ -105,6 +106,14 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                     refreshTargetMemo(memoId);
                 } else {
                     console.log(res.data.error);
+                    refreshMemos({
+                        search: '',
+                        offset: 0,
+                        limit: data.memos.length,
+                        menuQueryStr,
+                        cateQueryStr: Number(cateQueryStr) || null,
+                        tagQueryStr,
+                    });
                     showAlert(res.data.error);
                 }
             }).catch(e => console.log(e));
@@ -120,7 +129,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             form.setValue('update.newTags', [ ...tags, { tagName: input.value } ]);
             input.value = ''
         } else {
-            showAlert('이미 존재하는 태그명 입니다.', 'error')
+            showAlert('이미 존재하는 태그명 입니다.');
         }
     }
 
@@ -138,8 +147,8 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             if (targetMemo) {
                 const tags = targetMemo.tag.map(tag => ({ tagName: tag.tagName }));
                 form.setValue('update.newTags', tags);
-                form.setValue('update.memo.title', targetMemo.title);
-                form.setValue('update.memo.content', targetMemo.content);
+                form.setValue('update.memo.title', targetMemo.title.replace(/<br\/>/g, '\n'));
+                form.setValue('update.memo.content', targetMemo.content.replace(/<br\/>/g, '\n'));
                 form.setValue('cateId', targetMemo.cateId === null ? 0 : targetMemo.cateId);
 
                 setIsImportant(targetMemo.important);
@@ -237,22 +246,20 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                         </button>
                                                     </div>
                                                 ))}
-                                                <div className='h-full w-full text-zete-dark-400'>
-                                                    <form
-                                                        className='relative flex items-center text-zete-dark-400 text-12'
-                                                        onSubmit={handleAddTagFormSubmit}
-                                                    >
-                                                        <input
-                                                            ref={tagsInput}
-                                                            onChange={() => handleInputChange(tagsInput)}
-                                                            placeholder='태그추가'
-                                                            className='min-w-[50px] w-50px px-2px placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
-                                                        />
-                                                        <button type='submit' className='relative w-14px h-14px grid place-content-center'>
-                                                            <PlusIcon svgClassName='w-9px' strokeClassName='fill-black'/>
-                                                        </button>
-                                                    </form>
-                                                </div>
+                                                <form
+                                                    className='relative flex items-center text-zete-dark-400 text-12'
+                                                    onSubmit={handleAddTagFormSubmit}
+                                                >
+                                                    <input
+                                                        ref={tagsInput}
+                                                        onChange={() => handleInputChange(tagsInput)}
+                                                        placeholder='태그추가'
+                                                        className='min-w-[50px] w-50px px-2px placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
+                                                    />
+                                                    <button type='submit' className='relative w-14px h-14px grid place-content-center'>
+                                                        <PlusIcon svgClassName='w-9px' strokeClassName='fill-black'/>
+                                                    </button>
+                                                </form>
                                             </div>
                                             <div className='flex justify-between items-center pt-10px'>
                                                 <div className='flex items-center border border-zete-memo-border rounded-md px-2 py-1'>

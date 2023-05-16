@@ -31,28 +31,28 @@ export const Home = ()=> {
 
     return (
         <>
-                <div className="flex h-full w-full py-[100px] max-md:py-0">
+                <div className="flex h-full w-full py-100px max-md:py-0">
                     <div
-                        className="flex flex-col w-auto h-auto m-auto p-[60px] font-bold text-[48px] text-gray-800
+                        className="flex flex-col w-auto h-auto m-auto p-60px font-bold text-48 text-gray-800
                         max-md:z-20 max-md:text-center max-md:p-0"
                     >
-                        <div className="mt-10 text-[48px] text-gray-800 flex flex-col w-[376px]">
-                            <span className="max-md:text-4xl">깔끔한 기록을 위한</span>
-                            <span className="max-md:text-4xl mt-3">메모 서비스</span>
+                        <div className="mt-10 text-48 text-gray-800 flex flex-col w-[376px]">
+                            <span className="max-md:text-36">깔끔한 기록을 위한</span>
+                            <span className="max-md:text-36 mt-12px">메모 서비스</span>
                             <span className="font-extrabold">Zeriong Keep!</span>
                         </div>
                         {isLoggedIn ? (
-                            <div className="flex flex-col mt-14">
-                                <div className="flex text-[26px] font-bold justify-center">
+                            <div className="flex flex-col mt-56px">
+                                <div className="flex text-26 font-bold justify-center">
                                     {`어서오세요! ${name}님`}
                                 </div>
-                                <Link to="memo" className="text-[30px] font-bold flex py-2 px-5 items-center bg-orange-500
-                                rounded-2xl justify-center mt-8 cursor-pointer text-white">
+                                <Link to="memo" className="text-30 font-bold flex py-8px px-20px items-center bg-orange-500
+                                rounded-[16px] justify-center mt-32px cursor-pointer text-white">
                                     Let's Keep!
                                 </Link>
                             </div>
                         ) : (
-                            <div className="text-[26px] font-medium mt-20">
+                            <div className="text-26 font-medium mt-80px">
                                 자주 잊는 계획이나 일정관리, 정산관리 등<br/>
                                 다양한 메모를 좀 더 깔끔하게 정리하세요.<br/>
                                 가입하고 무료로 시작하세요.
@@ -62,14 +62,14 @@ export const Home = ()=> {
                             isLoggedIn ? (
                                 <></>
                             ) : (
-                                <div className="flex flex-row text-[30px] mt-10">
+                                <div className="flex flex-row text-30 mt-40px">
                                     <span onClick={() => setRouterQuery("modal","sign-in")}
-                                          className="mt-5 w-[180px] py-2 flex justify-center border-[1px] border-gray-500 bg-white
-                                          mb-3 cursor-pointer text-[22px] items-center mr-6 rounded-2xl">
+                                          className="mt-20px w-[180px] py-8px flex justify-center border border-gray-500 bg-white
+                                          mb-12px cursor-pointer text-22 items-center mr-24px rounded-[16px]">
                                         로그인하기
                                     </span>
                                     <span onClick={() => setRouterQuery("modal","sign-up")}
-                                          className="mt-5 w-[180px] py-2 flex justify-center mb-3 cursor-pointer text-[22px]
+                                          className="mt-20px w-[180px] py-8px flex justify-center mb-12px cursor-pointer text-22
                                            items-center bg-orange-500 rounded-2xl text-white">
                                         회원가입
                                     </span>
@@ -77,16 +77,16 @@ export const Home = ()=> {
                             )
                         }
                     </div>
-                    <div
+                    <figure
                         className="flex items-center w-1/2 max-md:fixed max-md:opacity-50 max-md:w-full
-                        z-10 h-full font-bold text-[48px] text-gray-800 max-md:top-0"
+                        z-10 h-full font-bold text-48 text-gray-800 max-md:top-0"
                     >
                         <img
-                            className="flex m-auto max-md:h-[400px] max-md:p-0 h-full w-auto p-10"
+                            className="flex m-auto max-md:h-[400px] max-md:p-0 h-full w-auto p-40px"
                             src={memoImg}
                             alt={''}
                         />
-                    </div>
+                    </figure>
                 </div>
             <SuccessSignupModal/>
             <SignupModal/>

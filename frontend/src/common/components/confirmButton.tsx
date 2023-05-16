@@ -18,8 +18,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     children: ReactNode
 }
 export const ConfirmButton = (props: ButtonProps) => {
-    const [isOpen, setIsOpen] = useState(false)
-    const [input, setInput] = useState('')
+    const [isOpen, setIsOpen] = useState(false);
+    const [input, setInput] = useState('');
 
     function closeModal() {
         if (props.options.setForeignSetOpen) {
@@ -33,12 +33,12 @@ export const ConfirmButton = (props: ButtonProps) => {
         if (props.options.setForeignSetOpen) {
             props.options.setForeignSetOpen(true);
         }
-        setIsOpen(true)
+        setIsOpen(true);
     }
 
     useEffect(() => {
-        setInput('')
-    }, [isOpen])
+        setInput('');
+    }, [isOpen]);
 
     return (
         <>

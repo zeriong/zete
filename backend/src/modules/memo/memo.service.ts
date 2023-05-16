@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { Category } from '../../entities/categories.entity';
-import { Tag } from '../../entities/tags.entity';
-import { Memo } from '../../entities/memos.entity';
+import { Category } from '../../entities/category.entity';
+import { Tag } from '../../entities/tag.entity';
+import { Memo } from '../../entities/memo.entity';
 import {
   CreateMemoOutput,
   MemoIdInput,
@@ -110,7 +110,21 @@ export class MemoService {
         qb.andWhere('Memo.important = :important', { important: true });
       }
       if (input.tagQueryStr) {
-        qb.andWhere('tags.tagName = :tagName', { tagName: input.tagQueryStr });
+        qb.andWhere(
+          `Memo.id IN ${qb
+            .subQuery()
+            .from('Tag', 'tag')
+            .select('tag.memoId')
+            .where(
+              'tag.tagName = :tagName AND tag.userId = :userId AND tag.cateId = :cateId',
+              {
+                tagName: input.tagQueryStr,
+                userId: user.id,
+                cateId: input.cateQueryStr,
+              },
+            )
+            .getQuery()}`,
+        );
       }
 
       const result = input.search
@@ -306,7 +320,7 @@ export class MemoService {
       const updateMemo = await this.memoRepository
         .createQueryBuilder()
         .update({
-          cate: { id: input.memo.cateId },
+          cate: { id: input.memo.cateId || null },
           title: input.memo.title,
           content: input.memo.content,
           important: input.memo.important,

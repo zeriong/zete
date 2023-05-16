@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from "react";
-import {loadAsideData, refreshMemos, resetMemos, SET_MEMO} from "../store/slices/memo.slice";
+import {useEffect, useRef, useState} from "react";
+import {resetMemos, SET_MEMO} from "../store/slices/memo.slice";
 import {Api} from "../common/libs/api";
 import {useHandleQueryStr} from "./useHandleQueryStr";
 import {AppDispatch, RootState} from "../store";
@@ -26,7 +26,6 @@ export const usePaginationObservers = () => {
 
     // 페이지네이션 옵저버 생성
     useEffect(()=> {
-        console.log('retry감지')
         obsRef.current = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !loadEndRef.current && preventRef.current) {
                 preventRef.current = false;
@@ -85,13 +84,12 @@ export const usePaginationObservers = () => {
             })
                 .then((res) => {
                     timeoutRef.current = setTimeout(() => {
-                        console.log('useObs - 데이터체크', res.data)
                         if (res.data.success) {
                             if (res.data.memos.length < limit.current) {
                                 loadEndRef.current = true;
                             }
                             handleLoadMore();
-                            console.log(res.data,'useObs - 로드데이터');
+
                             if (res.data.memos.length === limit.current) setRetryObs(!retryObs);
 
                             preventRef.current = true;
@@ -100,10 +98,10 @@ export const usePaginationObservers = () => {
                         } else if (!res.data.memos) {
                             loadEndRef.current = true;
                             preventRef.current = true;
-                        } else { console.log(res.data.error) }
-                    },50)
+                        } else { console.log(res.data.error); }
+                    },50);
                 })
-                .catch(e => console.log(e))
+                .catch(e => console.log(e));
         })()
     }
     return { paginationDivObsRef }

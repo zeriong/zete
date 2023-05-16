@@ -28,7 +28,7 @@ export const Aside = () => {
         return () => {
             window.removeEventListener('resize', handleResize);
         }
-    }, [dispatch])
+    }, [dispatch]);
 
     const toggleMenu = () => dispatch(TOGGLE_SHOW_MENU());
 
@@ -67,21 +67,18 @@ export const Aside = () => {
                             카테고리
                         </p>
                         <ul className='grid gap-4px'>
-                            {data.cate.map((cate, idx) => {
-                                    return (
-                                        <CateItemList
-                                            key={idx}
-                                            to={{ pathname: '/memo', search: `?cate=${cate.id}` }}
-                                            iconComponent={CategoryIcon}
-                                            iconClassName='mr-10px mt-4px min-w-[21px]'
-                                            cateName={cate.cateName}
-                                            cateId={String(cate.id)}
-                                            count={cate.memoCount}
-                                            tags={cate.tag}
-                                        />
-                                    )
-                                })
-                            }
+                            {data.cate.map((cate, idx) => (
+                                <CateItemList
+                                    key={idx}
+                                    to={{ pathname: '/memo', search: `?cate=${cate.id}` }}
+                                    iconComponent={CategoryIcon}
+                                    iconClassName='mr-10px mt-4px min-w-[21px]'
+                                    cateName={cate.cateName}
+                                    cateId={String(cate.id)}
+                                    count={cate.memoCount}
+                                    tags={cate.tag}
+                                />
+                            ))}
                         </ul>
                         <CateModifyModal buttonText={data.cate.length > 0 ? '카테고리 수정' : '카테고리 추가'}/>
                     </div>
@@ -95,10 +92,10 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
     const { tagQueryStr, cateQueryStr, searchParams, menuQueryStr } = useHandleQueryStr();
 
     const isActive = useMemo(() => {
-        if (props.cateId) return cateQueryStr === props.cateId
-        if (props.cateName === '전체메모') return !cateQueryStr && !tagQueryStr && !menuQueryStr
-        if (props.cateName === '중요메모') return menuQueryStr
-    },[searchParams])
+        if (props.cateId) return cateQueryStr === props.cateId;
+        if (props.cateName === '전체메모') return !cateQueryStr && !tagQueryStr && !menuQueryStr;
+        if (props.cateName === '중요메모') return menuQueryStr;
+    },[searchParams]);
 
     return (
         <li
@@ -122,9 +119,9 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                     className={`rounded-full text-zete-dark-100 py-2px px-8px text-12 font-medium
                     ${isActive ? 'bg-white' : 'group-hover:bg-white bg-zete-light-gray-300'}`}
                 >
-                        <span className='relative bottom-1px'>
-                            {props.count || 0}
-                        </span>
+                    <span className='relative bottom-1px'>
+                        {props.count || 0}
+                    </span>
                 </div>
             </Link>
             <div className={(isActive && props.tags?.length > 0) ? 'px-12px pb-12px' : 'h-0 overflow-hidden'}>
@@ -132,12 +129,12 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                     <div
                         key={idx}
                         className={`overflow-hidden font-light text-13 transition-all duration-300 
-                                    ${isActive ? 'max-h-[200px] mt-6px' : 'h-[0vh] p-0 m-0'}`}
+                        ${isActive ? 'max-h-[200px] mt-6px' : 'h-[0vh] p-0 m-0'}`}
                     >
                         <Link
                             to={{ pathname: '/memo', search: `${props.to.search}&tag=${tags.tagName}` }}
                             className={`flex w-full h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
-                                        ${tagQueryStr === tags.tagName && 'bg-zete-light-gray-500'}`}
+                            ${tagQueryStr === tags.tagName && 'bg-zete-light-gray-500'}`}
                         >
                             <>
                                 <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>

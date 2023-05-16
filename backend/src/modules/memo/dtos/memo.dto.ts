@@ -1,8 +1,8 @@
 import * as Validator from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Memo } from '../../../entities/memos.entity';
+import { Memo } from '../../../entities/memo.entity';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
-import { Tag } from '../../../entities/tags.entity';
+import { Tag } from '../../../entities/tag.entity';
 import { CateIdInput } from './cate.dto';
 import { CategoriesAndMemoCount } from './asideData.dto';
 

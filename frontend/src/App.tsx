@@ -4,7 +4,6 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "./store";
 import {sendRefreshAccessToken} from "./store/slices/auth.slice";
 import {Alert} from "./common/components/alert";
-import {loadAsideData} from "./store/slices/memo.slice";
 
 function App() {
     const { loading } = useSelector((state: RootState) => (state.auth));
@@ -13,7 +12,7 @@ function App() {
     useEffect( ()=> {
         (async () => {
             await dispatch(sendRefreshAccessToken());
-        })();
+        })()
     },[dispatch]);
 
     return (

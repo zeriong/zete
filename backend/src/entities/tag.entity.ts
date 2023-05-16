@@ -3,12 +3,10 @@ import {
   Column,
   ManyToOne,
   RelationId,
-  JoinColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Memo } from './memos.entity';
-import { coreEntity } from '../common/entities/core.entity';
-import { Category } from './categories.entity';
+import { Memo } from './memo.entity';
+import { Category } from './category.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from './user.entity';
 

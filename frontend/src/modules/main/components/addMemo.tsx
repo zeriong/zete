@@ -1,7 +1,7 @@
 import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from "../../../assets/vectors";
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
-import {handleInputChange, handleResizeHeight, uniqueKey} from "../../../common/libs/common.lib";
+import {handleInputChange, handleResizeHeight} from "../../../common/libs/common.lib";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
@@ -53,7 +53,13 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
             return
         }
 
-        Api().memo.createMemo({...form.getValues(), important: isImportant})
+        const replaceMemoContent: CreateMemoInput = {
+            ...form.getValues(),
+            title: form.getValues('title').replace(/\n/g, '<br/>'),
+            content: form.getValues('content').replace(/\n/g, '<br/>'),
+        }
+
+        Api().memo.createMemo({...replaceMemoContent, important: isImportant})
             .then((res) => {
                 if (res.data.success) {
                     console.log('메모추가데이터',res.data)
@@ -67,10 +73,10 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                     // titleTextarea.current.style.height = 'auto';
                 } else {
                     showAlert(res.data.error);
-                    console.log(res.data.error)
+                    console.log(res.data.error);
                 }
             })
-            .catch(e => console.log(e))
+            .catch(e => console.log(e));
     }
 
     const handleAddTagFormSubmit = (e) => {
@@ -81,23 +87,23 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         const exists = tags.find(tag => tag.tagName === input.value);
         if (!exists) {
             form.setValue('tags', [ ...tags, { tagName: input.value } ]);
-            input.value = ''
+            input.value = '';
         } else {
-            showAlert('이미 존재하는 태그명 입니다.', 'error')
+            showAlert('이미 존재하는 태그명 입니다.');
         }
     }
 
     const handleDeleteTag = (tagName) => {
         const tags = form.getValues('tags');
         if (tags) {
-            form.setValue('tags', tags.filter(tag => tag.tagName !== tagName))
+            form.setValue('tags', tags.filter(tag => tag.tagName !== tagName));
         }
     }
 
     useEffect(() => {
         form.setValue('cateId', cateQueryStr ? Number(cateQueryStr) : 0);
-        form.setValue('tags', tagQueryStr ? [ { tagName: tagQueryStr } ] : [])
-    },[searchParams])
+        form.setValue('tags', tagQueryStr ? [ { tagName: tagQueryStr } ] : []);
+    },[searchParams]);
 
     return (
         <article
@@ -124,19 +130,17 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                             {isImportant ? <FillStarIcon/> : <StarIcon/>}
                         </button>
                     </div>
-                    <div className='h-full w-full pt-9px'>
-                        <textarea
-                            // ref={handleMemoTextRef}
-                            {...form.register('content', {
-                                required: false,
-                                maxLength: 65535,
-                                onChange: () => handleResizeHeight(memoTextarea)
-                            })}
-                            rows={1}
-                            placeholder='메모 작성...'
-                            className='resize-none max-h-[300px] w-full bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
-                        />
-                    </div>
+                    <textarea
+                        // ref={handleMemoTextRef}
+                        {...form.register('content', {
+                            required: false,
+                            maxLength: 65535,
+                            onChange: () => handleResizeHeight(memoTextarea)
+                        })}
+                        rows={1}
+                        placeholder='메모 작성...'
+                        className='pt-9px resize-none max-h-[300px] w-full bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
+                    />
                 </div>
                 <div /*onClick={() => memoTextarea.current.focus()}*/ className='w-full h-full grow'/>
                 <div className='w-full h-full'>
@@ -154,22 +158,20 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                                 </button>
                             </div>
                         ))}
-                        <div className='h-full w-full text-zete-dark-400'>
-                            <form
-                                className='relative flex items-center text-zete-dark-400 text-12'
-                                onSubmit={handleAddTagFormSubmit}
-                            >
-                                <input
-                                    ref={tagsInput}
-                                    onChange={() => handleInputChange(tagsInput)}
-                                    placeholder='태그추가'
-                                    className='min-w-[50px] w-50px px-2px placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
-                                />
-                                <button type='submit' className='relative w-14px h-14px grid place-content-center'>
-                                    <PlusIcon svgClassName='w-9px' strokeClassName='fill-black'/>
-                                </button>
-                            </form>
-                        </div>
+                        <form
+                            className='relative flex items-center text-zete-dark-400 text-12'
+                            onSubmit={handleAddTagFormSubmit}
+                        >
+                            <input
+                                ref={tagsInput}
+                                onChange={() => handleInputChange(tagsInput)}
+                                placeholder='태그추가'
+                                className='min-w-[50px] w-50px px-2px placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
+                            />
+                            <button type='submit' className='relative w-14px h-14px grid place-content-center'>
+                                <PlusIcon svgClassName='w-9px' strokeClassName='fill-black'/>
+                            </button>
+                        </form>
                     </div>
                     <div className='flex justify-between items-center pt-10px'>
                         <div className='flex items-center border border-zete-memo-border rounded-md px-2 py-1'>

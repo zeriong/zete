@@ -1,8 +1,8 @@
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Category } from '../../../entities/categories.entity';
-import { Memo } from '../../../entities/memos.entity';
-import { Tag } from '../../../entities/tags.entity';
+import { Category } from '../../../entities/category.entity';
+import { Memo } from '../../../entities/memo.entity';
+import { Tag } from '../../../entities/tag.entity';
 
 export class CategoriesAndMemoCount {
   @ApiProperty({ type: Number })

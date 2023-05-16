@@ -8,18 +8,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     }
 }
 
-export const FuncButton = (props: ButtonProps) => { // { type, text, disabled, loading, className, onClick }: IButtonProps
-    return <button
+export const FuncButton = (props: ButtonProps) => (
+    <button
         {...Object.fromEntries(Object.entries(props).filter(([key]) => key !== 'options'))}
-        style={
-            (props.options.disabled || props.options.loading) ?
-                {
-                    pointerEvents: "none",
-                    //fontWeight: "500",
-                    backgroundColor: "#ccc",
-                    color: "#808080"
-                } : {}
-        }
+        style={ (props.options.disabled || props.options.loading) ?
+            { pointerEvents: "none", backgroundColor: "#ccc", color: "#808080" } : {} }
     >
         {props.options.loading ? (
             <div className="flex justify-center">
@@ -30,4 +23,4 @@ export const FuncButton = (props: ButtonProps) => { // { type, text, disabled, l
             </div>
         ) : props.options.text}
     </button>
-};
+);

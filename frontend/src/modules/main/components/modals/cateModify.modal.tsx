@@ -122,10 +122,7 @@ export const CateModifyModal = (props: { buttonText: string }) => {
                         <div className="fixed inset-0 bg-black bg-opacity-40"/>
                     </Transition.Child>
                     <div className="fixed inset-0 overflow-y-auto">
-                        <div
-                            className="close-modal-background
-                            flex min-h-full items-center justify-center p-4 text-center"
-                        >
+                        <div className="close-modal-background flex min-h-full items-center justify-center p-4 text-center">
                             <Transition.Child
                                 as={Fragment}
                                 enter="ease-out duration-300"
@@ -135,89 +132,73 @@ export const CateModifyModal = (props: { buttonText: string }) => {
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <Dialog.Panel
-                                    className="w-[300px] relative transform overflow-hidden bg-white text-left align-middle shadow-xl transition-all">
-                                    <div className='relative h-[430px] w-full'>
+                                <Dialog.Panel className="w-[300px] relative transform overflow-hidden bg-white text-left align-middle shadow-xl transition-all">
+                                    <div className='relative h-[430px] w-full p-16px'>
                                         <CustomScroller>
-                                            <div className='p-16px w-full h-full'>
-                                                <p className="text-zete-dark-400">
-                                                    카테고리 추가/수정
-                                                </p>
-                                                <div className='py-16px px-8px text-15'>
-                                                    <form
-                                                        onSubmit={handleSubmit}
-                                                        className='flex items-center'
-                                                    >
-                                                        <>
-                                                            <ModifyIcon className='min-w-[22px] mr-16px'/>
-                                                        </>
-                                                        <>
-                                                            <input
-                                                                name="addCateName"
-                                                                placeholder='새 카테고리 만들기'
-                                                                onChange={handleInputChange}
-                                                                value={addInputValues.addCateName || ''}
-                                                                className='placeholder:text-zete-dark-300 placeholder:font-thin pb-5px border-b border-zete-memo-border text-zete-dark-300 w-full'
-                                                            />
-                                                        </>
-                                                        <button type='submit' className='flex justify-center items-center rounded-full p-2px ml-8px hover:bg-zete-light-gray-200'>
-                                                            <CatePlusIcon className='fill-zete-dark-100'/>
-                                                        </button>
-                                                    </form>
-                                                    <ul className='text-zete-dark-200 grid gap-16px py-20px'>
-                                                        {cate?.map((val,idx) => {
-                                                            return (
-                                                                <li key={idx}>
-                                                                    <form
-                                                                        onSubmit={(event) => {
-                                                                            event.preventDefault()
-
-                                                                            // 서브밋이벤트의 타겟은 form내부 input, button 등 몇번째요소의 벨류인지 적어주어야 함.
-                                                                            const input = event.target[0]
-                                                                            handleUpdateFormSubmit(val.id, val.cateName, input)
-                                                                        }}
-                                                                        onBlur={(event) => {
-                                                                            // form에서의 onBlur타겟은 인풋이 몇개가 있든 가장 첫번째인풋을 타겟함
-                                                                            const input = event.target
-                                                                            handleUpdateFormSubmit(val.id, val.cateName, input)
-                                                                        }}
-                                                                        className='flex items-center'
-                                                                    >
-                                                                        <>
-                                                                            <FillCategoryIcon className='relative -left-3px fill-zete-dark-100 mr-10px' onClick={() => console.log('newCateListNames')}/>
-                                                                        </>
-                                                                        <input
-                                                                            placeholder='수정할 태그를 입력해주세요.'
-                                                                            value={updateInputValues[val.id] || ''}
-                                                                            onChange={(event) => handleUpdateInputChange(val.id, event.target.value)}
-                                                                            className='font-medium w-full flex items-center'
-                                                                        />
-                                                                        <ConfirmButton
-                                                                            options={{
-                                                                                subject: `"${val.cateName}"를 삭제하시겠습니까?`,
-                                                                                subtitle: "카테고리가 삭제되면 하위 메모가<br/>모두 삭제됩니다.",
-                                                                                confirmText: "삭제",
-                                                                                isNegative: true,
-                                                                                confirmCallback: () => {
-                                                                                    console.log('돼야하는데 왜 안될까?')
-                                                                                    deleteCategory({cateId: val.id})
-                                                                                }
-                                                                            }}
-                                                                            className='relative group p-6px rounded-full hover:bg-zete-light-gray-200 -right-2px'
-                                                                        >
-                                                                            <DeleteIcon className='fill-zete-dark-100 group-hover:fill-black'/>
-                                                                        </ConfirmButton>
-                                                                    </form>
-                                                                </li>
-                                                            )
-                                                        })}
-                                                    </ul>
-                                                </div>
+                                            <p className="text-zete-dark-400">
+                                                카테고리 추가/수정
+                                            </p>
+                                            <div className='py-16px px-8px text-15'>
+                                                <form
+                                                    onSubmit={handleSubmit}
+                                                    className='flex items-center'
+                                                >
+                                                    <ModifyIcon className='min-w-[22px] mr-16px'/>
+                                                    <input
+                                                        name="addCateName"
+                                                        placeholder='새 카테고리 만들기'
+                                                        onChange={handleInputChange}
+                                                        value={addInputValues.addCateName || ''}
+                                                        className='placeholder:text-zete-dark-300 placeholder:font-thin pb-5px border-b border-zete-memo-border text-zete-dark-300 w-full'
+                                                    />
+                                                    <button type='submit' className='flex justify-center items-center rounded-full p-2px ml-8px hover:bg-zete-light-gray-200'>
+                                                        <CatePlusIcon className='fill-zete-dark-100'/>
+                                                    </button>
+                                                </form>
+                                                <ul className='text-zete-dark-200 grid gap-16px py-20px'>
+                                                    {cate?.map((val,idx) => (
+                                                        <li key={idx}>
+                                                            <form
+                                                                onSubmit={(event) => {
+                                                                    event.preventDefault()
+                                                                    // 서브밋이벤트의 타겟은 form내부 input, button 등 몇번째요소의 벨류인지 적어주어야 함.
+                                                                    const input = event.target[0];
+                                                                    handleUpdateFormSubmit(val.id, val.cateName, input);
+                                                                }}
+                                                                onBlur={(event) => {
+                                                                    // form에서의 onBlur타겟은 인풋이 몇개가 있든 가장 첫번째인풋을 타겟함
+                                                                    const input = event.target;
+                                                                    handleUpdateFormSubmit(val.id, val.cateName, input);
+                                                                }}
+                                                                className='flex items-center'
+                                                            >
+                                                                <FillCategoryIcon className='relative -left-3px fill-zete-dark-100 mr-10px'/>
+                                                                <input
+                                                                    placeholder='수정할 태그를 입력해주세요.'
+                                                                    value={updateInputValues[val.id] || ''}
+                                                                    onChange={(event) => handleUpdateInputChange(val.id, event.target.value)}
+                                                                    className='font-medium w-full flex items-center'
+                                                                />
+                                                                <ConfirmButton
+                                                                    options={{
+                                                                        subject: `"${val.cateName}"를 삭제하시겠습니까?`,
+                                                                        subtitle: "카테고리가 삭제되면 하위 메모가<br/>모두 삭제됩니다.",
+                                                                        confirmText: "삭제",
+                                                                        isNegative: true,
+                                                                        confirmCallback: () => deleteCategory({cateId: val.id}),
+                                                                    }}
+                                                                    className='relative group p-6px rounded-full hover:bg-zete-light-gray-200 -right-2px'
+                                                                >
+                                                                    <DeleteIcon className='fill-zete-dark-100 group-hover:fill-black'/>
+                                                                </ConfirmButton>
+                                                            </form>
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             </div>
                                         </CustomScroller>
                                     </div>
-                                    <div
-                                        className="w-full flex justify-end p-1 py-16px pr-14px border-t border-zete-memo-border">
+                                    <div className="w-full flex justify-end p-4px py-16px pr-14px border-t border-zete-memo-border">
                                         <button
                                             type='button'
                                             onClick={closeModal}

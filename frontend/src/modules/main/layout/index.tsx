@@ -1,11 +1,11 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {sendMyProfile} from "../../../store/slices/user.slice";
 import {AppDispatch, RootState} from "../../../store";
 import {Outlet} from "react-router-dom";
 import {Header} from "./header";
 import {Aside} from "./aside";
-import {CategoryIcon, TagIcon} from "../../../assets/vectors";
+import {CategoryIcon} from "../../../assets/vectors";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {SearchMemo} from "../components/searchMemo";
 import {loadAsideData} from "../../../store/slices/memo.slice";
@@ -13,14 +13,14 @@ export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
     const { cate } = useSelector((state: RootState) => (state.memo.data));
-    const { cateQueryStr, menuQueryStr, searchParams } = useHandleQueryStr()
+    const { cateQueryStr, menuQueryStr, searchParams } = useHandleQueryStr();
 
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         dispatch(sendMyProfile());
         loadAsideData();
-    }, [dispatch])
+    }, [dispatch]);
 
     const categoryName = useMemo(() => {
         if (!cateQueryStr && !menuQueryStr) {
@@ -34,7 +34,7 @@ export const MemoLayout = () => {
             }
             return '카테고리가 존재하지않습니다.'
         }
-    }, [searchParams, cate])
+    }, [searchParams, cate]);
 
     return ( loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
         <>

@@ -54,10 +54,6 @@ export const userSlice = createSlice({
             state.data = action.payload;
             state.loading = false;
         });
-        /*builder.addCase(setProfile.rejected, (state, action) => {
-            state.loading = true;
-            console.log("썬크 리젝트", action.error);
-        });*/
     }
 });
 

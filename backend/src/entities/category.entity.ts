@@ -8,9 +8,8 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { coreEntity } from '../common/entities/core.entity';
-import { Memo } from './memos.entity';
-import { Tag } from './tags.entity';
+import { Memo } from './memo.entity';
+import { Tag } from './tag.entity';
 
 @Entity({ name: 'category' })
 export class Category {

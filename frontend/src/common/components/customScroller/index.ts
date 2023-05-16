@@ -1,4 +1,3 @@
-//@ts-ignore
 import css from 'dom-css';
 import { Component, createElement, cloneElement } from 'react';
 

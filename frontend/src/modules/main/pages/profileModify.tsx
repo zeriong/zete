@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useForm} from "react-hook-form";
 import {Api} from "../../../common/libs/api";
 import {FuncButton} from "../../../common/components/funcButton";
-import {SET_ALERT} from "../../../store/slices/alert.slice";
+import {showAlert} from "../../../store/slices/alert.slice";
 import {useNavigate} from "react-router-dom";
 
 
@@ -15,12 +15,11 @@ export const ProfileModify = () => {
         password?: string | '';
         passwordConfirm?: string | '';
         mobile: string;
-    };
+    }
 
     const [PwShow, setPwShow] = useState(false);
     const [PwConfirmShow, setPwConfirmShow] = useState(false);
     const [occurError, setOccurError] = useState('');
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const { data: userState, loading } = useSelector((state: RootState) => (state.user));
@@ -50,7 +49,6 @@ export const ProfileModify = () => {
 
     /** submit */
     const onSubmit = handleSubmit(async () => {
-        console.log('서브밋~!!')
         const {email,password,name,mobile} = getValues();
         await Api().user.profileUpdate(
             {
@@ -62,15 +60,11 @@ export const ProfileModify = () => {
             .then((res) => {
                 console.log(res.data);
                 if (res.data.success) {
-                    dispatch(
-                        SET_ALERT({type: "success", message:"✔ 회원정보 수정이 완료되었습니다!"})
-                    )
+                    showAlert('✔ 회원정보 수정이 완료되었습니다!');
                     navigate(-1);
                 } else {
                     setOccurError(res.data.error);
-                    dispatch(
-                        SET_ALERT({type: "error", message:"❌ 회원정보 수정에 실패했습니다. 오류를 확인해주세요!"})
-                    )
+                    showAlert('❌ 회원정보 수정에 실패했습니다.');
                 }
             })
             .catch((e) => {

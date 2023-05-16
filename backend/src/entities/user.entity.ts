@@ -1,9 +1,9 @@
 import { coreEntity } from '../common/entities/core.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Category } from './categories.entity';
-import { Memo } from './memos.entity';
-import { Tag } from './tags.entity';
+import { Category } from './category.entity';
+import { Memo } from './memo.entity';
+import { Tag } from './tag.entity';
 
 @Entity({ name: 'user' })
 export class User extends coreEntity {

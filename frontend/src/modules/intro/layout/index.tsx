@@ -9,18 +9,15 @@ export const HomeLayout = ()=> {
     /** state management */
     const dispatch = useDispatch<AppDispatch>();
     const { data:{ isLoggedIn }, loading} = useSelector((state: RootState) => (state.auth));
-    // const { data: { name } } = useSelector((state: RootState) => (state.user));
 
     useEffect(() => {
-        if (isLoggedIn) {
-            dispatch(sendMyProfile());
-        }
+        if (isLoggedIn) dispatch(sendMyProfile());
     }, [dispatch])
 
     return ( loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
         <>
             <Header/>
-            <main className="flex w-full h-full overflow-auto pt-[60px] max-md:pt-[48px]">
+            <main className="flex w-full h-full overflow-auto pt-60px max-md:pt-48px">
                 <Outlet/>
             </main>
         </>

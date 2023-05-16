@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { OpenAiModule } from './modules/openAi/openAi.module';
-import { Category } from './entities/categories.entity';
-import { Tag } from './entities/tags.entity';
-import { Memo } from './entities/memos.entity';
+import { Category } from './entities/category.entity';
+import { Tag } from './entities/tag.entity';
+import { Memo } from './entities/memo.entity';
 import { UserModule } from './modules/user/user.module';
 import { MemoModule } from './modules/memo/memo.module';
 

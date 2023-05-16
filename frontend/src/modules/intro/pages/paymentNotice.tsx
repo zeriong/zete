@@ -7,7 +7,7 @@ export const PayNotice = () => {
     return (
         loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
             <div className="m-auto text-center">
-                <div className="text-[32px] font-bold mt-10">
+                <div className="text-32 font-bold mt-40px">
                     요금안내 페이지입니다.
                 </div>
             </div>
