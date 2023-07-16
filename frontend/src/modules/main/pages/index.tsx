@@ -87,7 +87,7 @@ export const MemoMain = () => {
 
     useEffect(()=> {
         masonryCallBack();
-    },[data.memos, masonryCallBack]);
+    },[data.memos]);
 
     // 20분마다 데이터 최신화
     useEffect(() => {

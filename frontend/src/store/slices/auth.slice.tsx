@@ -46,7 +46,7 @@ export const sendRefreshAccessToken = createAsyncThunk(
             return response.data;
         }
         catch (err) {
-            return thunkAPI.rejectWithValue(err);
+            return thunkAPI.rejectWithValue(err.response.message);
         }
     }
 );

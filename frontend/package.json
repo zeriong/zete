@@ -33,7 +33,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "codegen": "npx @openapitools/openapi-generator-cli generate -i ../backend/openapi.yaml -g typescript-axios --additional-properties apiPackage=apis,modelPackage=models,withoutPrefixEnums=true,withSeparateModelsAndApi=true -o ./src/openapi"
+    "codegen": "npx @openapitools/openapi-generator-cli generate -i http://localhost:4000/api-yaml -g typescript-axios --additional-properties apiPackage=api,modelPackage=model,withoutPrefixEnums=true,withSeparateModelsAndApi=true,supportsES6=true -o ./src/openapi/generated"
   },
   "eslintConfig": {
     "extends": [

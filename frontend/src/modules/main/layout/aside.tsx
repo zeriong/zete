@@ -7,7 +7,7 @@ import {CateModifyModal} from "../components/modals/cateModify.modal";
 import {Link, To} from "react-router-dom";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../../../assets/vectors";
-import {Tag} from "../../../openapi";
+import {Tag} from "../../../openapi/generated";
 
 export const Aside = () => {
     const dispatch = useDispatch();

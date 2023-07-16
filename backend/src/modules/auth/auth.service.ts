@@ -138,7 +138,7 @@ export class AuthService {
       });
       return { success: true };
     } catch (e) {
-      return { success: false, error: '계정 생성에 실패하였습니다.' };
+      return { success: false, error: `계정 생성에 실패하였습니다.` };
     }
   }
 }

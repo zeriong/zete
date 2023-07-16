@@ -22,6 +22,7 @@ export class UserService {
       const exists = await this.userRepository.findOne({
         where: [{ email: input.email }],
       });
+
       if (exists) {
         return {
           success: false,
@@ -29,9 +30,10 @@ export class UserService {
           error: `이미 등록된 이메일입니다.`,
         };
       }
+
       /** 계정생성 */
       await this.userRepository.save(
-        this.userRepository.create({
+        await this.userRepository.create({
           email: input.email,
           password: await bcrypt.hash(input.password, 10),
           name: input.name,
@@ -41,7 +43,7 @@ export class UserService {
 
       return { success: true };
     } catch (e) {
-      return { success: false, error: '계정생성에 실패했습니다.' };
+      return { success: false, error: `${e}` };
     }
   }
   async logInValidate(

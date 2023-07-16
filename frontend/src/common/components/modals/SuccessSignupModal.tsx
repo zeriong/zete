@@ -2,27 +2,11 @@ import React, {useEffect, Fragment, useState} from "react";
 import {useSearchParams} from "react-router-dom";
 import {Dialog, Transition } from "@headlessui/react";
 
-export const SuccessSignupModal = () => {
-    /** 쿼리를 이용한 모달 팝업 컨트롤 */
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [isShow, setIsShow] = useState(false);
-
-    let closeModal = () => {
-        if (searchParams.get("modal") === "success-signup") {
-            searchParams.delete('modal');
-            setSearchParams(searchParams);
-        }
-    };
-
-    useEffect(() => {
-        if (searchParams.get("modal") === "success-signup") {
-            setIsShow(true);
-        } else { setIsShow(false) }
-    },[searchParams]);
-
+export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Dispatch<React.SetStateAction<boolean>> }) => {
+    const closeModal = () => props.setIsShow(false);
     return (
         <>
-            <Transition appear show={isShow} as={Fragment}>
+            <Transition appear show={props.isShow} as={Fragment}>
                 <Dialog as="div" className="relative z-20" onClose={closeModal}>
                     <Transition.Child
                         as={Fragment}
@@ -55,7 +39,7 @@ export const SuccessSignupModal = () => {
                                     </div>
                                     <div
                                         className="w-[160px] flex justify-center cursor-pointer
-                                        rounded-16px p-4px bg-orange-500 text-white m-auto"
+                                        rounded-[8px] p-4px bg-orange-500 text-white m-auto"
                                         onClick={closeModal}
                                     >
                                         확인

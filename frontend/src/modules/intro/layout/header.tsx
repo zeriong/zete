@@ -102,8 +102,9 @@ export const Header = ()=> {
                     }
                 </div>
                 <div className="flex max-lg:flex-col gap-32px max-lg:gap-20px text-lg font-bold justify-start w-full text-gray-700 ">
-                    {menuNames.map(menu => (
+                    {menuNames.map((menu, i) => (
                         <Link
+                            key={i}
                             to={menu.to}
                             className="justify-start hover:scale-105 hover:text-orange-800 ease-in-out duration-150"
                             onClick={() => setOpenMenu(false)}

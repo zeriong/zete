@@ -24,7 +24,7 @@ export const MemoInfoPopover = () => {
 
     return (
         <div className="w-auto max-w-sm">
-            <Popover className="relative h-28px">
+            <Popover className="relative h-28px z-50">
                 {({ open, close }) => (
                     <>
                         <Popover.Button
@@ -43,7 +43,7 @@ export const MemoInfoPopover = () => {
                             leaveFrom="opacity-100 translate-y-0"
                             leaveTo="opacity-0 translate-y-1"
                         >
-                            <Popover.Panel className="absolute z-10 mt-3 w-[180px] right-0 px-0 lg:max-w-lg max-md:w-[160px]">
+                            <Popover.Panel className="absolute mt-3 w-[180px] right-0 px-0 lg:max-w-lg max-md:w-[160px]">
                                 <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                     <div className="relative bg-white p-3">
                                         <div className="text-lg font-medium text-gray-900 p-1 mb-1 cursor-default">

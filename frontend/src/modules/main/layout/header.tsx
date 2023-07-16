@@ -34,7 +34,7 @@ export const Header = () => {
                     <div className='hidden md:block'>
                         <SearchMemo/>
                     </div>
-                    <div className="relative flex justify-end">
+                    <div className="relative flex justify-end z-50">
                         <MemoInfoPopover/>
                     </div>
                 </div>

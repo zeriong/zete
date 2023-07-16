@@ -1,7 +1,7 @@
 import {store} from "../../store";
 import axios, {AxiosRequestConfig} from "axios";
 import {sendRefreshAccessToken, SET_LOGOUT} from "../../store/slices/auth.slice";
-import {AuthApiFactory, MemoApiFactory, OpenAiApiFactory, UserApiFactory} from "../../openapi";
+import {AuthApiFactory, MemoApiFactory, OpenAiApiFactory, UserApiFactory} from "../../openapi/generated";
 
 const API_URL = "http://localhost:4000";
 export const REFRESH_TOKEN_PATH = "/auth/refresh";
@@ -28,8 +28,8 @@ export const InitApi = () => {
     instance.interceptors.request.use(
         (config) => {
         // @ts-ignore
-        config.headers.Authorization = `Bearer ${store.getState().auth.data.accessToken}`
-        return config
+        config.headers.Authorization = `Bearer ${store.getState().auth.data.accessToken}`;
+        return config;
     });
 
     instance.interceptors.response.use(

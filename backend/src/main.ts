@@ -2,14 +2,28 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
-import { useOpenApi } from './openApi';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 function bootstrap() {
   (async () => {
     try {
       const app = await NestFactory.create(AppModule);
 
-      await useOpenApi(app);
+      /** Swagger */
+      const config = new DocumentBuilder()
+        .setTitle('Cats example')
+        .setDescription('The cats API description')
+        .setVersion('v1')
+        .build();
+      const document = SwaggerModule.createDocument(app, config, {
+        // 프론트의 코드젠 전략을 위한 operationId 커스텀
+        operationIdFactory: (controllerKey, methodKey) => `${methodKey}`,
+      });
+      if (process.env.NODE_ENV !== 'production') {
+        SwaggerModule.setup('api-docs', app, document, {
+          yamlDocumentUrl: 'api-yaml',
+        });
+      }
 
       app.enableCors({
         origin: 'http://localhost:3000',

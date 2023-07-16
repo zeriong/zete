@@ -8,7 +8,7 @@ import {
     CreateCateInput,
     GetMemosInput,
     Memo,
-} from "../../openapi";
+} from "../../openapi/generated";
 import {store} from "../index";
 import {Api} from "../../common/libs/api";
 import {showAlert} from "./alert.slice";
@@ -130,7 +130,7 @@ export const memoSlice = createSlice({
                     tag.cateId = Number(tag.cateId);
                     return tag
                 }) || [],
-            }));
+            })).sort((a, b) => a.cateName > b.cateName ? 1 : -1);
             state.data.memosCount = payload.memosCount;
             state.data.importantMemoCount = payload.importantMemoCount;
         },

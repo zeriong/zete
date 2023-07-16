@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {SuccessSignupModal} from "../../../common/components/modals/SuccessSignupModal";
 import {SignupModal} from "../../../common/components/modals/SignupModal";
 import {SigninModal} from "../../../common/components/modals/SigninModal";
@@ -22,6 +22,7 @@ export const Home = ()=> {
     const dispatch = useDispatch<AppDispatch>();
     const isLoggedIn = useSelector((state: RootState) => (state.auth.data.isLoggedIn));
     const { data: { name } } = useSelector((state: RootState) => (state.user));
+    const [modalControl, setModalControl] = useState(false);
 
     useEffect(() => {
         if (isLoggedIn) {
@@ -88,8 +89,8 @@ export const Home = ()=> {
                         />
                     </figure>
                 </div>
-            <SuccessSignupModal/>
-            <SignupModal/>
+            <SuccessSignupModal isShow={modalControl} setIsShow={setModalControl}/>
+            <SignupModal successControl={setModalControl}/>
             <SigninModal/>
         </>
     );

@@ -15,7 +15,7 @@ import {useHorizontalScroll} from "../../../../hooks/useHorizontalScroll";
 import {showAlert} from "../../../../store/slices/alert.slice";
 import {refreshMemos, refreshTargetMemo} from "../../../../store/slices/memo.slice";
 import {useForm} from "react-hook-form";
-import {UpdateMemoInput} from "../../../../openapi";
+import {UpdateMemoInput} from "../../../../openapi/generated";
 import {Api} from "../../../../common/libs/api";
 
 interface UpdateFormInterface {
@@ -26,6 +26,7 @@ interface UpdateFormInterface {
 export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const memoTextarea = useRef<HTMLTextAreaElement>(null);
     const tagsInput = useRef<HTMLInputElement>(null);
+    const typingTimout = useRef<NodeJS.Timeout>(null);
 
     const { data } = useSelector((state:RootState) => state.memo);
     const {
@@ -41,6 +42,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
 
     const [isShow, setIsShow] = useState<boolean>(false);
     const [isImportant, setIsImportant] = useState<boolean>(false);
+    const [isUpdate, setIsUpdate] = useState(false);
 
     const form = useForm<UpdateFormInterface>();
 
@@ -51,15 +53,17 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
 
     const handleImportant = () => setIsImportant(!isImportant);
 
-    const memoModifier = () => {
+    const handleUpdate = () => {
         closeModal();
-        if (form.getValues('update.memo.title') === '' && form.getValues('update.memo.content') === '') {
-            return showAlert('메모수정이 취소되었습니다.');
-        }
+        const titleDeleteSpace = form.getValues('update.memo.title').replace(/ /g,"");
+        const contentDeleteSpace = form.getValues('update.memo.content').replace(/ /g,"");
+
+        if (titleDeleteSpace === '' && contentDeleteSpace === '') return showAlert('메모수정이 취소되었습니다.');
 
         const targetMemo = data.memos.find(memo => memo.id === memoId);
         const cateId = form.getValues('cateId') === 0 ? null : Number(form.getValues('cateId'));
-        const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags').some(inputTag => inputTag.tagName === tag.tagName)).length
+        const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags')
+            .some(inputTag => inputTag.tagName === tag.tagName)).length;
 
         // 수정사항이 없는 경우 요청X
         if (
@@ -100,23 +104,94 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             important: isImportant,
         }
 
+        if (isUpdate) refreshTargetMemo(memoId);
+        else {
+            Api().memo.updateMemo({memo, newTags, deleteTagIds})
+                .then((res)=>{
+                    if (res.data.success) refreshTargetMemo(memoId);
+                    else {
+                        console.log(res.data.error);
+                        refreshMemos({
+                            search: '',
+                            offset: 0,
+                            limit: data.memos.length,
+                            menuQueryStr,
+                            cateQueryStr: Number(cateQueryStr) || null,
+                            tagQueryStr,
+                        });
+                        showAlert(res.data.error);
+                    }
+                }).catch(e => console.log(e));
+        }
+
+        setIsUpdate(false);
+    }
+
+    const autoUpdateRequest = () => {
+        const titleDeleteSpace = form.getValues('update.memo.title').replace(/ /g,"");
+        const contentDeleteSpace = form.getValues('update.memo.content').replace(/ /g,"");
+
+        if (titleDeleteSpace === '' && contentDeleteSpace === '') return;
+
+        const targetMemo = data.memos.find(memo => memo.id === memoId);
+        const cateId = form.getValues('cateId') === 0 ? null : Number(form.getValues('cateId'));
+        const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags')
+            .some(inputTag => inputTag.tagName === tag.tagName)).length;
+
+        // 수정사항이 없는 경우 요청X
+        if (
+            form.getValues('update.memo.title') === targetMemo.title &&
+            form.getValues('update.memo.content') === targetMemo.content &&
+            cateId === targetMemo.cateId &&
+            isImportant === targetMemo.important &&
+            (changedTagLength === targetMemo.tag.length ||
+                (targetMemo.tag.length === 0 && form.getValues('update.newTags').length === 0))
+        ) return
+
+        // 삭제, 추가할 태그분류
+        let newTags: { tagName: string }[];
+        let deleteTagIds: number[];
+
+        // 카테고리 변경시 태그의 소속 변경
+        if (targetMemo.tag.length === 0) {
+            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
+            deleteTagIds = [];
+        } else if (targetMemo.cateId !== cateId) {
+            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
+            deleteTagIds = targetMemo.tag.map(tag => tag.id);
+        } else {
+            newTags = form.getValues('update.newTags')
+                .filter(tag => !targetMemo.tag.some(target => target.tagName === tag.tagName))
+                .map(tag => ({ tagName: tag.tagName }));
+
+            deleteTagIds = targetMemo.tag
+                .filter(target => !form.getValues('update.newTags').some(tag => tag.tagName === target.tagName))
+                .map(tag => tag.id);
+        }
+
+        const memo = {
+            id: targetMemo.id,
+            cateId,
+            title: form.getValues('update.memo.title').replace(/\n/g, '<br/>'),
+            content: form.getValues('update.memo.content').replace(/\n/g, '<br/>'),
+            important: isImportant,
+        }
+
         Api().memo.updateMemo({memo, newTags, deleteTagIds})
             .then((res)=>{
-                if (res.data.success) {
-                    refreshTargetMemo(memoId);
-                } else {
-                    console.log(res.data.error);
-                    refreshMemos({
-                        search: '',
-                        offset: 0,
-                        limit: data.memos.length,
-                        menuQueryStr,
-                        cateQueryStr: Number(cateQueryStr) || null,
-                        tagQueryStr,
-                    });
-                    showAlert(res.data.error);
-                }
+                if (res.data.success) setIsUpdate(true);
+                else setIsUpdate(false);
             }).catch(e => console.log(e));
+    }
+
+    const handleTypingUpdate = () => {
+        if (typingTimout.current != null) {
+            clearTimeout(typingTimout.current);
+            typingTimout.current = null;
+        }
+        if (typingTimout.current === null) {
+            typingTimout.current = setTimeout(() => autoUpdateRequest(), 3000);
+        }
     }
 
     const handleAddTagFormSubmit = (e) => {
@@ -128,9 +203,8 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         if (!exists) {
             form.setValue('update.newTags', [ ...tags, { tagName: input.value } ]);
             input.value = ''
-        } else {
-            showAlert('이미 존재하는 태그명 입니다.');
         }
+        else showAlert('이미 존재하는 태그명 입니다.');
     }
 
     const handleDeleteTag = (tagName) => {
@@ -152,12 +226,10 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                 form.setValue('cateId', targetMemo.cateId === null ? 0 : targetMemo.cateId);
 
                 setIsImportant(targetMemo.important);
-            } else {
-                closeModal();
             }
-        } else {
-            setIsShow(false);
+            else closeModal();
         }
+        else setIsShow(false);
     },[modalQueryStr, data])
 
     return (
@@ -165,7 +237,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             <Dialog
                 as="div"
                 className="relative z-40"
-                onClose={memoModifier}
+                onClose={handleUpdate}
             >
                 <Transition.Child
                     as={Fragment}
@@ -204,6 +276,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                     {...form.register('update.memo.title', {
                                                         required: false,
                                                         maxLength: 64,
+                                                        onChange: handleTypingUpdate
                                                     })}
                                                     rows={1}
                                                     placeholder='제목'
@@ -223,6 +296,7 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                     {...form.register('update.memo.content', {
                                                         required: false,
                                                         maxLength: 65535,
+                                                        onChange: handleTypingUpdate,
                                                     })}
                                                     rows={1}
                                                     placeholder='메모 작성...'

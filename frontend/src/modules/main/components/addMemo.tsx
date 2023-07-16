@@ -8,7 +8,7 @@ import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
 import {Api} from "../../../common/libs/api";
 import {useForm} from "react-hook-form";
 import {showAlert} from "../../../store/slices/alert.slice";
-import {CreateMemoInput} from "../../../openapi";
+import {CreateMemoInput} from "../../../openapi/generated";
 import {ADD_MEMO} from "../../../store/slices/memo.slice";
 
 export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>) => {
@@ -49,8 +49,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
 
     const handleAddMemoAction = () => {
         if (!form.getValues('content') && !form.getValues('content')) {
-            showAlert('메모를 작성해주세요');
-            return
+            return showAlert('메모를 작성해주세요');
         }
 
         const replaceMemoContent: CreateMemoInput = {
@@ -62,7 +61,6 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
         Api().memo.createMemo({...replaceMemoContent, important: isImportant})
             .then((res) => {
                 if (res.data.success) {
-                    console.log('메모추가데이터',res.data)
                     if (Number(res.data.savedMemo.cateId) === Number(cateQueryStr) || cateQueryStr === null) {
                         dispatch(ADD_MEMO({...res.data.savedMemo}));
                     }
@@ -71,10 +69,8 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
                     setIsImportant(false);
                     // memoTextarea.current.style.height = 'auto';
                     // titleTextarea.current.style.height = 'auto';
-                } else {
-                    showAlert(res.data.error);
-                    console.log(res.data.error);
                 }
+                else showAlert(res.data.error);
             })
             .catch(e => console.log(e));
     }
@@ -95,9 +91,7 @@ export const AddMemo = (props: React.DetailedHTMLProps<React.HTMLAttributes<HTML
 
     const handleDeleteTag = (tagName) => {
         const tags = form.getValues('tags');
-        if (tags) {
-            form.setValue('tags', tags.filter(tag => tag.tagName !== tagName));
-        }
+        if (tags) form.setValue('tags', tags.filter(tag => tag.tagName !== tagName));
     }
 
     useEffect(() => {

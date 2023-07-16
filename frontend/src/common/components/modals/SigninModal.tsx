@@ -20,7 +20,20 @@ export const SigninModal = () => {
     // 쿼리를 이용한 모달 팝업 컨트롤
     const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState(false);
+    const [PwShow, setPwShow] = useState(false);
+    const [occurError, setOccurError] = useState('');
     const navigate = useNavigate();
+
+    // 폼 컨트롤
+    const {
+        reset,
+        setValue,
+        getValues,
+        register,
+        handleSubmit,
+        formState: { errors, isValid },
+    } = useForm<FormData>({ mode: 'onChange' });
+
     const setRouterQuery = (key: string, value:string) => {
         searchParams.set(key, value);
         setSearchParams(searchParams);
@@ -39,26 +52,6 @@ export const SigninModal = () => {
             reset();
         }
     };
-
-    useEffect(() => {
-        if (searchParams.get("modal") === "sign-in") {
-            setIsShow(true);
-        } else { setIsShow(false) }
-        console.log(typeof loading)
-    },[searchParams]);
-
-    // 폼 컨트롤
-    const {
-        reset,
-        setValue,
-        getValues,
-        register,
-        handleSubmit,
-        formState: { errors, isValid },
-    } = useForm<FormData>({ mode: 'onChange' });
-
-    const [PwShow, setPwShow] = useState(false);
-    const [occurError, setOccurError] = useState('');
 
     // submit
     const onSubmit = handleSubmit(async () => {
@@ -85,6 +78,12 @@ export const SigninModal = () => {
                 console.log(e);
             });
     });
+
+    useEffect(() => {
+        if (searchParams.get("modal") === "sign-in") {
+            setIsShow(true);
+        } else { setIsShow(false) }
+    },[searchParams]);
 
     return (
         <>

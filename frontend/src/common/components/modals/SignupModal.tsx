@@ -18,15 +18,34 @@ type FormData = {
     mobile: string;
 };
 
-export const SignupModal = () => {
-    /** 쿼리를 이용한 모달 팝업 컨트롤 */
+export const SignupModal = (props: { successControl: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState(false);
+    const [PwShow, setPwShow] = useState(false);
+    const [PwConfirmShow, setPwConfirmShow] = useState(false);
+    const [occurError, setOccurError] = useState('');
+
+    /** State Management */
+    const { loading } = useSelector((state: RootState) => (state.auth));
+
+    /** 폼 컨트롤 */
+    const {
+        setValue,
+        getValues,
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors, isValid },
+    } = useForm<FormData>({ mode: 'onChange' });
+
+    // passwordConfirm === password 검증을 위한 변수
+    let password = watch("password", "");
 
     const setRouterQuery = (key: string, value:string) => {
         searchParams.set(key, value);
         setSearchParams(searchParams);
     };
+
     let closeModal = () => {
         if (searchParams.get("modal") === "sign-up") {
             searchParams.delete('modal');
@@ -40,32 +59,10 @@ export const SignupModal = () => {
         }
     };
 
-    /** State Management */
-    const { loading } = useSelector((state: RootState) => (state.auth));
-
-
     useEffect(() => {
-        if (searchParams.get("modal") === "sign-up") {
-            setIsShow(true);
-        } else { setIsShow(false) }
+        if (searchParams.get("modal") === "sign-up") setIsShow(true);
+        else setIsShow(false);
     },[searchParams]);
-
-    /** 폼 컨트롤 */
-    const {
-        setValue,
-        getValues,
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors, isValid },
-    } = useForm<FormData>({ mode: 'onChange' });
-
-    const [PwShow, setPwShow] = useState(false);
-    const [PwConfirmShow, setPwConfirmShow] = useState(false);
-    const [occurError, setOccurError] = useState('');
-
-    // passwordConfirm === password 검증을 위한 변수
-    let password = watch("password", "");
 
     /** submit */
     const onSubmit = handleSubmit(async () => {
@@ -79,17 +76,14 @@ export const SignupModal = () => {
             },)
             .then((res) => {
                 if (res.data.success) {
-                    console.log(res.data);
                     closeModal();
-                    setRouterQuery("modal","success-signup");
-                } else {
-                    setOccurError(res.data.error);
+                    props.successControl(true);
                 }
+                else console.log(res.data.error);
             })
-            .catch((e) => {
-                console.log(e);
-            });
+            .catch(e => console.log(e));
     });
+
     return (
         <>
             <Transition appear show={isShow} as={Fragment}>
@@ -206,7 +200,7 @@ export const SignupModal = () => {
                                                 placeholder="휴대폰번호를 입력해주세요."
                                                 onInput={(e) => {
                                                     let val = e.currentTarget.value.substring(0, 13).replace(/[^0-9]/g, '')
-                                                        .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3").replace(/(\-{1,2})$/g, "");
+                                                        .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3").replace(/(-{1,2})$/g, "");
                                                     setValue("mobile", val);
                                                 }}
                                             />
@@ -224,6 +218,74 @@ export const SignupModal = () => {
                                             }}
                                         />
                                     </form>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
+        </>
+    );
+};
+
+export const SuccessSignupModal = () => {
+    /** 쿼리를 이용한 모달 팝업 컨트롤 */
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [isShow, setIsShow] = useState(false);
+
+    let closeModal = () => {
+        if (searchParams.get("modal") === "success-signup") {
+            searchParams.delete('modal');
+            setSearchParams(searchParams);
+        }
+    };
+
+    useEffect(() => {
+        if (searchParams.get("modal") === "success-signup") {
+            setIsShow(true);
+        } else { setIsShow(false) }
+    },[searchParams]);
+
+    return (
+        <>
+            <Transition appear show={isShow} as={Fragment}>
+                <Dialog as="div" className="relative z-20" onClose={closeModal}>
+                    <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                    >
+                        <div className="fixed inset-0 bg-black bg-opacity-40" />
+                    </Transition.Child>
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-24px md:p-32px text-left align-middle shadow-xl transition-all">
+                                    <div className="text-24 mb-20px">
+                                        회원가입 성공!
+                                    </div>
+                                    <div className="mb-24px">
+                                        Zeriong Kepp 서비스를 무료로 이용해보세요.
+                                    </div>
+                                    <div
+                                        className="w-[160px] flex justify-center cursor-pointer
+                                        rounded-[8px] p-4px bg-orange-500 text-white m-auto"
+                                        onClick={closeModal}
+                                    >
+                                        확인
+                                    </div>
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>
