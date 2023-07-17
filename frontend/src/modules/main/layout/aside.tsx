@@ -12,14 +12,18 @@ import {Tag} from "../../../openapi/generated";
 export const Aside = () => {
     const dispatch = useDispatch();
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
-
     const { data } = useSelector((state: RootState) => state.memo);
 
+    const toggleMenu = () => dispatch(TOGGLE_SHOW_MENU());
+
+    // 리사이즈 상태비교를 통한 최적화
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth > 767) {
+                if (showMenu) return;
                 dispatch(SET_SHOW_MENU(true));
             } else {
+                if (!showMenu) return;
                 dispatch(SET_SHOW_MENU(false));
             }
         }
@@ -28,64 +32,66 @@ export const Aside = () => {
         return () => {
             window.removeEventListener('resize', handleResize);
         }
-    }, [dispatch]);
+    }, [dispatch, showMenu]);
 
-    const toggleMenu = () => dispatch(TOGGLE_SHOW_MENU());
+    // 모바일사이즈로 렌더링되는 경우 사이드바 숨기기
+    useEffect(() => {
+        if (window.innerWidth <= 767) dispatch(SET_SHOW_MENU(false));
+    },[]);
 
-    return (
-        <>
-            <section
-                className={`${showMenu ? "opacity-50 visible" : "opacity-0 invisible"}
+    return <>
+        <section
+            className={`${showMenu ? "opacity-50 visible" : "opacity-0 invisible"}
                 z-50 w-full h-full left-0 top-0 fixed bg-black opacity-0 hidden max-md:block ease-in-out duration-300`}
-                onClick={toggleMenu}
-            />
-            <nav
-                className={`${showMenu ? "left-0" : "-left-asideWidth"}
+            onClick={toggleMenu}
+        />
+        <nav
+            className={`${showMenu ? "left-0" : "-left-asideWidth"}
                 fixed w-asideWidth bg-white z-50 md:z-20 ease-in-out duration-300 pt-0 md:pt-headerHeight h-full overflow-auto scroll-hidden border-r border-zete-light-gray-400`}
-            >
-                <CustomScroller>
-                    <div className="flex flex-col h-full min-h-full w-full p-14px text-zete-dark-500 font-light text-14">
-                        <ul className='flex flex-col justify-center gap-4px'>
+        >
+            <CustomScroller>
+                <div className="flex flex-col h-full min-h-full w-full p-14px text-zete-dark-500 font-light text-14">
+                    <ul className='flex flex-col justify-center gap-4px'>
+                        <CateItemList
+                            to={{ pathname: '/memo' }}
+                            iconComponent={AllIcon}
+                            iconClassName='mr-14px w-20px'
+                            cateName='전체메모'
+                            cateId={null}
+                            count={data.memosCount}
+                        />
+                        <CateItemList
+                            to={{ pathname: '/memo', search: '?menu=important' }}
+                            iconComponent={StarIcon}
+                            iconClassName='mr-14px w-20px'
+                            cateName='중요메모'
+                            cateId={null}
+                            count={data.importantMemoCount}
+                        />
+                    </ul>
+                    <p className='text-zete-dark-300 text-11 font-light pb-14px pt-17px pl-12px'>
+                        카테고리
+                    </p>
+                    <ul className='grid gap-4px'>
+                        {data.cate.map((cate, idx) => (
                             <CateItemList
-                                to={{ pathname: '/memo' }}
-                                iconComponent={AllIcon}
-                                iconClassName='mr-14px w-20px'
-                                cateName='전체메모'
-                                cateId={null}
-                                count={data.memosCount}
+                                key={idx}
+                                to={{ pathname: '/memo', search: `?cate=${cate.id}` }}
+                                iconComponent={CategoryIcon}
+                                iconClassName='mr-10px mt-4px min-w-[21px]'
+                                cateName={cate.cateName}
+                                cateId={String(cate.id)}
+                                count={cate.memoCount}
+                                tags={cate.tag}
                             />
-                            <CateItemList
-                                to={{ pathname: '/memo', search: '?menu=important' }}
-                                iconComponent={StarIcon}
-                                iconClassName='mr-14px w-20px'
-                                cateName='중요메모'
-                                cateId={null}
-                                count={data.importantMemoCount}
-                            />
-                        </ul>
-                        <p className='text-zete-dark-300 text-11 font-light pb-14px pt-17px pl-12px'>
-                            카테고리
-                        </p>
-                        <ul className='grid gap-4px'>
-                            {data.cate.map((cate, idx) => (
-                                <CateItemList
-                                    key={idx}
-                                    to={{ pathname: '/memo', search: `?cate=${cate.id}` }}
-                                    iconComponent={CategoryIcon}
-                                    iconClassName='mr-10px mt-4px min-w-[21px]'
-                                    cateName={cate.cateName}
-                                    cateId={String(cate.id)}
-                                    count={cate.memoCount}
-                                    tags={cate.tag}
-                                />
-                            ))}
-                        </ul>
-                        <CateModifyModal buttonText={data.cate.length > 0 ? '카테고리 수정' : '카테고리 추가'}/>
-                    </div>
-                </CustomScroller>
-            </nav>
-        </>
-    )
+                        ))}
+                    </ul>
+                    <CateModifyModal buttonText={data.cate.length > 0 ? '카테고리 수정' : '카테고리 추가'}/>
+                </div>
+            </CustomScroller>
+        </nav>
+    </>
+    
 }
 
 const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string, cateName: string, cateId: string, count: number, tags?: Tag[] }) => {

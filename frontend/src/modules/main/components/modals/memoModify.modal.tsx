@@ -54,9 +54,11 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const handleImportant = () => setIsImportant(!isImportant);
 
     const handleUpdate = () => {
+        clearTimeout(typingTimout.current);
+        typingTimout.current = null;
         closeModal();
-        const titleDeleteSpace = form.getValues('update.memo.title').replace(/ /g,"");
-        const contentDeleteSpace = form.getValues('update.memo.content').replace(/ /g,"");
+        const titleDeleteSpace = form.getValues('update.memo.title').replace(/\s*|\n/g,"");
+        const contentDeleteSpace = form.getValues('update.memo.content').replace(/\s*|\n/g,"");
 
         if (titleDeleteSpace === '' && contentDeleteSpace === '') return showAlert('메모수정이 취소되었습니다.');
 
@@ -67,13 +69,13 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
 
         // 수정사항이 없는 경우 요청X
         if (
-            form.getValues('update.memo.title') === targetMemo.title &&
-            form.getValues('update.memo.content') === targetMemo.content &&
+            form.getValues('update.memo.title') === targetMemo.title.replace(/<br\/>/g, '\n') &&
+            form.getValues('update.memo.content') === targetMemo.content.replace(/<br\/>/g, '\n') &&
             cateId === targetMemo.cateId &&
             isImportant === targetMemo.important &&
             (changedTagLength === targetMemo.tag.length ||
             (targetMemo.tag.length === 0 && form.getValues('update.newTags').length === 0))
-        ) return
+        ) return;
 
         // 삭제, 추가할 태그분류
         let newTags: { tagName: string }[];

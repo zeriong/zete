@@ -106,24 +106,3 @@ export const usePaginationObservers = () => {
     }
     return { paginationDivObsRef }
 }
-
-export const useCloneDivObserver = () => {
-    const cloneMainRef = useRef(null);
-    const cloneRef = useRef(null);
-
-    useEffect(() => { //addMemo-clone-box 옵저버생성
-        if (cloneMainRef.current) {
-            const observer = new ResizeObserver((entries) => {
-                entries.forEach(entry => {
-                    cloneRef.current.style.height = `${entry.contentRect.height}px`;
-                    cloneRef.current.style.width = `${entry.contentRect.width}px`;
-                });
-            })
-            observer.observe(cloneMainRef.current);
-
-            return () => observer.disconnect();
-        }
-    },[cloneMainRef.current]);
-
-    return { cloneMainRef, cloneRef }
-}

@@ -30,7 +30,6 @@ module.exports = {
           light: '#E6E6E6',
           DEFAULT: '#C6C7CD', // f9d270
           deep: '#92929A',
-
         },
         'zete': {
           'scroll-gray': '#a0a0a0',
@@ -52,6 +51,12 @@ module.exports = {
           'light-gray-300': '#eeeeee',
           'light-gray-200': '#f2f2f2',
           'light-gray-100': '#f5f5f5',
+          'gpt-black': '#202123',
+          'gpt-500': '#19C37D',
+          'gpt-400': '#27bd7f',
+          'gpt-300': '#42be8b',
+          'gpt-200': '#70c9a5',
+          'gpt-100': '#a0e3c7',
         }
       },
       width: {

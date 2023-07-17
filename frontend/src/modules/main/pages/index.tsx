@@ -15,7 +15,7 @@ import {
     refreshMemos,
     refreshTargetMemo
 } from "../../../store/slices/memo.slice";
-import {useCloneDivObserver, usePaginationObservers} from "../../../hooks/useObservers";
+import {usePaginationObservers} from "../../../hooks/useObservers";
 
 export const MemoMain = () => {
     const intervalRef = useRef<NodeJS.Timeout>(null);
@@ -26,7 +26,6 @@ export const MemoMain = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { data } = useSelector((state: RootState) => state.memo);
     const { paginationDivObsRef } = usePaginationObservers();
-    const { cloneRef, cloneMainRef } = useCloneDivObserver();
     const {
         modalQueryStr,
         menuQueryStr,
@@ -60,6 +59,7 @@ export const MemoMain = () => {
         refreshTargetMemo(memoId);
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const convertCols = (n:number) => {
         if (!data.memos) return
         if (menuQueryStr) {
@@ -103,37 +103,38 @@ export const MemoMain = () => {
     return (
         loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
             <CustomScroller>
-                <section className='relative top-0 flex gap-28px w-full p-16px browser-width-900px:p-30px'>
+                <section className='relative top-0 gap-28px w-full p-16px browser-width-900px:p-30px'>
                     {!menuQueryStr && (
-                        <div ref={cloneRef} className='absolute left-16px top-16px mb-16px mb-16px browser-width-900px:mb-30px browser-width-900px:left-30px browser-width-900px:top-30px z-20'>
+                        <div className='relative flex justify-center mt-6px mb-22px browser-width-900px:mb-30px browser-width-900px:mt-0'>
                             <AddMemo/>
                         </div>
                     )}
                     <Masonry
                         breakpointCols={masonryCols}
-                        className='my-masonry-grid flex gap-x-16px browser-width-900px:gap-x-30px w-full browser-width-900px:w-auto'
+                        className='my-masonry-grid flex justify-center gap-x-16px browser-width-900px:gap-x-30px w-full browser-width-900px:w-auto'
                         columnClassName='my-masonry-grid_column'
                     >
-                        {!menuQueryStr && (
-                            <div ref={cloneMainRef} className='mb-16px w-full browser-width-900px:mb-30px browser-width-900px:w-[300px] min-h-[234px]'/>
-                        )}
                         {data.memos?.map((memo) => (
                             <div
                                 key={memo.id}
-                                className='relative'
+                                className='relative w-full'
                             >
                                 <div
-                                    className='mb-16px browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
+                                    className='mb-16px w-full browser-width-900px:w-[300px] browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
                                     onClick={() => memoModifier(memo.id)}
                                 >
                                     <article
-                                        className='relative min-w-0 w-full browser-width-900px:w-[300px] flex flex-col justify-between border
-                                        border-zete-light-gray-500 rounded-[8px] p-20px min-h-[212px] bg-zete-primary-200'
+                                        className='relative flex flex-col justify-between border w-full
+                                        border-zete-light-gray-500 rounded-[8px] px-18px py-14px min-h-[212px] bg-zete-primary-200'
                                     >
-                                        <p
-                                            className='text-zete-gray-500 font-light text-18 text-start w-full mb-20px pr-30px'
-                                            dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(memo.title)}}
-                                        />
+                                        {memo.title ? (
+                                            <p
+                                                className='text-zete-gray-500 font-light text-20 text-start w-full mb-10px pr-30px'
+                                                dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(memo.title)}}
+                                            />
+                                        ) : (
+                                            <p className='min-h-[30px] w-full mb-10px pr-30px'/>
+                                        )}
                                         <div className='items-end h-full w-full line-clamp-[14]'>
                                             <p
                                                 className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
@@ -152,13 +153,13 @@ export const MemoMain = () => {
                                             </div>
                                         </div>
                                     </article>
-                                    <div className='absolute bottom-16px right-21px '>
+                                    <div className='absolute bottom-10px right-18px'>
                                         <SavedMemoMenuPopover memoId={memo.id}/>
                                     </div>
                                 </div>
                                 <button
                                     type='button'
-                                    className='absolute top-18px right-20px'
+                                    className='absolute top-13px right-14px'
                                     onClick={() => importantConverter(memo.id)}
                                 >
                                     {memo.important ? <FillStarIcon/> : <StarIcon/>}
