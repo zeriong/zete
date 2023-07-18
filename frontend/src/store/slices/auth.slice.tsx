@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Api} from "../../common/libs/api";
+import {Api} from "../../api";
 
 export interface AuthState {
     data: {

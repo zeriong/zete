@@ -40,6 +40,7 @@ module.exports = {
           'primary-300': '#FFE794',
           'primary-200': '#fff8d9',
           'tagBlack': '#313131',
+          'dark': '#2f2f2f',
           'dark-500': '#303030',
           'dark-400': '#383838',
           'dark-300': '#464646',

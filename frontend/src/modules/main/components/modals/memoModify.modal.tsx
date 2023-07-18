@@ -8,23 +8,22 @@ import {
     PlusIcon,
     StarIcon,
 } from "../../../../assets/vectors";
-import {handleInputChange} from "../../../../common/libs/common.lib";
+import {handleAddTagSubmit, handleTagInput} from "../../../../common/libs";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {useHorizontalScroll} from "../../../../hooks/useHorizontalScroll";
 import {showAlert} from "../../../../store/slices/alert.slice";
-import {refreshMemos, refreshTargetMemo} from "../../../../store/slices/memo.slice";
+import {refreshMemos, refreshTargetMemo} from "../../../../api/content";
 import {useForm} from "react-hook-form";
 import {UpdateMemoInput} from "../../../../openapi/generated";
-import {Api} from "../../../../common/libs/api";
+import {Api} from "../../../../api";
 
 interface UpdateFormInterface {
     update: UpdateMemoInput;
     cateId: number | null;
 }
 
-export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
-    const memoTextarea = useRef<HTMLTextAreaElement>(null);
+export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
     const tagsInput = useRef<HTMLInputElement>(null);
     const typingTimout = useRef<NodeJS.Timeout>(null);
 
@@ -56,7 +55,9 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
     const handleUpdate = () => {
         clearTimeout(typingTimout.current);
         typingTimout.current = null;
+
         closeModal();
+
         const titleDeleteSpace = form.getValues('update.memo.title').replace(/\s*|\n/g,"");
         const contentDeleteSpace = form.getValues('update.memo.content').replace(/\s*|\n/g,"");
 
@@ -66,11 +67,85 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         const cateId = form.getValues('cateId') === 0 ? null : Number(form.getValues('cateId'));
         const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags')
             .some(inputTag => inputTag.tagName === tag.tagName)).length;
+        const newTagLength = form.getValues('update.newTags').filter((newTag) => !targetMemo.tag
+            .some((tag) => tag.tagName === newTag.tagName)).length;
 
         // 수정사항이 없는 경우 요청X
         if (
             form.getValues('update.memo.title') === targetMemo.title.replace(/<br\/>/g, '\n') &&
             form.getValues('update.memo.content') === targetMemo.content.replace(/<br\/>/g, '\n') &&
+            cateId === targetMemo.cateId &&
+            isImportant === targetMemo.important &&
+            newTagLength === 0 &&
+            (changedTagLength === targetMemo.tag.length ||
+            (targetMemo.tag.length === 0 && form.getValues('update.newTags').length === 0))
+        ) return;
+
+        // 삭제, 추가할 태그분류
+        let newTags: { tagName: string }[];
+        let deleteTagIds: number[];
+
+        // 카테고리 변경시 태그의 소속 변경
+        if (targetMemo.tag.length === 0) {
+            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
+            deleteTagIds = [];
+        } else if (targetMemo.cateId !== cateId) {
+            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
+            deleteTagIds = targetMemo.tag.map(tag => tag.id);
+        } else {
+            newTags = form.getValues('update.newTags')
+                .filter(tag => !targetMemo.tag.some(target => target.tagName === tag.tagName))
+                .map(tag => ({ tagName: tag.tagName }));
+
+            deleteTagIds = targetMemo.tag
+                .filter(target => !form.getValues('update.newTags').some(tag => tag.tagName === target.tagName))
+                .map(tag => tag.id);
+        }
+
+        const memo = {
+            id: targetMemo.id,
+            cateId,
+            title: form.getValues('update.memo.title').replace(/\n/g, '<br/>'),
+            content: form.getValues('update.memo.content').replace(/\n/g, '<br/>'),
+            important: isImportant,
+        };
+
+        if (isUpdate) refreshTargetMemo(memoId);
+        else {
+            Api().memo.updateMemo({memo, newTags, deleteTagIds}).then((res)=>{
+                if (res.data.success) refreshTargetMemo(memoId);
+                else {
+                    console.log(res.data.error);
+                    refreshMemos({
+                        search: '',
+                        offset: 0,
+                        limit: data.memos.length,
+                        menuQueryStr,
+                        cateQueryStr: Number(cateQueryStr) || null,
+                        tagQueryStr,
+                    });
+                    showAlert(res.data.error);
+                }
+            }).catch(e => console.log(e));
+        }
+        setIsUpdate(false);
+    }
+
+    const autoUpdateRequest = () => {
+        const titleDeleteSpace = form.getValues('update.memo.title').replace(/ /g,"");
+        const contentDeleteSpace = form.getValues('update.memo.content').replace(/ /g,"");
+
+        if (titleDeleteSpace === '' && contentDeleteSpace === '') return;
+
+        const targetMemo = data.memos.find(memo => memo.id === memoId);
+        const cateId = form.getValues('cateId') === 0 ? null : Number(form.getValues('cateId'));
+        const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags')
+            .some(inputTag => inputTag.tagName === tag.tagName)).length;
+
+        // 수정사항이 없는 경우 요청X
+        if (
+            form.getValues('update.memo.title') === targetMemo.title &&
+            form.getValues('update.memo.content') === targetMemo.content &&
             cateId === targetMemo.cateId &&
             isImportant === targetMemo.important &&
             (changedTagLength === targetMemo.tag.length ||
@@ -104,87 +179,13 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
             title: form.getValues('update.memo.title').replace(/\n/g, '<br/>'),
             content: form.getValues('update.memo.content').replace(/\n/g, '<br/>'),
             important: isImportant,
-        }
+        };
 
-        if (isUpdate) refreshTargetMemo(memoId);
-        else {
-            Api().memo.updateMemo({memo, newTags, deleteTagIds})
-                .then((res)=>{
-                    if (res.data.success) refreshTargetMemo(memoId);
-                    else {
-                        console.log(res.data.error);
-                        refreshMemos({
-                            search: '',
-                            offset: 0,
-                            limit: data.memos.length,
-                            menuQueryStr,
-                            cateQueryStr: Number(cateQueryStr) || null,
-                            tagQueryStr,
-                        });
-                        showAlert(res.data.error);
-                    }
-                }).catch(e => console.log(e));
-        }
-
-        setIsUpdate(false);
-    }
-
-    const autoUpdateRequest = () => {
-        const titleDeleteSpace = form.getValues('update.memo.title').replace(/ /g,"");
-        const contentDeleteSpace = form.getValues('update.memo.content').replace(/ /g,"");
-
-        if (titleDeleteSpace === '' && contentDeleteSpace === '') return;
-
-        const targetMemo = data.memos.find(memo => memo.id === memoId);
-        const cateId = form.getValues('cateId') === 0 ? null : Number(form.getValues('cateId'));
-        const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags')
-            .some(inputTag => inputTag.tagName === tag.tagName)).length;
-
-        // 수정사항이 없는 경우 요청X
-        if (
-            form.getValues('update.memo.title') === targetMemo.title &&
-            form.getValues('update.memo.content') === targetMemo.content &&
-            cateId === targetMemo.cateId &&
-            isImportant === targetMemo.important &&
-            (changedTagLength === targetMemo.tag.length ||
-                (targetMemo.tag.length === 0 && form.getValues('update.newTags').length === 0))
-        ) return
-
-        // 삭제, 추가할 태그분류
-        let newTags: { tagName: string }[];
-        let deleteTagIds: number[];
-
-        // 카테고리 변경시 태그의 소속 변경
-        if (targetMemo.tag.length === 0) {
-            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
-            deleteTagIds = [];
-        } else if (targetMemo.cateId !== cateId) {
-            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
-            deleteTagIds = targetMemo.tag.map(tag => tag.id);
-        } else {
-            newTags = form.getValues('update.newTags')
-                .filter(tag => !targetMemo.tag.some(target => target.tagName === tag.tagName))
-                .map(tag => ({ tagName: tag.tagName }));
-
-            deleteTagIds = targetMemo.tag
-                .filter(target => !form.getValues('update.newTags').some(tag => tag.tagName === target.tagName))
-                .map(tag => tag.id);
-        }
-
-        const memo = {
-            id: targetMemo.id,
-            cateId,
-            title: form.getValues('update.memo.title').replace(/\n/g, '<br/>'),
-            content: form.getValues('update.memo.content').replace(/\n/g, '<br/>'),
-            important: isImportant,
-        }
-
-        Api().memo.updateMemo({memo, newTags, deleteTagIds})
-            .then((res)=>{
-                if (res.data.success) setIsUpdate(true);
-                else setIsUpdate(false);
-            }).catch(e => console.log(e));
-    }
+        Api().memo.updateMemo({memo, newTags, deleteTagIds}).then((res)=>{
+            if (res.data.success) setIsUpdate(true);
+            else setIsUpdate(false);
+        }).catch(e => console.log(e));
+    };
 
     const handleTypingUpdate = () => {
         if (typingTimout.current != null) {
@@ -194,27 +195,12 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
         if (typingTimout.current === null) {
             typingTimout.current = setTimeout(() => autoUpdateRequest(), 3000);
         }
-    }
-
-    const handleAddTagFormSubmit = (e) => {
-        e.preventDefault();
-        const input = e.target[0];
-        const tags = form.getValues('update.newTags') || [];
-
-        const exists = tags.find(tag => tag.tagName === input.value);
-        if (!exists) {
-            form.setValue('update.newTags', [ ...tags, { tagName: input.value } ]);
-            input.value = ''
-        }
-        else showAlert('이미 존재하는 태그명 입니다.');
-    }
+    };
 
     const handleDeleteTag = (tagName) => {
         const tags = form.getValues('update.newTags');
-        if (tags) {
-            form.setValue('update.newTags', tags.filter(tag => tag.tagName !== tagName))
-        }
-    }
+        if (tags) form.setValue('update.newTags', tags.filter(tag => tag.tagName !== tagName));
+    };
 
     useEffect(() => {
         if (modalQueryStr) {
@@ -226,13 +212,12 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                 form.setValue('update.memo.title', targetMemo.title.replace(/<br\/>/g, '\n'));
                 form.setValue('update.memo.content', targetMemo.content.replace(/<br\/>/g, '\n'));
                 form.setValue('cateId', targetMemo.cateId === null ? 0 : targetMemo.cateId);
-
                 setIsImportant(targetMemo.important);
             }
             else closeModal();
         }
         else setIsShow(false);
-    },[modalQueryStr, data])
+    },[modalQueryStr, data]);
 
     return (
         <Transition appear show={isShow} as={Fragment}>
@@ -324,11 +309,11 @@ export const MemoModifyModal = ({ memoId }: { memoId:number }) => {
                                                 ))}
                                                 <form
                                                     className='relative flex items-center text-zete-dark-400 text-12'
-                                                    onSubmit={handleAddTagFormSubmit}
+                                                    onSubmit={(e) => handleAddTagSubmit(e, form.getValues, form.setValue, 'update.newTags')}
                                                 >
                                                     <input
                                                         ref={tagsInput}
-                                                        onChange={() => handleInputChange(tagsInput)}
+                                                        onChange={() => handleTagInput(tagsInput)}
                                                         placeholder='태그추가'
                                                         className='min-w-[50px] w-50px px-2px placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
                                                     />

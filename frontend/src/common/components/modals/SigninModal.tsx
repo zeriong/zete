@@ -7,7 +7,7 @@ import {SET_USER} from "../../../store/slices/user.slice";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../store";
 
-import {Api} from "../../libs/api";
+import {Api} from "../../../api";
 import {FuncButton} from "../funcButton";
 /** 폼항목 */
 type FormData = {
@@ -16,7 +16,6 @@ type FormData = {
 };
 
 export const SigninModal = () => {
-
     // 쿼리를 이용한 모달 팝업 컨트롤
     const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState(false);
@@ -56,10 +55,7 @@ export const SigninModal = () => {
     // submit
     const onSubmit = handleSubmit(async () => {
         const {email,password} = getValues();
-        await Api().auth.login(
-            {
-                email, password,
-            },)
+        await Api().auth.login({ email, password })
             .then((res) => {
                 console.log(res.data);
                 if (res.data.success) {
@@ -74,15 +70,12 @@ export const SigninModal = () => {
                     dispatch(SET_LOGOUT());
                 }
             })
-            .catch((e) => {
-                console.log(e);
-            });
+            .catch((e) => console.log(e));
     });
 
     useEffect(() => {
-        if (searchParams.get("modal") === "sign-in") {
-            setIsShow(true);
-        } else { setIsShow(false) }
+        if (searchParams.get("modal") === "sign-in") setIsShow(true);
+        else setIsShow(false);
     },[searchParams]);
 
     return (

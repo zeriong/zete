@@ -1,7 +1,7 @@
 import {SearchIcon} from "../../../assets/vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
-import {resetSearch, setSearch} from "../../../store/slices/memo.slice";
+import {resetSearch, setSearch} from "../../../api/content";
 
 export const SearchMemo = () => {
     const timeout = useRef<NodeJS.Timeout>(null);

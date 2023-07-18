@@ -4,10 +4,11 @@ import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from "../../../.
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import CustomScroller from "../../../../common/components/customScroller";
-import {createCategory, deleteCategory, loadAsideData, UPDATE_CATE} from "../../../../store/slices/memo.slice";
-import {Api} from "../../../../common/libs/api";
+import {createCategory, deleteCategory, loadAsideData} from "../../../../api/content";
+import {Api} from "../../../../api";
 import {showAlert} from "../../../../store/slices/alert.slice";
 import {ConfirmButton} from "../../../../common/components/confirmButton";
+import {UPDATE_CATE} from "../../../../store/slices/memo.slice";
 
 export const CateModifyModal = (props: { buttonText: string }) => {
     const { cate } = useSelector((state: RootState) => state.memo.data);

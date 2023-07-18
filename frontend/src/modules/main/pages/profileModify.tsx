@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useForm} from "react-hook-form";
-import {Api} from "../../../common/libs/api";
+import {Api} from "../../../api";
 import {FuncButton} from "../../../common/components/funcButton";
 import {showAlert} from "../../../store/slices/alert.slice";
 import {useNavigate} from "react-router-dom";

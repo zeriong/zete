@@ -1,11 +1,11 @@
 import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from "../../../assets/vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
-import {handleInputChange, handleResizeHeight} from "../../../common/libs/common.lib";
+import {handleTagInput, handleResizeHeight, handleAddTagSubmit} from "../../../common/libs";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
-import {Api} from "../../../common/libs/api";
+import {Api} from "../../../api";
 import {useForm} from "react-hook-form";
 import {showAlert} from "../../../store/slices/alert.slice";
 import {CreateMemoInput} from "../../../openapi/generated";
@@ -27,9 +27,10 @@ export const AddMemo = () => {
     const horizonScroll = useHorizontalScroll();
 
     const [isImportant, setIsImportant] = useState<boolean>(false);
-    const [readyToMemo, setReadyToMemo] = useState(false);
+    const [readyToMemo, setReadyToMemo] = useState<boolean | number>(0);
     const [openGPT, setOpenGPT] = useState(false);
     const [gptTextInput, setGptTextInput] = useState('');
+    const [newId, setNewId] = useState(0);
 
     const form = useForm<CreateMemoInput>({ mode: 'onBlur' });
 
@@ -88,21 +89,6 @@ export const AddMemo = () => {
             .catch(e => console.log(e));
     }
 
-    const handleAddTagFormSubmit = (e) => {
-        e.preventDefault();
-        const input = e.target[0];
-        if (input.value === '') return;
-
-        const tags = form.getValues('tags') || [];
-        const exists = tags.find(tag => tag.tagName === input.value);
-
-        if (!exists) {
-            form.setValue('tags', [ ...tags, { tagName: input.value } ]);
-            input.value = '';
-        }
-        else showAlert('이미 존재하는 태그명 입니다.');
-    }
-
     const handleDeleteTag = (tagName) => {
         const tags = form.getValues('tags');
         if (tags) form.setValue('tags', tags.filter(tag => tag.tagName !== tagName));
@@ -122,7 +108,7 @@ export const AddMemo = () => {
             console.log('서브밋~');
             setGptTextInput('')
             gptTextareaRef.current.style.height = 'auto';
-            e.preventDefault()
+            e.preventDefault();
         }
     }
 
@@ -166,12 +152,12 @@ export const AddMemo = () => {
     }
 
     return (
-        <div className='relative h-auto w-full browser-width-900px:w-[500px]'>
+        <div className='relative w-full browser-width-900px:w-[500px]'>
             <div className='relative min-w-0 h-fit'>
                 <article
                     ref={memoRef}
-                    className={`relative flex flex-col justify-between border border-zete-light-gray-500 transition-all duration-300
-                    px-18px pb-10px pt-12px memo-shadow ${openGPT ? 'rounded-t-[8px] bg-white' : 'rounded-[8px] bg-zete-primary-200'}`}
+                    className={`relative flex flex-col justify-between transition-all duration-300 px-18px pb-10px pt-12px memo-shadow
+                    ${openGPT ? 'rounded-t-[8px] bg-white border-t-[10px] border-x-[10px] border-zete-gpt-100' : 'border border-zete-light-gray-500 rounded-[8px] bg-zete-primary-200'}`}
                 >
                     <div className='relative w-full h-full flex flex-col'>
                         <div className='flex flex-col w-full h-full'>
@@ -205,7 +191,7 @@ export const AddMemo = () => {
                                 className={`${readyToMemo ? 'pt-9px' : 'pt-0'} resize-none max-h-[300px] w-full bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll`}
                             />
                         </div>
-                        {readyToMemo &&
+                        {readyToMemo === true &&
                             <div className='w-full h-full'>
                                 <div onClick={() => contentTextarea.current.focus()} className='h-20px w-full'/>
                                 <div ref={horizonScroll} className='flex w-full h-full relative pb-8px overflow-y-hidden memo-custom-vertical-scroll'>
@@ -224,11 +210,11 @@ export const AddMemo = () => {
                                     ))}
                                     <form
                                         className='relative flex items-center text-zete-dark-400 text-12'
-                                        onSubmit={handleAddTagFormSubmit}
+                                        onSubmit={(e) => handleAddTagSubmit(e, form.getValues, form.setValue, 'tags')}
                                     >
                                         <input
                                             ref={tagsInput}
-                                            onChange={() => handleInputChange(tagsInput)}
+                                            onChange={() => handleTagInput(tagsInput)}
                                             placeholder='태그추가'
                                             className='min-w-[50px] w-50px px-2px placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
                                         />
@@ -267,7 +253,7 @@ export const AddMemo = () => {
                 </article>
             </div>
             {!readyToMemo &&
-                <GptBtn className={'absolute top-1/2 -translate-y-1/2 right-18px'}/>
+                <GptBtn className={`absolute right-18px ${openGPT ? 'top-[calc(50%-10px)] -translate-[calc(50%-10px)]' : 'top-1/2 -translate-y-1/2'}`}/>
             }
             <article
                 ref={gptAreaRef}
@@ -275,7 +261,7 @@ export const AddMemo = () => {
                 ${openGPT && 'h-[400px] p-10px'}`}
             >
                 <div className='flex flex-col relative w-full h-full'>
-                    <h1 className='grow text-start text-zete-gpt-black pb-50px bg-white rounded-[8px] p-8px bg-opacity-80'>
+                    <h1 className='grow text-start text-zete-dark-500 pb-60px bg-white rounded-[8px] p-8px bg-opacity-80'>
                         쥐피티 떠드는 공간
                     </h1>
                     <div

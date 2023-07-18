@@ -1,9 +1,10 @@
 import {useEffect, useRef, useState} from "react";
-import {resetMemos, SET_MEMO} from "../store/slices/memo.slice";
-import {Api} from "../common/libs/api";
+import {SET_MEMO} from "../store/slices/memo.slice";
+import {Api} from "../api";
 import {useHandleQueryStr} from "./useHandleQueryStr";
 import {AppDispatch, RootState} from "../store";
 import {useDispatch, useSelector} from "react-redux";
+import {resetMemos} from "../api/content";
 
 export const usePaginationObservers = () => {
     const loadEndRef = useRef(false); // 모든 데이터로드시 true
@@ -23,6 +24,41 @@ export const usePaginationObservers = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const handleLoadMore = () => offset.current += limit.current;
+
+    const loadMemos = () => {
+        (async () => {
+            await Api().memo.get({
+                search: searchInput,
+                offset: offset.current,
+                limit: limit.current,
+                cateQueryStr: Number(cateQueryStr) || null,
+                tagQueryStr,
+                menuQueryStr,
+            })
+                .then((res) => {
+                    timeoutRef.current = setTimeout(() => {
+                        if (res.data.success) {
+                            if (res.data.memos.length < limit.current) {
+                                loadEndRef.current = true;
+                            }
+                            handleLoadMore();
+
+                            if (res.data.memos.length === limit.current) setRetryObs(!retryObs);
+
+                            preventRef.current = true;
+
+                            dispatch(SET_MEMO(res.data.memos));
+                        }
+                        else if (!res.data.memos) {
+                            loadEndRef.current = true;
+                            preventRef.current = true;
+                        }
+                        else console.log(res.data.error);
+                    },50);
+                })
+                .catch(e => console.log(e));
+        })()
+    }
 
     // 페이지네이션 옵저버 생성
     useEffect(()=> {
@@ -72,37 +108,5 @@ export const usePaginationObservers = () => {
         setRetryObs(!retryObs);
     },[searchInput]);
 
-    const loadMemos = () => {
-        (async () => {
-            await Api().memo.get({
-                search: searchInput,
-                offset: offset.current,
-                limit: limit.current,
-                cateQueryStr: Number(cateQueryStr) || null,
-                tagQueryStr,
-                menuQueryStr,
-            })
-                .then((res) => {
-                    timeoutRef.current = setTimeout(() => {
-                        if (res.data.success) {
-                            if (res.data.memos.length < limit.current) {
-                                loadEndRef.current = true;
-                            }
-                            handleLoadMore();
-
-                            if (res.data.memos.length === limit.current) setRetryObs(!retryObs);
-
-                            preventRef.current = true;
-
-                            dispatch(SET_MEMO(res.data.memos));
-                        } else if (!res.data.memos) {
-                            loadEndRef.current = true;
-                            preventRef.current = true;
-                        } else { console.log(res.data.error); }
-                    },50);
-                })
-                .catch(e => console.log(e));
-        })()
-    }
     return { paginationDivObsRef }
 }

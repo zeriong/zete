@@ -14,13 +14,24 @@ import {
     importantConverter,
     refreshMemos,
     refreshTargetMemo
-} from "../../../store/slices/memo.slice";
+} from "../../../api/content";
 import {usePaginationObservers} from "../../../hooks/useObservers";
 
 export const MemoMain = () => {
     const intervalRef = useRef<NodeJS.Timeout>(null);
 
-    const [masonryCols,setMasonryCols] = useState<{}>({});
+    const [masonryCols] = useState({
+        default: 7,
+        2544: 6,
+        2222: 5,
+        1888: 4,
+        1566: 3,
+        1234: 2,
+        900: 1,
+        767: 2,
+        610: 1,
+    });
+
     const [currentMemoId,setCurrentMemoId] = useState<number>(0);
 
     const { loading } = useSelector((state: RootState) => (state.user));
@@ -32,7 +43,7 @@ export const MemoMain = () => {
         searchParams,
         cateQueryStr,
         tagQueryStr,
-        setSearchParams
+        setSearchParams,
     } = useHandleQueryStr();
 
     const horizonScroll = useHorizontalScroll();
@@ -58,36 +69,6 @@ export const MemoMain = () => {
         setSearchParams(searchParams);
         refreshTargetMemo(memoId);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const convertCols = (n:number) => {
-        if (!data.memos) return
-        if (menuQueryStr) {
-            if (n > data.memos.length) return data.memos.length;
-            if (n < data.memos.length) return n;
-        }
-        if (n > data.memos.length+1) return data.memos.length+1;
-        if (n < data.memos.length+1) return n;
-        else return n;
-    }
-
-    const masonryCallBack = useCallback(() => {
-        setMasonryCols({
-            default: convertCols(7),
-            2544: convertCols(6),
-            2222: convertCols(5),
-            1888: convertCols(4),
-            1566: convertCols(3),
-            1234: convertCols(2),
-            900: convertCols(1),
-            767: convertCols(2),
-            610: convertCols(1),
-        })
-    },[convertCols]);
-
-    useEffect(()=> {
-        masonryCallBack();
-    },[data.memos]);
 
     // 20분마다 데이터 최신화
     useEffect(() => {

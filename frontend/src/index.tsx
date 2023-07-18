@@ -4,7 +4,7 @@ import App from './App';
 import './common/style/global.css';
 import {Provider} from "react-redux";
 import {store} from "./store";
-import {InitApi} from "./common/libs/api";
+import {InitApi} from "./api";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

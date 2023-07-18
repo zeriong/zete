@@ -5,7 +5,7 @@ import {useForm} from "react-hook-form";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 
-import {Api} from "../../libs/api";
+import {Api} from "../../../api";
 import {Dialog, Transition } from "@headlessui/react";
 import {FuncButton} from "../funcButton";
 

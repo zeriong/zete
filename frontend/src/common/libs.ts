@@ -1,4 +1,7 @@
 import css from 'dom-css';
+import {showAlert} from "../store/slices/alert.slice";
+
+/** ---- Handle Cookie ---- */
 
 export const getCookie = (name: string) => {
     let value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
@@ -10,15 +13,14 @@ export const setCookie = (name: string, val: string) => {
     document.cookie = `${name}=${val}; path=/; max-age=${maxAge}; SameSite=Strict;`;
 }
 
-export const deleteCookie = (name: string) => {
-    document.cookie = name+"=; max-age=0;";
-}
+export const deleteCookie = (name: string) => document.cookie = name+"=; max-age=0;";
 
 export const existToken = () => {
-    if (getCookie('rt')) {
-        console.log(String(getCookie('rt')))
-    } else { console.log(null); }
+    if (getCookie('rt')) console.log(String(getCookie('rt')));
+    else console.log(null);
 }
+
+/** ---- In Content Method ---- */
 
 export const handleResizeHeight = (textareaRef) => {
     const ref = textareaRef.current;
@@ -27,12 +29,27 @@ export const handleResizeHeight = (textareaRef) => {
         ref.style.height = ref.scrollHeight + 'px';
     }
 }
-export const handleInputChange = (inputRef) => {
+export const handleTagInput = (inputRef) => {
     const input = inputRef.current;
     input.style.width = '50px';
     input.style.width = `${input.scrollWidth}px`;
     input.style.whiteSpace = 'nowrap'; // 추가
 };
+
+export const handleAddTagSubmit = (event, getVal, setValFunc, target) => {
+    event.preventDefault();
+    const input = event.target[0];
+    if (input.value === '') return;
+
+    const tags = getVal(target) || [];
+    const exists = tags.find(tag => tag.tagName === input.value);
+
+    if (!exists) {
+        setValFunc(target, [ ...tags, { tagName: input.value } ]);
+        input.value = '';
+    }
+    else showAlert('이미 존재하는 태그명 입니다.');
+}
 
 
 /** -------- 커스텀스크롤 function start ------- */
@@ -75,23 +92,4 @@ export const isString = (maybe: string | number) => typeof maybe === 'string';
 
 export const returnFalse = () => false;
 
-/** -------- 커스텀스크롤 function end ------- */
-
-
-export const uniqueKey = () => {
-    const date = new Date();
-    return Number(Date.now() +
-        String(date.getDate()) +
-        String(date.getMonth()) +
-        String(Math.random()))
-}
-
-export const subUniqueKey = () => {
-    const date = new Date();
-    return Number(Date.now() +
-        String(date.getDate()) +
-        String(date.getMonth()) +
-        String(date.getFullYear() +
-            String(Math.random()))
-    )
-}
+/** -------- close ------- */

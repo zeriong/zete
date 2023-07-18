@@ -8,7 +8,7 @@ import {Aside} from "./aside";
 import {CategoryIcon} from "../../../assets/vectors";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {SearchMemo} from "../components/searchMemo";
-import {loadAsideData} from "../../../store/slices/memo.slice";
+import {loadAsideData} from "../../../api/content";
 export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
