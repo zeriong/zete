@@ -12,11 +12,9 @@ import {handleAddTagSubmit, handleTagInput} from "../../../../common/libs";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {useHorizontalScroll} from "../../../../hooks/useHorizontalScroll";
-import {showAlert} from "../../../../store/slices/alert.slice";
-import {refreshMemos, refreshTargetMemo} from "../../../../api/content";
+import {handleUpdateOrAddMemo} from "../../../../api/content";
 import {useForm} from "react-hook-form";
 import {UpdateMemoInput} from "../../../../openapi/generated";
-import {Api} from "../../../../api";
 
 interface UpdateFormInterface {
     update: UpdateMemoInput;
@@ -50,144 +48,48 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
         setSearchParams(searchParams);
     }
 
-    const handleImportant = () => setIsImportant(!isImportant);
-
+    // 업데이트 핸들러
     const handleUpdate = () => {
-        clearTimeout(typingTimout.current);
-        typingTimout.current = null;
-
-        closeModal();
-
-        const titleDeleteSpace = form.getValues('update.memo.title').replace(/\s*|\n/g,"");
-        const contentDeleteSpace = form.getValues('update.memo.content').replace(/\s*|\n/g,"");
-
-        if (titleDeleteSpace === '' && contentDeleteSpace === '') return showAlert('메모수정이 취소되었습니다.');
-
-        const targetMemo = data.memos.find(memo => memo.id === memoId);
-        const cateId = form.getValues('cateId') === 0 ? null : Number(form.getValues('cateId'));
-        const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags')
-            .some(inputTag => inputTag.tagName === tag.tagName)).length;
-        const newTagLength = form.getValues('update.newTags').filter((newTag) => !targetMemo.tag
-            .some((tag) => tag.tagName === newTag.tagName)).length;
-
-        // 수정사항이 없는 경우 요청X
-        if (
-            form.getValues('update.memo.title') === targetMemo.title.replace(/<br\/>/g, '\n') &&
-            form.getValues('update.memo.content') === targetMemo.content.replace(/<br\/>/g, '\n') &&
-            cateId === targetMemo.cateId &&
-            isImportant === targetMemo.important &&
-            newTagLength === 0 &&
-            (changedTagLength === targetMemo.tag.length ||
-            (targetMemo.tag.length === 0 && form.getValues('update.newTags').length === 0))
-        ) return;
-
-        // 삭제, 추가할 태그분류
-        let newTags: { tagName: string }[];
-        let deleteTagIds: number[];
-
-        // 카테고리 변경시 태그의 소속 변경
-        if (targetMemo.tag.length === 0) {
-            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
-            deleteTagIds = [];
-        } else if (targetMemo.cateId !== cateId) {
-            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
-            deleteTagIds = targetMemo.tag.map(tag => tag.id);
-        } else {
-            newTags = form.getValues('update.newTags')
-                .filter(tag => !targetMemo.tag.some(target => target.tagName === tag.tagName))
-                .map(tag => ({ tagName: tag.tagName }));
-
-            deleteTagIds = targetMemo.tag
-                .filter(target => !form.getValues('update.newTags').some(tag => tag.tagName === target.tagName))
-                .map(tag => tag.id);
-        }
-
-        const memo = {
-            id: targetMemo.id,
-            cateId,
-            title: form.getValues('update.memo.title').replace(/\n/g, '<br/>'),
-            content: form.getValues('update.memo.content').replace(/\n/g, '<br/>'),
-            important: isImportant,
-        };
-
-        if (isUpdate) refreshTargetMemo(memoId);
-        else {
-            Api().memo.updateMemo({memo, newTags, deleteTagIds}).then((res)=>{
-                if (res.data.success) refreshTargetMemo(memoId);
-                else {
-                    console.log(res.data.error);
-                    refreshMemos({
-                        search: '',
-                        offset: 0,
-                        limit: data.memos.length,
-                        menuQueryStr,
-                        cateQueryStr: Number(cateQueryStr) || null,
-                        tagQueryStr,
-                    });
-                    showAlert(res.data.error);
-                }
-            }).catch(e => console.log(e));
-        }
-        setIsUpdate(false);
-    }
-
-    const autoUpdateRequest = () => {
-        const titleDeleteSpace = form.getValues('update.memo.title').replace(/ /g,"");
-        const contentDeleteSpace = form.getValues('update.memo.content').replace(/ /g,"");
-
-        if (titleDeleteSpace === '' && contentDeleteSpace === '') return;
-
-        const targetMemo = data.memos.find(memo => memo.id === memoId);
-        const cateId = form.getValues('cateId') === 0 ? null : Number(form.getValues('cateId'));
-        const changedTagLength = targetMemo.tag.filter(tag => form.getValues('update.newTags')
-            .some(inputTag => inputTag.tagName === tag.tagName)).length;
-
-        // 수정사항이 없는 경우 요청X
-        if (
-            form.getValues('update.memo.title') === targetMemo.title &&
-            form.getValues('update.memo.content') === targetMemo.content &&
-            cateId === targetMemo.cateId &&
-            isImportant === targetMemo.important &&
-            (changedTagLength === targetMemo.tag.length ||
-            (targetMemo.tag.length === 0 && form.getValues('update.newTags').length === 0))
-        ) return;
-
-        // 삭제, 추가할 태그분류
-        let newTags: { tagName: string }[];
-        let deleteTagIds: number[];
-
-        // 카테고리 변경시 태그의 소속 변경
-        if (targetMemo.tag.length === 0) {
-            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
-            deleteTagIds = [];
-        } else if (targetMemo.cateId !== cateId) {
-            newTags = form.getValues('update.newTags').map(tag => ({ tagName: tag.tagName }));
-            deleteTagIds = targetMemo.tag.map(tag => tag.id);
-        } else {
-            newTags = form.getValues('update.newTags')
-                .filter(tag => !targetMemo.tag.some(target => target.tagName === tag.tagName))
-                .map(tag => ({ tagName: tag.tagName }));
-
-            deleteTagIds = targetMemo.tag
-                .filter(target => !form.getValues('update.newTags').some(tag => tag.tagName === target.tagName))
-                .map(tag => tag.id);
-        }
-
-        const memo = {
-            id: targetMemo.id,
-            cateId,
-            title: form.getValues('update.memo.title').replace(/\n/g, '<br/>'),
-            content: form.getValues('update.memo.content').replace(/\n/g, '<br/>'),
-            important: isImportant,
-        };
-
-        Api().memo.updateMemo({memo, newTags, deleteTagIds}).then((res)=>{
-            if (res.data.success) setIsUpdate(true);
-            else setIsUpdate(false);
-        }).catch(e => console.log(e));
+        handleUpdateOrAddMemo({
+            getTitle: form.getValues('update.memo.title'),
+            getContent: form.getValues('update.memo.content'),
+            getNewTags: form.getValues('update.newTags'),
+            memoId: memoId,
+            getCateId: form.getValues('cateId'),
+            autoReq: false,
+            reqType: 'update',
+            typingTimeout: typingTimout,
+            closeModal,
+            cateQueryStr,
+            tagQueryStr,
+            menuQueryStr,
+            isImportant,
+            setIsDone: setIsUpdate,
+            isDone: isUpdate,
+        });
     };
 
-    const handleTypingUpdate = () => {
+    // 타이핑 자동 업데이트 핸들러
+    const autoUpdateRequest = () => {
+        handleUpdateOrAddMemo({
+            getTitle: form.getValues('update.memo.title'),
+            getContent: form.getValues('update.memo.content'),
+            getNewTags: form.getValues('update.newTags'),
+            memoId: memoId,
+            getCateId: form.getValues('cateId'),
+            autoReq: true,
+            reqType: 'update',
+            typingTimeout: typingTimout,
+            cateQueryStr,
+            tagQueryStr,
+            menuQueryStr,
+            isImportant,
+            setIsDone: setIsUpdate,
+            isDone: isUpdate,
+        });
+    };
+
+    const handleOnChangeUpdate = () => {
         if (typingTimout.current != null) {
             clearTimeout(typingTimout.current);
             typingTimout.current = null;
@@ -196,6 +98,11 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
             typingTimout.current = setTimeout(() => autoUpdateRequest(), 3000);
         }
     };
+
+    const handleImportant = () => {
+        handleOnChangeUpdate();
+        setIsImportant(!isImportant);
+    }
 
     const handleDeleteTag = (tagName) => {
         const tags = form.getValues('update.newTags');
@@ -263,7 +170,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
                                                     {...form.register('update.memo.title', {
                                                         required: false,
                                                         maxLength: 64,
-                                                        onChange: handleTypingUpdate
+                                                        onChange: handleOnChangeUpdate
                                                     })}
                                                     rows={1}
                                                     placeholder='제목'
@@ -283,7 +190,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
                                                     {...form.register('update.memo.content', {
                                                         required: false,
                                                         maxLength: 65535,
-                                                        onChange: handleTypingUpdate,
+                                                        onChange: handleOnChangeUpdate,
                                                     })}
                                                     rows={1}
                                                     placeholder='메모 작성...'

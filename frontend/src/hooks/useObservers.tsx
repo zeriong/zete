@@ -38,9 +38,7 @@ export const usePaginationObservers = () => {
                 .then((res) => {
                     timeoutRef.current = setTimeout(() => {
                         if (res.data.success) {
-                            if (res.data.memos.length < limit.current) {
-                                loadEndRef.current = true;
-                            }
+                            if (res.data.memos.length < limit.current) loadEndRef.current = true;
                             handleLoadMore();
 
                             if (res.data.memos.length === limit.current) setRetryObs(!retryObs);
@@ -54,7 +52,7 @@ export const usePaginationObservers = () => {
                             preventRef.current = true;
                         }
                         else console.log(res.data.error);
-                    },50);
+                    }, 50);
                 })
                 .catch(e => console.log(e));
         })()
@@ -68,10 +66,12 @@ export const usePaginationObservers = () => {
                 loadMemos();
             }
         });
+
         if (obsRef.current) {
             if(paginationDivObsRef.current) obsRef.current.observe(paginationDivObsRef.current);
-            return () => { obsRef.current.disconnect(); }
         }
+
+        return () => obsRef.current.disconnect();
     }, [retryObs]);
 
     // url 변경시 옵저버 초기화
@@ -85,7 +85,7 @@ export const usePaginationObservers = () => {
             resetMemos();
             setIsReset(true);
         }
-    },[menuQueryStr, cateQueryStr, tagQueryStr]);
+    }, [menuQueryStr, cateQueryStr, tagQueryStr]);
 
 
     // 초기화 완료시 retryObs를 변경시켜 옵저버 재생성
@@ -95,7 +95,7 @@ export const usePaginationObservers = () => {
             setRetryObs(!retryObs);
             setIsReset(false);
         }
-    },[isReset]);
+    }, [isReset]);
 
     // 검색창 입력시 데이터로드
     useEffect(() => {
@@ -106,7 +106,7 @@ export const usePaginationObservers = () => {
         loadEndRef.current = false;
         resetMemos();
         setRetryObs(!retryObs);
-    },[searchInput]);
+    }, [searchInput]);
 
     return { paginationDivObsRef }
 }

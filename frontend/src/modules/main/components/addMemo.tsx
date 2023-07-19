@@ -1,4 +1,4 @@
-import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from "../../../assets/vectors";
+import {CategoryIcon, CloseIcon, DeleteIcon, FillStarIcon, PlusIcon, StarIcon} from "../../../assets/vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {handleTagInput, handleResizeHeight, handleAddTagSubmit} from "../../../common/libs";
@@ -8,8 +8,9 @@ import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
 import {Api} from "../../../api";
 import {useForm} from "react-hook-form";
 import {showAlert} from "../../../store/slices/alert.slice";
-import {CreateMemoInput} from "../../../openapi/generated";
+import {CreateMemoInput, Memo} from "../../../openapi/generated";
 import {ADD_MEMO} from "../../../store/slices/memo.slice";
+import {deleteMemo, handleUpdateOrAddMemo} from "../../../api/content";
 
 export const AddMemo = () => {
     const contentTextarea = useRef<HTMLTextAreaElement>(null);
@@ -19,33 +20,45 @@ export const AddMemo = () => {
     const gptBtnRef = useRef<HTMLButtonElement>(null);
     const gptAreaRef = useRef<HTMLElement>(null);
     const gptTextareaRef = useRef<HTMLTextAreaElement>(null);
+    const typingTimout = useRef<NodeJS.Timeout>(null);
 
     const { cateQueryStr, tagQueryStr, searchParams } = useHandleQueryStr();
     const { cate } = useSelector((state: RootState) => state.memo.data);
 
-    const dispatch = useDispatch();
     const horizonScroll = useHorizontalScroll();
 
     const [isImportant, setIsImportant] = useState<boolean>(false);
     const [readyToMemo, setReadyToMemo] = useState<boolean | number>(0);
     const [openGPT, setOpenGPT] = useState(false);
     const [gptTextInput, setGptTextInput] = useState('');
-    const [newId, setNewId] = useState(0);
+    const [temporarySaveMemo, setTemporarySaveMemo] = useState<Memo>();
+    const [isDone, setIsDone] = useState(false);
+    const [memoId, setMemoId] = useState(0);
 
     const form = useForm<CreateMemoInput>({ mode: 'onBlur' });
 
     const { ref: titleRef, ...titleReg } = form.register('title', {
         required: false,
         maxLength: 64,
-        onChange: () => handleResizeHeight(titleTextarea),
+        onChange: () => {
+            handleResizeHeight(titleTextarea)
+            handleOnChangeUpdate();
+        },
     });
     const { ref: contentRef, ...contentReg} = form.register('content', {
         required: false,
         maxLength: 65535,
-        onChange: () => handleResizeHeight(contentTextarea),
+        onChange: () => {
+            handleOnChangeUpdate();
+            handleResizeHeight(contentTextarea);
+        },
     });
 
-    const handleImportant = () => setIsImportant(!isImportant);
+    const resetAddMemoForm = () => {
+        form.reset({ title: '', content: '', cateId: Number(cateQueryStr) || 0, tags: [] });
+        contentTextarea.current.style.height = 'auto';
+        titleTextarea.current.style.height = 'auto';
+    }
 
     const handleKeyDown = (e) => {
         if (e.shiftKey && e.key === 'Enter') {
@@ -63,31 +76,59 @@ export const AddMemo = () => {
         handleResizeHeight(titleTextarea);
     }
 
-    const handleAddMemoAction = () => {
-        if (!form.getValues('content') && !form.getValues('content')) return
+    // 업데이트 핸들러
+    const handleUpdate = () => {
+        handleUpdateOrAddMemo({
+            getTitle: form.getValues('title'),
+            getContent: form.getValues('content'),
+            getNewTags: form.getValues('tags'),
+            getCateId: form.getValues('cateId'),
+            memoId,
+            autoReq: false,
+            reqType: 'create',
+            typingTimeout: typingTimout,
+            isImportant,
+            isDone,
+            setIsDone,
+            temporarySaveMemo,
+            setTemporarySaveMemo,
+        });
+    };
 
-        const replaceMemoContent: CreateMemoInput = {
-            ...form.getValues(),
-            title: form.getValues('title').replace(/\n/g, '<br/>'),
-            content: form.getValues('content').replace(/\n/g, '<br/>'),
-        }
+    // 타이핑 자동 업데이트 핸들러
+    const autoUpdateRequest = () => {
+        handleUpdateOrAddMemo({
+            getTitle: form.getValues('title'),
+            getContent: form.getValues('content'),
+            getNewTags: form.getValues('tags'),
+            memoId,
+            setMemoId,
+            getCateId: form.getValues('cateId'),
+            autoReq: true,
+            reqType: 'create',
+            typingTimeout: typingTimout,
+            isImportant,
+            isDone,
+            setIsDone,
+            temporarySaveMemo,
+            setTemporarySaveMemo,
+        });
+    };
 
-        Api().memo.createMemo({...replaceMemoContent, important: isImportant})
-            .then((res) => {
-                if (res.data.success) {
-                    if (Number(res.data.savedMemo.cateId) === Number(cateQueryStr) || cateQueryStr === null) {
-                        dispatch(ADD_MEMO({...res.data.savedMemo}));
-                    }
-
-                    form.reset({ title: '', content: '', cateId: Number(cateQueryStr) || 0, tags: [] });
-                    setIsImportant(false);
-                    contentTextarea.current.style.height = 'auto';
-                    titleTextarea.current.style.height = 'auto';
-                }
-                else showAlert(res.data.error);
-            })
-            .catch(e => console.log(e));
+    const handleImportant = () => {
+        handleOnChangeUpdate();
+        setIsImportant(!isImportant);
     }
+
+    const handleOnChangeUpdate = () => {
+        if (typingTimout.current != null) {
+            clearTimeout(typingTimout.current);
+            typingTimout.current = null;
+        }
+        if (typingTimout.current === null) {
+            typingTimout.current = setTimeout(() => autoUpdateRequest(), 3000);
+        }
+    };
 
     const handleDeleteTag = (tagName) => {
         const tags = form.getValues('tags');
@@ -112,6 +153,15 @@ export const AddMemo = () => {
         }
     }
 
+    const HandleMemoCancel = () => {
+        resetAddMemoForm();
+        if (memoId === 0) return;
+        else {
+            deleteMemo(memoId, 'create');
+            setMemoId(0);
+        }
+    }
+
     useEffect(() => {
         form.setValue('cateId', cateQueryStr ? Number(cateQueryStr) : 0);
         form.setValue('tags', tagQueryStr ? [ { tagName: tagQueryStr } ] : []);
@@ -126,9 +176,6 @@ export const AddMemo = () => {
             else {
                 setReadyToMemo(false);
                 setOpenGPT(false);
-                form.reset({ title: '', content: '', cateId: Number(cateQueryStr) || 0, tags: [] });
-                contentTextarea.current.style.height = 'auto';
-                titleTextarea.current.style.height = 'auto';
             }
         }
 
@@ -136,6 +183,14 @@ export const AddMemo = () => {
 
         return () => document.removeEventListener('mousedown', handleOutside);
     },[]);
+
+    useEffect(() => {
+        if (readyToMemo === false) {
+            handleUpdate();
+            setIsImportant(false);
+            resetAddMemoForm();
+        }
+    }, [readyToMemo]);
 
     const GptBtn = (props: { className?: string }) => {
         return (
@@ -243,9 +298,9 @@ export const AddMemo = () => {
                                             <GptBtn className='ml-20px'/>
                                         </>
                                     </div>
-                                    <div onClick={handleAddMemoAction}>
-                                        <PlusIcon svgClassName='cursor-pointer'/>
-                                    </div>
+                                    <button type='button' className='' onClick={HandleMemoCancel}>
+                                        Cancel
+                                    </button>
                                 </div>
                             </div>
                         }

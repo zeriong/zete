@@ -79,6 +79,7 @@ export const MemoMain = () => {
             clearInterval(intervalRef.current);
             handleInterval();
         }
+        console.log('gdgd')
     },[searchParams, data]);
 
     return (
