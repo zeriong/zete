@@ -1,13 +1,12 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {useSearchParams} from "react-router-dom";
 import {useForm} from "react-hook-form";
-
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
-
-import {Api} from "../../../api";
 import {Dialog, Transition } from "@headlessui/react";
 import {FuncButton} from "../funcButton";
+import {exportApis} from "../../../openapi/generated";
+import {Api} from "../../api";
 
 /** 폼항목 */
 type FormData = {
@@ -67,7 +66,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
     /** submit */
     const onSubmit = handleSubmit(async () => {
         const {email,password,name,mobile} = getValues();
-        await Api().user.createAccount(
+        await Api.user.createAccount(
             {
                 "email": email,
                 "password": password,

@@ -1,10 +1,9 @@
 import {useEffect, useRef, useState} from "react";
-import {SET_MEMO} from "../store/slices/memo.slice";
-import {Api} from "../api";
+import {resetMemos, SET_MEMO} from "../store/slices/memo.slice";
+import {Api} from "../common/api";
 import {useHandleQueryStr} from "./useHandleQueryStr";
 import {AppDispatch, RootState} from "../store";
 import {useDispatch, useSelector} from "react-redux";
-import {resetMemos} from "../api/content";
 
 export const usePaginationObservers = () => {
     const loadEndRef = useRef(false); // 모든 데이터로드시 true
@@ -27,7 +26,7 @@ export const usePaginationObservers = () => {
 
     const loadMemos = () => {
         (async () => {
-            await Api().memo.get({
+            await Api.memo.get({
                 search: searchInput,
                 offset: offset.current,
                 limit: limit.current,

@@ -1,7 +1,7 @@
 import {store} from "../store";
 import axios, {AxiosRequestConfig} from "axios";
 import {sendRefreshAccessToken, SET_LOGOUT} from "../store/slices/auth.slice";
-import {AuthApiFactory, MemoApiFactory, OpenAiApiFactory, UserApiFactory} from "../openapi/generated";
+import {exportApis} from "../openapi/generated";
 
 const API_URL = process.env.REACT_APP_SERVER_PORT;
 
@@ -14,14 +14,7 @@ const instance = axios.create({
 });
 
 /** OpenAPI Autogen ajax 매서드 */
-export const Api = () => {
-    return {
-        user: UserApiFactory(null,'',instance),
-        auth: AuthApiFactory(null,'',instance),
-        memo: MemoApiFactory(null, '',instance),
-        AI: OpenAiApiFactory(null,'',instance),
-    }
-}
+export const Api = exportApis(instance);
 
 /** axios interceptor 사용하여 token 통신 */
 export const InitApi = () => {

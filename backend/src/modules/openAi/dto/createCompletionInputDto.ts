@@ -1,17 +1,15 @@
 import * as Validator from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-export class CreateCompletionInputObj {
-  @ApiProperty()
-  @Validator.IsString()
-  role: string;
+import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
+import { IsOptional } from 'class-validator';
 
+export class CreateCompletionInputDto {
   @ApiProperty()
   @Validator.IsString()
   content: string;
 }
 
-export class CreateCompletionInputDto {
-  @ApiProperty({ type: CreateCompletionInputObj })
-  @Validator.IsArray()
-  data: CreateCompletionInputObj[];
+export class CreateCompletionOutputDto extends CoreOutput {
+  @ApiProperty()
+  resGpt?: string;
 }

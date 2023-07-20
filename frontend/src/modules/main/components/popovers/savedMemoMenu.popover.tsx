@@ -2,10 +2,10 @@ import { Popover, Transition} from "@headlessui/react";
 import React, {Fragment, useState} from "react";
 import {DeleteIcon, EditIcon, ThreeDotMenuIcon} from "../../../../assets/vectors";
 import {ConfirmButton} from "../../../../common/components/confirmButton";
-import {deleteMemo, refreshMemos} from "../../../../api/content";
 import {RootState} from "../../../../store";
 import {useSelector} from "react-redux";
 import {useHandleQueryStr} from "../../../../hooks/useHandleQueryStr";
+import {deleteMemo, refreshMemos} from "../../../../store/slices/memo.slice";
 
 export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
     const { menuQueryStr, tagQueryStr, cateQueryStr } = useHandleQueryStr();

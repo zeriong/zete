@@ -4,11 +4,10 @@ import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from "../../../.
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import CustomScroller from "../../../../common/components/customScroller";
-import {createCategory, deleteCategory, loadAsideData} from "../../../../api/content";
-import {Api} from "../../../../api";
 import {showAlert} from "../../../../store/slices/alert.slice";
 import {ConfirmButton} from "../../../../common/components/confirmButton";
-import {UPDATE_CATE} from "../../../../store/slices/memo.slice";
+import {createCategory, deleteCategory, loadAsideData, UPDATE_CATE} from "../../../../store/slices/memo.slice";
+import {Api} from "../../../../common/api";
 
 export const CateModifyModal = (props: { buttonText: string }) => {
     const { cate } = useSelector((state: RootState) => state.memo.data);
@@ -23,15 +22,6 @@ export const CateModifyModal = (props: { buttonText: string }) => {
         setAddInputValues({ addCateName: '' })
         setIsShow(false)
     }
-
-    // 카테고리 목록에 따른 input state 생성
-    useEffect(() => {
-        let values = {}
-        cate.map((cate) => (
-            values = { ...values, [cate.id]: cate.cateName }
-        ));
-        setUpdateInputValues(values)
-    }, [cate])
 
     // 카테고리 생성 form submit
     const handleSubmit = (e) => {
@@ -55,7 +45,7 @@ export const CateModifyModal = (props: { buttonText: string }) => {
         const val = input.value
         if (val && val.length > 1 && val !== prevVal) {
             //console.log('handleUpdateFormSubmit - ', val)
-            Api().memo.updateCategory({ cateId: id, cateName: val })
+            Api.memo.updateCategory({ cateId: id, cateName: val })
                 .then((res) => {
                     if (res.data) {
                         if (res.data.success) {
@@ -83,6 +73,15 @@ export const CateModifyModal = (props: { buttonText: string }) => {
             return { ...state }
         })
     }
+
+    // 카테고리 목록에 따른 input state 생성
+    useEffect(() => {
+        let values = {}
+        cate.map((cate) => (
+            values = { ...values, [cate.id]: cate.cateName }
+        ));
+        setUpdateInputValues(values)
+    }, [cate])
 
     useEffect(() => {
         if (isShow) {

@@ -6,9 +6,9 @@ import {SET_LOGIN, SET_LOGOUT } from "../../../store/slices/auth.slice";
 import {SET_USER} from "../../../store/slices/user.slice";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../store";
-
-import {Api} from "../../../api";
 import {FuncButton} from "../funcButton";
+import {exportApis} from "../../../openapi/generated";
+import {Api} from "../../api";
 /** 폼항목 */
 type FormData = {
     email: string;
@@ -55,7 +55,7 @@ export const SigninModal = () => {
     // submit
     const onSubmit = handleSubmit(async () => {
         const {email,password} = getValues();
-        await Api().auth.login({ email, password })
+        await Api.auth.login({ email, password })
             .then((res) => {
                 console.log(res.data);
                 if (res.data.success) {

@@ -10,12 +10,8 @@ import {FillStarIcon, StarIcon} from "../../../assets/vectors";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
 import {MemoModifyModal} from "../components/modals/memoModify.modal";
 import {SavedMemoMenuPopover} from "../components/popovers/savedMemoMenu.popover";
-import {
-    importantConverter,
-    refreshMemos,
-    refreshTargetMemo
-} from "../../../api/content";
 import {usePaginationObservers} from "../../../hooks/useObservers";
+import {importantConverter, refreshMemos, refreshTargetMemo} from "../../../store/slices/memo.slice";
 
 export const MemoMain = () => {
     const intervalRef = useRef<NodeJS.Timeout>(null);
@@ -79,7 +75,6 @@ export const MemoMain = () => {
             clearInterval(intervalRef.current);
             handleInterval();
         }
-        console.log('gdgd')
     },[searchParams, data]);
 
     return (

@@ -1,16 +1,15 @@
-import {CategoryIcon, CloseIcon, DeleteIcon, FillStarIcon, PlusIcon, StarIcon} from "../../../assets/vectors";
+import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from "../../../assets/vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
-import {handleTagInput, handleResizeHeight, handleAddTagSubmit} from "../../../common/libs";
-import {useDispatch, useSelector} from "react-redux";
+import {handleTagInput, handleResizeHeight, handleAddTagSubmit, updateOrAddMemo} from "../../../common/libs";
+import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
-import {Api} from "../../../api";
 import {useForm} from "react-hook-form";
 import {showAlert} from "../../../store/slices/alert.slice";
 import {CreateMemoInput, Memo} from "../../../openapi/generated";
-import {ADD_MEMO} from "../../../store/slices/memo.slice";
-import {deleteMemo, handleUpdateOrAddMemo} from "../../../api/content";
+import {Api} from "../../../common/api";
+import {deleteMemo} from "../../../store/slices/memo.slice";
 
 export const AddMemo = () => {
     const contentTextarea = useRef<HTMLTextAreaElement>(null);
@@ -34,6 +33,9 @@ export const AddMemo = () => {
     const [temporarySaveMemo, setTemporarySaveMemo] = useState<Memo>();
     const [isDone, setIsDone] = useState(false);
     const [memoId, setMemoId] = useState(0);
+    const [gptLoading, setGptLoading] = useState(false);
+    const [gptContent, setGptContent] = useState('');
+    const [gptAvailable, setGptAvailable] = useState(10);
 
     const form = useForm<CreateMemoInput>({ mode: 'onBlur' });
 
@@ -78,7 +80,7 @@ export const AddMemo = () => {
 
     // 업데이트 핸들러
     const handleUpdate = () => {
-        handleUpdateOrAddMemo({
+        updateOrAddMemo({
             getTitle: form.getValues('title'),
             getContent: form.getValues('content'),
             getNewTags: form.getValues('tags'),
@@ -96,8 +98,8 @@ export const AddMemo = () => {
     };
 
     // 타이핑 자동 업데이트 핸들러
-    const autoUpdateRequest = () => {
-        handleUpdateOrAddMemo({
+    const handleAutoUpdateRequest = () => {
+        updateOrAddMemo({
             getTitle: form.getValues('title'),
             getContent: form.getValues('content'),
             getNewTags: form.getValues('tags'),
@@ -126,11 +128,11 @@ export const AddMemo = () => {
             typingTimout.current = null;
         }
         if (typingTimout.current === null) {
-            typingTimout.current = setTimeout(() => autoUpdateRequest(), 3000);
+            typingTimout.current = setTimeout(() => handleAutoUpdateRequest(), 3000);
         }
     };
 
-    const handleDeleteTag = (tagName) => {
+    const deleteTag = (tagName) => {
         const tags = form.getValues('tags');
         if (tags) form.setValue('tags', tags.filter(tag => tag.tagName !== tagName));
     }
@@ -140,16 +142,44 @@ export const AddMemo = () => {
         setGptTextInput(e.target.value);
     }
 
-    const handleGptSubmit = (e) => {
-        if (e.shiftKey && e.key === 'Enter') {
-            handleResizeHeight(gptTextareaRef);
-        }
+    const requestGpt = () => {
+        setGptLoading(true);
+        Api.openAi.createCompletion({ content: gptTextInput })
+            .then((res) => {
+                setGptLoading(false);
+                if (res.data.success) {
+                    setGptAvailable(gptAvailable - 1)
+                    setGptContent(res.data.resGpt);
+                }
+                else {
+                    if (res.data.message === '횟수초과') {
+                        setGptContent('질문 가능한 횟수를 초과했습니다, 질문가능 횟수를 확인해주세요.');
+                        return showAlert('질문 가능한 횟수를 초과했습니다.');
+                    }
+                    showAlert(res.data.error);
+                }
+            })
+            .catch((e) => {
+                setGptLoading(false);
+                setGptContent('');
+                console.log(e);
+                showAlert('GPT요청에 실패했습니다.');
+            });
+    }
+
+    const handleGptSubmit = () => {
+        if (gptTextInput === '') showAlert('GPT: 대화내용을 입력해주세요');
+        else requestGpt();
+        setGptTextInput('');
+        gptTextareaRef.current.style.height = 'auto';
+    }
+
+
+    const handleKeydownForGptSubmit = (e) => {
+        if (e.shiftKey && e.key === 'Enter') handleResizeHeight(gptTextareaRef);
         else if (e.key === 'Enter') {
-            if (e.target.value === '') showAlert('GPT: 대화내용을 입력해주세요')
-            console.log('서브밋~');
-            setGptTextInput('')
-            gptTextareaRef.current.style.height = 'auto';
             e.preventDefault();
+            handleGptSubmit();
         }
     }
 
@@ -257,7 +287,7 @@ export const AddMemo = () => {
                                             </span>
                                             <button
                                                 className='absolute right-2px group rounded-full grid place-content-center hover:bg-zete-dark-300 hover:bg-opacity-50 w-14px h-14px'
-                                                onClick={() => handleDeleteTag(tag.tagName)}
+                                                onClick={() => deleteTag(tag.tagName)}
                                             >
                                                 <CloseIcon className='w-10px fill-zete-dark-400 group-hover:fill-white'/>
                                             </button>
@@ -316,31 +346,70 @@ export const AddMemo = () => {
                 ${openGPT && 'h-[400px] p-10px'}`}
             >
                 <div className='flex flex-col relative w-full h-full'>
-                    <h1 className='grow text-start text-zete-dark-500 pb-60px bg-white rounded-[8px] p-8px bg-opacity-80'>
-                        쥐피티 떠드는 공간
-                    </h1>
-                    <div
-                        className='flex items-center justify-between absolute bottom-10px p-8px bg-white shadow-1xl rounded-[12px] max-h-[88px] w-[calc(100%-20px)]
+                    <div className='relative grow text-start text-zete-dark-500 bg-white overflow-hidden rounded-[8px] p-8px bg-opacity-80'>
+                        <div className='relative text-center bg-zete-gpt-500 rounded-[8px] py-4px mb-4px'>
+                            <span className='text-zete-gpt-black font-bold'>
+                                Chat GPT
+                            </span>
+                            <div className='absolute top-1/2 -translate-y-1/2 text-13 right-13px text-white font-semibold'>
+                                질문 가능 횟수:
+                                <span className={`${gptAvailable === 0 && 'text-red-300'}`}>
+                                    {` ${gptAvailable}`}
+                                </span>
+                            </div>
+                        </div>
+                        <div className='overflow-auto max-h-[calc(100%-84px)] memo-custom-vertical-scroll'>
+                            {
+                                (!gptLoading && gptContent === '') ?
+                                    (
+                                        // 응답받은 gpt-content가 없고 로딩이 아닌경우
+                                        <>
+                                            <p className='mb-12px'>궁금한 것이 있다면 GPT에게 물어보세요!</p>
+                                            표준어를 사용해주세요!<br/>
+                                            줄임말이나 신조어를 사용하면<br/>
+                                            원하는 답변을 얻지 못할 수 있어요.<br/>
+                                            {`< 참고사항 >`}<br/>
+                                            1. gpt에게 물어볼 수 있는 횟수는 한 계정당 10번 물어볼 수 있어요.<br/>
+                                            2. 하나의 질문에 한번의 답변만 할 수 있어요. (대화형식 불가)
+                                        </>
+                                    ) : gptLoading ? (
+                                        // 답변 응답을 받는중인 경우 ( 로딩중 )
+                                        <>
+                                            gpt가 답변을 준비하고 있어요.
+                                        </>
+                                    ) : gptContent !== '' && (
+                                        // 답변을 받은 경우
+                                        <>
+                                            {gptContent}
+                                        </>
+                                    )
+                            }
+                        </div>
+                    </div>
+                    <article
+                        className='flex items-center justify-between absolute bottom-10px p-8px bg-white shadow-1xl rounded-[12px] w-[calc(100%-20px)]
                         border border-zete-light-gray-500 left-1/2 -translate-x-1/2 shadow-2xl'
                     >
-                        <textarea
-                            ref={gptTextareaRef}
-                            maxLength={3500}
-                            onChange={handleGptTextarea}
-                            onKeyDown={handleGptSubmit}
-                            value={gptTextInput}
-                            rows={1}
-                            placeholder='GPT에게 물어보세요! ( Shift + Enter 줄바꿈 )'
-                            className='resize-none bg-transparent overflow-auto placeholder:text-zete-gray-500 font-light placeholder:text-14
-                            memo-custom-scroll w-full h-fit'
-                        />
+                        <div className='relative flex items-center memo-custom-scroll overflow-auto max-h-[88px] w-[calc(100%-42px)]'>
+                            <textarea
+                                ref={gptTextareaRef}
+                                maxLength={500}
+                                onChange={handleGptTextarea}
+                                onKeyDown={handleKeydownForGptSubmit}
+                                value={gptTextInput}
+                                rows={1}
+                                placeholder='GPT에게 물어보세요! ( Shift + Enter 줄바꿈 )'
+                                className='resize-none bg-transparent placeholder:text-zete-gray-500 font-light placeholder:text-14 w-full h-fit'
+                            />
+                        </div>
                         <button
                             type='button'
-                            className='px-4px bg-zete-gpt-200 text-white ml-10px whitespace-nowrap h-fit text-15'
+                            onClick={handleGptSubmit}
+                            className='absolute right-10px px-4px bg-zete-gpt-200 text-white whitespace-nowrap h-fit text-15'
                         >
                             전송
                         </button>
-                    </div>
+                    </article>
                 </div>
             </article>
         </div>

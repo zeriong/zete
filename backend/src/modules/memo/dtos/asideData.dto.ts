@@ -1,6 +1,5 @@
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Category } from '../../../entities/category.entity';
 import { Memo } from '../../../entities/memo.entity';
 import { Tag } from '../../../entities/tag.entity';
 

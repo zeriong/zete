@@ -1,0 +1,8 @@
+{
+  "supportsES6": true,
+  "withSeparateModelsAndApi": true,
+  "apiPackage": "api",
+  "modelPackage": "model",
+  "allowUnicodeIdentifiers": true,
+  "withoutPrefixEnums": true
+}

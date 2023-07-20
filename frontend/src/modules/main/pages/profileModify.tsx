@@ -2,10 +2,10 @@ import React, {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useForm} from "react-hook-form";
-import {Api} from "../../../api";
 import {FuncButton} from "../../../common/components/funcButton";
 import {showAlert} from "../../../store/slices/alert.slice";
 import {useNavigate} from "react-router-dom";
+import {Api} from "../../../common/api";
 
 
 export const ProfileModify = () => {
@@ -50,7 +50,7 @@ export const ProfileModify = () => {
     /** submit */
     const onSubmit = handleSubmit(async () => {
         const {email,password,name,mobile} = getValues();
-        await Api().user.profileUpdate(
+        await Api.user.profileUpdate(
             {
                 "email": email,
                 "name": name,

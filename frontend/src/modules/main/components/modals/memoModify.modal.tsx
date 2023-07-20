@@ -8,11 +8,10 @@ import {
     PlusIcon,
     StarIcon,
 } from "../../../../assets/vectors";
-import {handleAddTagSubmit, handleTagInput} from "../../../../common/libs";
+import {handleAddTagSubmit, handleTagInput, updateOrAddMemo} from "../../../../common/libs";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {useHorizontalScroll} from "../../../../hooks/useHorizontalScroll";
-import {handleUpdateOrAddMemo} from "../../../../api/content";
 import {useForm} from "react-hook-form";
 import {UpdateMemoInput} from "../../../../openapi/generated";
 
@@ -50,7 +49,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
 
     // 업데이트 핸들러
     const handleUpdate = () => {
-        handleUpdateOrAddMemo({
+        updateOrAddMemo({
             getTitle: form.getValues('update.memo.title'),
             getContent: form.getValues('update.memo.content'),
             getNewTags: form.getValues('update.newTags'),
@@ -70,8 +69,8 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
     };
 
     // 타이핑 자동 업데이트 핸들러
-    const autoUpdateRequest = () => {
-        handleUpdateOrAddMemo({
+    const handleAutoUpdate = () => {
+        updateOrAddMemo({
             getTitle: form.getValues('update.memo.title'),
             getContent: form.getValues('update.memo.content'),
             getNewTags: form.getValues('update.newTags'),
@@ -95,7 +94,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
             typingTimout.current = null;
         }
         if (typingTimout.current === null) {
-            typingTimout.current = setTimeout(() => autoUpdateRequest(), 3000);
+            typingTimout.current = setTimeout(() => handleAutoUpdate(), 3000);
         }
     };
 
@@ -104,7 +103,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
         setIsImportant(!isImportant);
     }
 
-    const handleDeleteTag = (tagName) => {
+    const deleteTag = (tagName) => {
         const tags = form.getValues('update.newTags');
         if (tags) form.setValue('update.newTags', tags.filter(tag => tag.tagName !== tagName));
     };
@@ -208,7 +207,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
                                                         </span>
                                                         <button
                                                             className='absolute right-2px group rounded-full grid place-content-center hover:bg-zete-dark-300 hover:bg-opacity-50 w-14px h-14px'
-                                                            onClick={() => handleDeleteTag(tag.tagName)}
+                                                            onClick={() => deleteTag(tag.tagName)}
                                                         >
                                                             <CloseIcon className='w-10px fill-zete-dark-400 group-hover:fill-white'/>
                                                         </button>
