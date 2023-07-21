@@ -1,5 +1,6 @@
 import * as Validator from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 
 export class CreateAccountDto {
   /** email */
@@ -27,4 +28,9 @@ export class CreateAccountDto {
   @Validator.Length(13, 13, { message: '휴대폰번호를 입력해주세요.' })
   @Validator.IsString()
   mobile: string;
+
+  /** gpt available */
+  @ApiProperty({ type: Number })
+  @Validator.IsNumber()
+  gptRefillAt: number;
 }

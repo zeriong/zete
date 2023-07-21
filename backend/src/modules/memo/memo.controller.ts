@@ -36,7 +36,7 @@ import { AsideDataOutput } from './dtos/asideData.dto';
 export class MemoController {
   constructor(private readonly memoService: MemoService) {}
 
-  // get data -----------------------------------------------------
+  /** get data ----------------------------------------------------- */
   @ApiResponse({ type: AsideDataOutput })
   @Get('getAsideData')
   getAsideData(@Req() req): Promise<AsideDataOutput> {
@@ -55,7 +55,7 @@ export class MemoController {
     return this.memoService.getOneMemo(input, req.user);
   }
 
-  // category -----------------------------------------------------
+  /** category ----------------------------------------------------- */
   @ApiResponse({ type: CreateCateOutput })
   @Post('createCategory')
   createCategory(
@@ -80,7 +80,7 @@ export class MemoController {
     return this.memoService.deleteCategory(input, req.user);
   }
 
-  // memo -----------------------------------------------------
+  /** memo ----------------------------------------------------- */
   @ApiResponse({ type: CreateMemoOutput })
   @Post('createMemo')
   createMemo(

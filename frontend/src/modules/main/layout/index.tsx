@@ -23,15 +23,12 @@ export const MemoLayout = () => {
     }, [dispatch]);
 
     const categoryName = useMemo(() => {
-        if (!cateQueryStr && !menuQueryStr) {
-            return "전체메모";
-        } else if (menuQueryStr) {
-            return "중요메모";
-        } else {
+        if (!cateQueryStr && !menuQueryStr) return "전체메모";
+        else if (menuQueryStr) return "중요메모";
+
+        else {
             const matchCate = cate.find((cate) => Number(cate.id) === Number(cateQueryStr))?.cateName
-            if (matchCate) {
-                return matchCate;
-            }
+            if (matchCate) return matchCate;
             return '카테고리가 존재하지않습니다.'
         }
     }, [searchParams, cate]);

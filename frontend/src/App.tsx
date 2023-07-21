@@ -9,7 +9,7 @@ function App() {
     const { loading } = useSelector((state: RootState) => (state.auth));
     const dispatch = useDispatch<AppDispatch>();
 
-    useEffect( ()=> {
+    useEffect(()=> {
         (async () => {
             await dispatch(sendRefreshAccessToken());
         })()
@@ -17,7 +17,10 @@ function App() {
 
     return (
         <>
-            {loading ? <div className="flex h-full items-center justify-center">로딩중...</div> : <Index/>}
+            {
+                loading ? <div className="flex h-full items-center justify-center">로딩중...</div>
+                    : <Index/>
+            }
             <Alert/>
         </>
     );

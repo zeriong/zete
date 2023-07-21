@@ -1,7 +1,13 @@
 import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from "../../../assets/vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
-import {handleTagInput, handleResizeHeight, handleAddTagSubmit, updateOrAddMemo} from "../../../common/libs";
+import {
+    handleTagInput,
+    handleResizeHeight,
+    handleAddTagSubmit,
+    updateOrAddMemo,
+    getGptRefillAt
+} from "../../../common/libs";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
@@ -10,6 +16,7 @@ import {showAlert} from "../../../store/slices/alert.slice";
 import {CreateMemoInput, Memo} from "../../../openapi/generated";
 import {Api} from "../../../common/api";
 import {deleteMemo} from "../../../store/slices/memo.slice";
+import {dispatchGptAvailable, dispatchGptRefillAt} from "../../../store/slices/user.slice";
 
 export const AddMemo = () => {
     const contentTextarea = useRef<HTMLTextAreaElement>(null);
@@ -23,6 +30,7 @@ export const AddMemo = () => {
 
     const { cateQueryStr, tagQueryStr, searchParams } = useHandleQueryStr();
     const { cate } = useSelector((state: RootState) => state.memo.data);
+    const userState = useSelector((state: RootState) => state.user.data);
 
     const horizonScroll = useHorizontalScroll();
 
@@ -35,7 +43,9 @@ export const AddMemo = () => {
     const [memoId, setMemoId] = useState(0);
     const [gptLoading, setGptLoading] = useState(false);
     const [gptContent, setGptContent] = useState('');
-    const [gptAvailable, setGptAvailable] = useState(10);
+    const [titleFocus, setTitleFocus] = useState(false);
+    const [contentFocus, setContentFocus] = useState(false);
+    const [waitText, setWaitText] = useState(false)
 
     const form = useForm<CreateMemoInput>({ mode: 'onBlur' });
 
@@ -95,7 +105,7 @@ export const AddMemo = () => {
             temporarySaveMemo,
             setTemporarySaveMemo,
         });
-    };
+    }
 
     // 타이핑 자동 업데이트 핸들러
     const handleAutoUpdateRequest = () => {
@@ -115,7 +125,7 @@ export const AddMemo = () => {
             temporarySaveMemo,
             setTemporarySaveMemo,
         });
-    };
+    }
 
     const handleImportant = () => {
         handleOnChangeUpdate();
@@ -130,7 +140,7 @@ export const AddMemo = () => {
         if (typingTimout.current === null) {
             typingTimout.current = setTimeout(() => handleAutoUpdateRequest(), 3000);
         }
-    };
+    }
 
     const deleteTag = (tagName) => {
         const tags = form.getValues('tags');
@@ -143,27 +153,30 @@ export const AddMemo = () => {
     }
 
     const requestGpt = () => {
+        if (userState.gptAvailable === 0) return showAlert('질문가능 횟수가 초과하였습니다, 매일 자정이 지나면 충전됩니다.');
         setGptLoading(true);
         Api.openAi.createCompletion({ content: gptTextInput })
             .then((res) => {
-                setGptLoading(false);
-                if (res.data.success) {
-                    setGptAvailable(gptAvailable - 1)
+                /* gpt 3.5 turbo 특성상 요청이 매우느리고 연속요청에 에러를 발생시키기 때문에 요청에러방지,
+                   사용자경험을 높이기 위해 요청을 받은 후 setWaitText를 통해 "답변이 거의 완성되었어요!" 문구를 띄움 */
+                setWaitText(true);
+
+                setTimeout(() => {
+                    setWaitText(false);
+                    setGptLoading(false);
+                }, 7000);
+
+                if (!res.data.success) return showAlert(res.data.error);
+                if (res.data.message) return showAlert(res.data.message);
+                if (res.data.resGpt) {
+                    dispatchGptAvailable(res.data.gptAvailable);
                     setGptContent(res.data.resGpt);
-                }
-                else {
-                    if (res.data.message === '횟수초과') {
-                        setGptContent('질문 가능한 횟수를 초과했습니다, 질문가능 횟수를 확인해주세요.');
-                        return showAlert('질문 가능한 횟수를 초과했습니다.');
-                    }
-                    showAlert(res.data.error);
                 }
             })
             .catch((e) => {
                 setGptLoading(false);
-                setGptContent('');
                 console.log(e);
-                showAlert('GPT요청에 실패했습니다.');
+                showAlert('Chat-GPT 서버에 접속할 수 없습니다.');
             });
     }
 
@@ -222,6 +235,35 @@ export const AddMemo = () => {
         }
     }, [readyToMemo]);
 
+    const handleTryGptAvailable = (gptRefillAt) => {
+        Api.user.tryGptAvailableRefill({ gptRefillAt })
+            .then((res) => {
+                const data = res.data
+                if (data.success) {
+                    dispatchGptAvailable(data.gptAvailable);
+                    dispatchGptRefillAt(data.gptRefillAt);
+                }
+            }).catch(e => console.log(e));
+    }
+
+    /* gptOpen 일때 db에서 받아온 날짜비교하여 통신결정
+       (initState가 null이기 때문에 최초에 반드시 1회 요청) */
+    useEffect(() => {
+        if (openGPT) {
+            const gptRefillAt = getGptRefillAt();
+
+            if (userState.gptRefillAt !== gptRefillAt) {
+                handleTryGptAvailable(gptRefillAt);
+            }
+        }
+    }, [openGPT]);
+
+    useEffect(() => {
+        if (!gptLoading && !titleFocus && !contentFocus) {
+            gptTextareaRef.current.focus();
+        }
+    }, [gptLoading])
+
     const GptBtn = (props: { className?: string }) => {
         return (
             <button
@@ -257,6 +299,8 @@ export const AddMemo = () => {
                                     }}
                                     {...titleReg}
                                     onKeyDown={handleKeyDown}
+                                    onFocus={() => setTitleFocus(true)}
+                                    onBlur={() => setTitleFocus(false)}
                                     rows={1}
                                     placeholder='제목'
                                     className='resize-none w-full pr-6px max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
@@ -271,6 +315,8 @@ export const AddMemo = () => {
                                     contentTextarea.current = e;
                                 }}
                                 {...contentReg}
+                                onFocus={() => setContentFocus(true)}
+                                onBlur={() => setContentFocus(false)}
                                 rows={1}
                                 placeholder='메모 작성...'
                                 className={`${readyToMemo ? 'pt-9px' : 'pt-0'} resize-none max-h-[300px] w-full bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll`}
@@ -353,8 +399,8 @@ export const AddMemo = () => {
                             </span>
                             <div className='absolute top-1/2 -translate-y-1/2 text-13 right-13px text-white font-semibold'>
                                 질문 가능 횟수:
-                                <span className={`${gptAvailable === 0 && 'text-red-300'}`}>
-                                    {` ${gptAvailable}`}
+                                <span>
+                                    {` ${userState.gptAvailable}`}
                                 </span>
                             </div>
                         </div>
@@ -375,7 +421,10 @@ export const AddMemo = () => {
                                     ) : gptLoading ? (
                                         // 답변 응답을 받는중인 경우 ( 로딩중 )
                                         <>
-                                            gpt가 답변을 준비하고 있어요.
+                                            {
+                                                waitText ? '답변이 거의 완성되었어요!' :
+                                                'gpt가 답변을 준비하고 있어요.'
+                                            }
                                         </>
                                     ) : gptContent !== '' && (
                                         // 답변을 받은 경우
@@ -398,6 +447,7 @@ export const AddMemo = () => {
                                 onKeyDown={handleKeydownForGptSubmit}
                                 value={gptTextInput}
                                 rows={1}
+                                disabled={gptLoading}
                                 placeholder='GPT에게 물어보세요! ( Shift + Enter 줄바꿈 )'
                                 className='resize-none bg-transparent placeholder:text-zete-gray-500 font-light placeholder:text-14 w-full h-fit'
                             />

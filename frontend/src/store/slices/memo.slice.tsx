@@ -11,34 +11,40 @@ import {Api} from "../../common/api";
 import {showAlert} from "./alert.slice";
 
 
-/** state 변경매서드 */
+/** state dispatch 매서드 */
 
-export const resetMemos = () => store.dispatch(memoSlice.actions.RESET_MEMOS());
-export const resetSearch = () => store.dispatch(memoSlice.actions.RESET_SEARCH());
-export const setSearch = (value: string) => store.dispatch(memoSlice.actions.SET_SEARCH(value));
+export const resetMemos = () => {
+    store.dispatch(memoSlice.actions.RESET_MEMOS());
+}
+export const resetSearch = () => {
+    store.dispatch(memoSlice.actions.RESET_SEARCH());
+}
+export const setSearch = (value: string) => {
+    store.dispatch(memoSlice.actions.SET_SEARCH(value));
+}
+
+
+/** API를 통한 state 변경매서드 */
 
 export const importantConverter = (memoId: number) => {
     Api.memo.changeImportant({memoId})
         .then((res) => {
             if (res.data.success) {
-                store.dispatch(memoSlice.actions.SET_IMPORTANT_LENGTH(Number(res.data.importantMemoCount)))
+                store.dispatch(memoSlice.actions.SET_IMPORTANT_LENGTH(Number(res.data.importantMemoCount)));
                 store.dispatch(memoSlice.actions.CHANGE_IMPORTANT(memoId));
             }
-            else console.log(res.data.error)
+            else console.log(res.data.error);
         })
         .catch(e => console.log(e));
 }
 
-/** API를 통한 state 변경매서드 */
-
 export const loadAsideData = () => {
     Api.memo.getAsideData()
         .then((res) => {
-            console.log('이거슨 어사이드 데이타\n',res.data.asideData)
             if (res.data.success) {
                 store.dispatch(memoSlice.actions.SET_ASIDE_DATA(res.data.asideData));
             }
-            else console.log(res.data.error)
+            else console.log(res.data.error);
         })
         .catch(e => console.log(e));
 }
@@ -94,7 +100,7 @@ export const deleteMemo = (memoId: number, create?: string) => {
     Api.memo.deleteMemo({memoId})
         .then((res) => {
             if (res.data.success) {
-                if (create === 'create') return
+                if (create === 'create') return;
                 store.dispatch(memoSlice.actions.DELETE_MEMO(memoId));
                 showAlert(res.data.message);
             }
@@ -127,8 +133,8 @@ export const memoSlice = createSlice({
     name: 'memo',
     initialState: memoSliceInitState,
     reducers: {
-        SET_ASIDE_DATA: (state: CombineData, action: PayloadAction<AsideData>) => {
-            const { cate, ...payload } = action.payload;
+        SET_ASIDE_DATA: (state: CombineData, { payload }: PayloadAction<AsideData>) => {
+            const { cate, ...leftStates } = payload;
             state.data.cate = cate.map(val => ({
                 ...val,
                 id: Number(val.id),
@@ -138,28 +144,26 @@ export const memoSlice = createSlice({
                     return tag
                 }) || [],
             })).sort((a, b) => a.cateName > b.cateName ? 1 : -1);
-            state.data.memosCount = payload.memosCount;
-            state.data.importantMemoCount = payload.importantMemoCount;
+            state.data.memosCount = leftStates.memosCount;
+            state.data.importantMemoCount = leftStates.importantMemoCount;
         },
-        SET_CATE: (state: CombineData, action: PayloadAction<Category[]>) => {
-            state.data.cate = action.payload;
+        SET_CATE: (state: CombineData, { payload }: PayloadAction<Category[]>) => {
+            state.data.cate = payload;
         },
-        ADD_CATE: (state: CombineData, action: PayloadAction<CategoriesAndMemoCount>) => {
-            state.data.cate = [...state.data.cate, action.payload]
-                .sort((a, b) => a.cateName > b.cateName ? 1 : -1);
+        ADD_CATE: (state: CombineData, { payload }: PayloadAction<CategoriesAndMemoCount>) => {
+            state.data.cate = [...state.data.cate, payload].sort((a, b) => a.cateName > b.cateName ? 1 : -1);
         },
-        UPDATE_CATE: (state: CombineData, action: PayloadAction<CateInput>) => {
+        UPDATE_CATE: (state: CombineData, { payload }: PayloadAction<CateInput>) => {
             state.data.cate = state.data.cate.map((cate) => {
-                if (cate.id === action.payload.cateId) {
-                    cate.cateName = action.payload.cateName;
-                    return cate;
-                } else {
+                if (cate.id === payload.cateId) {
+                    cate.cateName = payload.cateName;
                     return cate;
                 }
+                else return cate;
             }).sort((a, b) => a.cateName > b.cateName ? 1 : -1);
         },
-        DELETE_CATE: (state: CombineData, action: PayloadAction<{ importantMemoCount: number, cateId: number }>) => {
-            const { cateId, importantMemoCount } = action.payload;
+        DELETE_CATE: (state: CombineData, { payload }: PayloadAction<{ importantMemoCount: number, cateId: number }>) => {
+            const { cateId, importantMemoCount } = payload;
             const { memos, cate } = state.data;
 
             const targetLength = cate.find(cate => cate.id === cateId).memoCount;
@@ -169,8 +173,8 @@ export const memoSlice = createSlice({
             state.data.memos = memos.filter(memo => memo.cateId !== cateId) || [];
             state.data.cate = cate.filter(exists => exists.id !== cateId) || [];
         },
-        SET_MEMO: (state: CombineData, action: PayloadAction<Memo[]>) => {
-            state.data.memos = [...state.data.memos, ...action.payload.map((memos) => {
+        SET_MEMO: (state: CombineData, { payload }: PayloadAction<Memo[]>) => {
+            state.data.memos = [...state.data.memos, ...payload.map((memos) => {
                 if (memos.cateId !== null) {
                     memos.cateId = Number(memos.cateId);
                     return memos
@@ -178,20 +182,20 @@ export const memoSlice = createSlice({
                 return memos;
             })];
         },
-        ADD_MEMO: (state: CombineData, action: PayloadAction<Memo>) => {
-            state.data.memos = [...state.data.memos, action.payload]
+        ADD_MEMO: (state: CombineData, { payload }: PayloadAction<Memo>) => {
+            state.data.memos = [...state.data.memos, payload]
                 .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
             loadAsideData();
         },
-        REFRESH_MEMOS: (state: CombineData, action: PayloadAction<Memo[]>) => {
-            state.data.memos = action.payload
+        REFRESH_MEMOS: (state: CombineData, { payload }: PayloadAction<Memo[]>) => {
+            state.data.memos = payload
                 .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
             loadAsideData();
         },
-        REFRESH_TARGET_MEMO: (state: CombineData, action: PayloadAction<Memo>) => {
+        REFRESH_TARGET_MEMO: (state: CombineData, { payload }: PayloadAction<Memo>) => {
             state.data.memos = state.data.memos.map((memo) => {
-                if (memo.id === action.payload.id) {
-                    memo = action.payload;
+                if (memo.id === payload.id) {
+                    memo = payload;
                     memo.cateId = memo.cateId === null ? null : Number(memo.cateId);
                     return memo;
                 }
@@ -199,22 +203,21 @@ export const memoSlice = createSlice({
             }).sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
             loadAsideData();
         },
-        SET_IMPORTANT_LENGTH: (state: CombineData, action: PayloadAction<number>) => { state.data.importantMemoCount = action.payload; },
-        CHANGE_IMPORTANT: (state: CombineData, action: PayloadAction<number>) => {
+        SET_IMPORTANT_LENGTH: (state: CombineData, { payload }: PayloadAction<number>) => {
+            state.data.importantMemoCount = payload;
+        },
+        CHANGE_IMPORTANT: (state: CombineData, { payload }: PayloadAction<number>) => {
             state.data.memos = state.data.memos.map((memos) => {
-                if (memos.id === action.payload) {
-                    return { ...memos, important: memos.important !==true };
-                } else {
-                    return memos;
-                }
+                if (memos.id === payload) return { ...memos, important: memos.important !==true };
+                else return memos;
             }).sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
         },
-        DELETE_MEMO: (state, action: PayloadAction<number>) => {
-            state.data.memos = state.data.memos.filter(memo => memo.id !== action.payload)
+        DELETE_MEMO: (state, { payload }: PayloadAction<number>) => {
+            state.data.memos = state.data.memos.filter(memo => memo.id !== payload)
                 .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
         },
-        SET_SEARCH: (state: CombineData, action: PayloadAction<string>) => {
-            state.searchInput = action.payload;
+        SET_SEARCH: (state: CombineData, { payload }: PayloadAction<string>) => {
+            state.searchInput = payload;
         },
         RESET_MEMOS: (state: CombineData) => {
             state.data.memos = [];
@@ -225,4 +228,4 @@ export const memoSlice = createSlice({
     },
 });
 
-export const { ADD_MEMO, SET_MEMO, UPDATE_CATE } = memoSlice.actions;
+export const { SET_MEMO, UPDATE_CATE } = memoSlice.actions;

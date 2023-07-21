@@ -98,6 +98,15 @@ export const returnFalse = () => false;
 
 /** -------- close ------- */
 
+export const getGptRefillAt = () => {
+    const date = new Date();
+    const year = String(date.getFullYear());
+    const month = String(date.getMonth() + 1);
+    const day = String(date.getDate());
+
+    return Number(year + month + day);
+}
+
 
 /** ---- 메모 (생성, 업데이트) + 자동저장기능 모듈매서드 ---- */
 export interface HandleUpdateOrAddMemoInterface {

@@ -16,6 +16,10 @@ import { CreateAccountDto } from './dtos/createAccount.dto';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import { UpdateAccountDto } from './dtos/updateAccount.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  GptRefillInputDto,
+  GptAvailableOutputDto,
+} from './dtos/gptManagement.dto';
 
 @Controller('user')
 @ApiTags('User') //스웨거 Tag를 지정
@@ -62,9 +66,13 @@ export class UserController {
     return this.userService.delete(id);
   }
 
-  @ApiResponse({ type: CoreOutput })
-  @Post('testApi')
-  async testApi(@Body('id') id: number): Promise<CoreOutput> {
-    return { success: true, target: `test: ${id}` };
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ type: GptAvailableOutputDto })
+  @Patch('tryGptAvailableRefill')
+  async tryGptAvailableRefill(
+    @Body() input: GptRefillInputDto,
+    @Req() req,
+  ): Promise<GptAvailableOutputDto> {
+    return this.userService.tryGptAvailableRefill(input, req.user);
   }
 }

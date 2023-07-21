@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {Api} from "../../common/api";
+import {store} from "../index";
 
 export interface userState {
     data: {
@@ -7,6 +8,8 @@ export interface userState {
         email: string | null,
         mobile: string | null,
         password: string | null,
+        gptAvailable: number | null,
+        gptRefillAt: number | null,
     },
     loading: boolean,
 }
@@ -16,6 +19,8 @@ const initUserState: userState = {
         email: null,
         mobile: null,
         password: null,
+        gptAvailable: null,
+        gptRefillAt: null,
     },
     loading: true,
 }
@@ -26,17 +31,22 @@ export const sendMyProfile = createAsyncThunk(
         try {
             const response = await Api.user.profile();
 
-            if (!response) {
-                return thunkAPI.rejectWithValue(null);
-            }
+            if (!response) return thunkAPI.rejectWithValue(null);
 
             return response.data;
         }
         catch (err) {
-            return thunkAPI.rejectWithValue(err);
+            thunkAPI.rejectWithValue(err);
         }
     }
 );
+
+export const dispatchGptAvailable = (available: number) => {
+    store.dispatch(userSlice.actions.SET_GPT_AVAILABLE(available));
+}
+export const dispatchGptRefillAt = (refillAt: number) => {
+    store.dispatch(userSlice.actions.SET_GPT_REFILL_AT(refillAt));
+}
 
 export const userSlice = createSlice({
     name: 'user',
@@ -44,6 +54,12 @@ export const userSlice = createSlice({
     reducers: {
         SET_USER: (state: userState, { payload }) => {
             state.data = payload;
+        },
+        SET_GPT_AVAILABLE: (state: userState, { payload }) => {
+            state.data.gptAvailable = payload;
+        },
+        SET_GPT_REFILL_AT: (state: userState, { payload }) => {
+            state.data.gptRefillAt = payload;
         }
     },
     extraReducers: (builder) => {

@@ -15,8 +15,8 @@ export const changedMenuSlice = createSlice({
         TOGGLE_SHOW_MENU: (state: ChangedMenuState) => {
             state.showMenu = !state.showMenu;
         },
-        SET_SHOW_MENU: (state: ChangedMenuState, action: PayloadAction<boolean>) => {
-            state.showMenu = action.payload;
+        SET_SHOW_MENU: (state: ChangedMenuState, { payload }: PayloadAction<boolean>) => {
+            state.showMenu = payload;
         },
     },
 })

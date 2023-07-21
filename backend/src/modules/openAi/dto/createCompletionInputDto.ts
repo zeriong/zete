@@ -12,4 +12,7 @@ export class CreateCompletionInputDto {
 export class CreateCompletionOutputDto extends CoreOutput {
   @ApiProperty()
   resGpt?: string;
+
+  @ApiProperty({ type: Number })
+  gptAvailable?: number;
 }

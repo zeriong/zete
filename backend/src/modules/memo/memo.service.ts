@@ -37,7 +37,7 @@ export class MemoService {
     private readonly tagsRepository: Repository<Tag>,
   ) {}
 
-  // getData =====================================================
+  /** getData ===================================================== */
 
   async getAsideData(user: User): Promise<AsideDataOutput> {
     try {
@@ -159,7 +159,7 @@ export class MemoService {
     }
   }
 
-  // Category =======================================================================
+  /** Category ======================================================================= */
 
   async createCategory(
     input: CreateCateInput,
@@ -255,7 +255,7 @@ export class MemoService {
     }
   }
 
-  // Memo ===============================================================
+  /** Memo =============================================================== */
 
   async createMemo(
     input: CreateMemoInput,

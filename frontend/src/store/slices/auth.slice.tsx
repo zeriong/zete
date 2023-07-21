@@ -22,9 +22,9 @@ export const sendLogout = createAsyncThunk(
     async (_, thunkAPI) => {
         try {
             const response = await Api.auth.logout();
-            if (!response || !response.data) {
-                return thunkAPI.rejectWithValue(null);
-            }
+
+            if (!response || !response.data) return thunkAPI.rejectWithValue(null);
+
             return response.data;
         }
         catch (err) {
@@ -39,9 +39,7 @@ export const sendRefreshAccessToken = createAsyncThunk(
         try {
             const response = await Api.auth.refreshToken();
 
-            if (!response || !response.data) {
-                return thunkAPI.rejectWithValue(null);
-            }
+            if (!response || !response.data) return thunkAPI.rejectWithValue(null);
 
             return response.data;
         }
@@ -55,35 +53,39 @@ export const authSlice = createSlice({
     name: 'auth',
     initialState: initAuthState,
     reducers: {
-        SET_LOGIN: (state: AuthState, action: PayloadAction<string>) => {
-            state.data.accessToken = action.payload;
-            localStorage.setItem('at', state.data.accessToken);
+        SET_LOGIN: (state: AuthState, { payload }: PayloadAction<string>) => {
+            state.data.accessToken = payload;
             state.data.isLoggedIn = true;
+
+            localStorage.setItem('at', state.data.accessToken);
         },
         SET_LOGOUT: (state: AuthState) => {
             state.data.accessToken = '';
-            localStorage.setItem('at', '');
             state.data.isLoggedIn = false;
+
+            localStorage.setItem('at', '');
         },
     },
     extraReducers: (builder) => {
         // sendRefreshAccessToken
-        builder.addCase(sendRefreshAccessToken.fulfilled, (state: AuthState, action) => {
-            if (action.payload.success) {
+        builder.addCase(sendRefreshAccessToken.fulfilled, (state: AuthState, { payload }) => {
+            if (payload.success) {
                 state.data.isLoggedIn = true;
-                state.data.accessToken = action.payload.accessToken;
-                localStorage.setItem('at', state.data.accessToken);
+                state.data.accessToken = payload.accessToken;
                 state.loading = false;
+
+                localStorage.setItem('at', state.data.accessToken);
             }
         });
-        builder.addCase(sendRefreshAccessToken.rejected, (state: AuthState, action) => {
+        builder.addCase(sendRefreshAccessToken.rejected, (state: AuthState) => {
             state.loading = false;
         });
         // sendLogout
-        builder.addCase(sendLogout.fulfilled, (state: AuthState, action) => {
-            if (action.payload.success) {
+        builder.addCase(sendLogout.fulfilled, (state: AuthState, { payload }) => {
+            if (payload.success) {
                 state.data.isLoggedIn = false;
                 state.data.accessToken = '';
+
                 localStorage.setItem('at', '');
             }
         });

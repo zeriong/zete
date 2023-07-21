@@ -8,6 +8,10 @@ import { CoreOutput } from '../../common/dtos/coreOutput.dto';
 import * as Validator from 'class-validator';
 import { UserDataOutput } from './dtos/userData.dto';
 import { UpdateAccountDto } from './dtos/updateAccount.dto';
+import {
+  GptRefillInputDto,
+  GptAvailableOutputDto,
+} from './dtos/gptManagement.dto';
 
 /** 실질적인 서비스 구현 */
 @Injectable()
@@ -20,7 +24,7 @@ export class UserService {
     try {
       //중복 검증
       const exists = await this.userRepository.findOne({
-        where: [{ email: input.email }],
+        where: { email: input.email },
       });
 
       if (exists) {
@@ -38,6 +42,8 @@ export class UserService {
           password: await bcrypt.hash(input.password, 10),
           name: input.name,
           mobile: input.mobile,
+          gptAvailable: 10,
+          gptRefillAt: input.gptRefillAt,
         }),
       );
 
@@ -81,6 +87,41 @@ export class UserService {
       return { success: false, error: '로그인 검증 실패.' };
     }
   }
+
+  /** gpt Available 리필 시도 */
+  async tryGptAvailableRefill(
+    input: GptRefillInputDto,
+    user: User,
+  ): Promise<GptAvailableOutputDto> {
+    try {
+      const findUser = await this.userRepository.findOne({
+        where: { id: user.id },
+      });
+
+      if (input.gptRefillAt === findUser.gptRefillAt) {
+        return {
+          success: true,
+          gptRefillAt: findUser.gptRefillAt,
+          gptAvailable: findUser.gptAvailable,
+          message: '자정이 지나면 리필됩니다.',
+        };
+      }
+
+      findUser.gptRefillAt = input.gptRefillAt;
+      findUser.gptAvailable = 10;
+
+      await this.userRepository.save(findUser);
+
+      return {
+        success: true,
+        gptRefillAt: findUser.gptRefillAt,
+        gptAvailable: 10,
+      };
+    } catch (error) {
+      return { success: false, error: `gpt 통신 실패, error: ${error}` };
+    }
+  }
+
   /** 모든유저정보 */
   async getAll(): Promise<User[]> {
     return this.userRepository.find();
@@ -157,9 +198,5 @@ export class UserService {
     } catch (e) {
       return { success: false, error: '유저 데이터 업데이트 실패' };
     }
-  }
-  /** 단일조건 검색용 메소드 */
-  async findOne(condition: any): Promise<User> {
-    return this.userRepository.findOne(condition);
   }
 }

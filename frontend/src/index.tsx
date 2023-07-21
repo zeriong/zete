@@ -8,7 +8,7 @@ import {InitApi} from "./common/api";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-InitApi()
+InitApi();
 
 root.render(
       <Provider store={store}>

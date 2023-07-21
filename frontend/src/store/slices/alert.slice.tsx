@@ -13,16 +13,16 @@ const initNotificationState: INotificationState = {
     alerts: [],
 }
 
-export const showAlert = (msg: string) => {
-    store.dispatch(alertSlice.actions.SET_ALERT({ message: msg }))
+export const showAlert = (message: string) => {
+    store.dispatch(alertSlice.actions.SET_ALERT({ message }))
 }
 
 export const alertSlice = createSlice({
     name: 'alert',
     initialState: initNotificationState,
     reducers: {
-        SET_ALERT: (state: INotificationState, action: PayloadAction<IAlertObject>) => {
-            state.alerts.push({message: action.payload.message});
+        SET_ALERT: (state: INotificationState, { payload }: PayloadAction<IAlertObject>) => {
+            state.alerts.push({message: payload.message});
         },
         DELETE_ALERT: (state:INotificationState) => {
             state.alerts.shift();

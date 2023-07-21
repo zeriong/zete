@@ -19,17 +19,17 @@ export const CateModifyModal = (props: { buttonText: string }) => {
     const dispatch = useDispatch();
 
     const closeModal = () => {
-        setAddInputValues({ addCateName: '' })
-        setIsShow(false)
+        setAddInputValues({ addCateName: '' });
+        setIsShow(false);
     }
 
     // 카테고리 생성 form submit
     const handleSubmit = (e) => {
         e.preventDefault();
-        createCategory({ cateName: addInputValues.addCateName })
+        createCategory({ cateName: addInputValues.addCateName });
         setAddInputValues({
             addCateName: ''
-        })
+        });
     }
 
     // 카테고리 생성 input change
@@ -37,31 +37,29 @@ export const CateModifyModal = (props: { buttonText: string }) => {
         setAddInputValues({
             ...addInputValues,
             [e.target.name]: e.target.value,
-        })
+        });
     }
 
     // 카테고리 업데이트 input submit
     const handleUpdateFormSubmit = (id: number, prevVal: string, input: any) => {
         const val = input.value
         if (val && val.length > 1 && val !== prevVal) {
-            //console.log('handleUpdateFormSubmit - ', val)
             Api.memo.updateCategory({ cateId: id, cateName: val })
                 .then((res) => {
                     if (res.data) {
-                        if (res.data.success) {
-                            dispatch(UPDATE_CATE({ cateId: id, cateName: val }))
-                        } else {
+                        if (res.data.success) dispatch(UPDATE_CATE({ cateId: id, cateName: val }));
+                        else {
                             // 입력 초기화
-                            input.value = prevVal
-                            showAlert(res.data.error)
+                            input.value = prevVal;
+                            showAlert(res.data.error);
                         }
                     }
                 })
                 .catch((e) => {
                     // 입력 초기화
-                    input.value = prevVal
-                    console.log('에러: ', e)
-                    showAlert("카테고리 업데이트에 실패하였습니다.")
+                    input.value = prevVal;
+                    console.log('에러: ', e);
+                    showAlert("카테고리 업데이트에 실패하였습니다.");
                 })
         }
     }
@@ -69,7 +67,7 @@ export const CateModifyModal = (props: { buttonText: string }) => {
     // 카테고리 업데이트 input change
     const handleUpdateInputChange = (id: number, value: string) => {
         setUpdateInputValues((state) => {
-            state[id] = value
+            state[id] = value;
             return { ...state }
         })
     }
@@ -80,22 +78,18 @@ export const CateModifyModal = (props: { buttonText: string }) => {
         cate.map((cate) => (
             values = { ...values, [cate.id]: cate.cateName }
         ));
-        setUpdateInputValues(values)
-    }, [cate])
+        setUpdateInputValues(values);
+    }, [cate]);
 
+    // 모달 오픈시 카테고리 목록 갱신
     useEffect(() => {
-        if (isShow) {
-            // 모달 오픈시 카테고리 목록 갱신
-            loadAsideData();
-        }
-    },[isShow])
+        if (isShow) loadAsideData();
+    },[isShow]);
 
     return (
         <>
             <button
-                onClick={() => {
-                    setIsShow(true);
-                }}
+                onClick={() => setIsShow(true)}
                 type='button'
                 className='flex w-full justify-between items-center px-10px py-8px rounded-[5px] mt-4px h-42px'
             >
@@ -174,7 +168,7 @@ export const CateModifyModal = (props: { buttonText: string }) => {
                                                             >
                                                                 <FillCategoryIcon className='relative -left-3px fill-zete-dark-100 mr-10px'/>
                                                                 <input
-                                                                    placeholder='수정할 태그를 입력해주세요.'
+                                                                    placeholder='카테고리 이름을 입력해주세요.'
                                                                     value={updateInputValues[val.id] || ''}
                                                                     onChange={(event) => handleUpdateInputChange(val.id, event.target.value)}
                                                                     className='font-medium w-full flex items-center'

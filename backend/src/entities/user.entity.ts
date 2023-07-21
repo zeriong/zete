@@ -32,6 +32,15 @@ export class User extends coreEntity {
   @Column({ nullable: true, type: 'tinytext' })
   refreshToken?: string;
 
+  /** gpt available */
+  @ApiProperty({ type: Number })
+  @Column()
+  gptRefillAt: number;
+
+  @ApiProperty({ type: Number })
+  @Column()
+  gptAvailable: number;
+
   @ApiProperty({ type: [Category] })
   @OneToMany(() => Category, (categories) => categories.user, {
     cascade: true,

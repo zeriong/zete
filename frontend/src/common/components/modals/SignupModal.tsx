@@ -5,7 +5,7 @@ import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {Dialog, Transition } from "@headlessui/react";
 import {FuncButton} from "../funcButton";
-import {exportApis} from "../../../openapi/generated";
+import {CreateAccountDto, exportApis} from "../../../openapi/generated";
 import {Api} from "../../api";
 
 /** 폼항목 */
@@ -66,13 +66,14 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
     /** submit */
     const onSubmit = handleSubmit(async () => {
         const {email,password,name,mobile} = getValues();
-        await Api.user.createAccount(
-            {
-                "email": email,
-                "password": password,
-                "name": name,
-                "mobile": mobile,
-            },)
+        const date = new Date();
+        const year = String(date.getFullYear());
+        const month = String(date.getMonth() + 1);
+        const day = String(date.getDate());
+        const gptRefillAt = Number(year + month + day);
+        const reqData: CreateAccountDto = {email, password, name, mobile, gptRefillAt};
+
+        await Api.user.createAccount(reqData)
             .then((res) => {
                 if (res.data.success) {
                     closeModal();
@@ -217,74 +218,6 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                             }}
                                         />
                                     </form>
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
-        </>
-    );
-};
-
-export const SuccessSignupModal = () => {
-    /** 쿼리를 이용한 모달 팝업 컨트롤 */
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [isShow, setIsShow] = useState(false);
-
-    let closeModal = () => {
-        if (searchParams.get("modal") === "success-signup") {
-            searchParams.delete('modal');
-            setSearchParams(searchParams);
-        }
-    };
-
-    useEffect(() => {
-        if (searchParams.get("modal") === "success-signup") {
-            setIsShow(true);
-        } else { setIsShow(false) }
-    },[searchParams]);
-
-    return (
-        <>
-            <Transition appear show={isShow} as={Fragment}>
-                <Dialog as="div" className="relative z-20" onClose={closeModal}>
-                    <Transition.Child
-                        as={Fragment}
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
-                        <div className="fixed inset-0 bg-black bg-opacity-40" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 overflow-y-auto">
-                        <div className="flex min-h-full items-center justify-center p-4 text-center">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-24px md:p-32px text-left align-middle shadow-xl transition-all">
-                                    <div className="text-24 mb-20px">
-                                        회원가입 성공!
-                                    </div>
-                                    <div className="mb-24px">
-                                        Zeriong Kepp 서비스를 무료로 이용해보세요.
-                                    </div>
-                                    <div
-                                        className="w-[160px] flex justify-center cursor-pointer
-                                        rounded-[8px] p-4px bg-orange-500 text-white m-auto"
-                                        onClick={closeModal}
-                                    >
-                                        확인
-                                    </div>
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>
