@@ -1,9 +1,8 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {AddMemo} from "../components/addMemo";
 import Masonry from "react-masonry-css";
-import CustomScroller from "../../../common/components/customScroller";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import * as DOMPurify from "dompurify";
 import {FillStarIcon, StarIcon} from "../../../assets/vectors";
@@ -46,7 +45,6 @@ export const MemoMain = () => {
 
     const handleInterval = () => {
         intervalRef.current = setInterval(() => {
-            console.log('20분경과, 데이터 최신화');
             refreshMemos({
                 offset: 0,
                 limit: data.memos.length,
@@ -78,8 +76,8 @@ export const MemoMain = () => {
     },[searchParams, data]);
 
     return (
-        loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
-            <CustomScroller>
+        loading ? <div className="flex h-full items-center justify-center">로딩중...</div> : (
+            <>
                 <section className='relative top-0 gap-28px w-full p-16px browser-width-900px:p-30px'>
                     {!menuQueryStr && (
                         <div className='relative flex justify-center mt-6px mb-22px browser-width-900px:mb-30px browser-width-900px:mt-0'>
@@ -151,7 +149,7 @@ export const MemoMain = () => {
                 <div className='relative w-full h-1px'>
                     <div ref={paginationDivObsRef} className='absolute left-0 bottom-0 w-1px h-[500px]'/>
                 </div>
-            </CustomScroller>
+            </>
         )
     )
 }

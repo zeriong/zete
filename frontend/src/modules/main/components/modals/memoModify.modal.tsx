@@ -13,7 +13,7 @@ import {useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import {useHorizontalScroll} from "../../../../hooks/useHorizontalScroll";
 import {useForm} from "react-hook-form";
-import {UpdateMemoInput} from "../../../../openapi/generated";
+import {Memo, UpdateMemoInput} from "../../../../openapi/generated";
 
 interface UpdateFormInterface {
     update: UpdateMemoInput;
@@ -23,6 +23,8 @@ interface UpdateFormInterface {
 export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
     const tagsInput = useRef<HTMLInputElement>(null);
     const typingTimout = useRef<NodeJS.Timeout>(null);
+    const isUpdate = useRef<boolean>(false);
+    const temporarySaveMemo = useRef<Memo>(null);
 
     const { data } = useSelector((state:RootState) => state.memo);
     const {
@@ -38,8 +40,6 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
 
     const [isShow, setIsShow] = useState<boolean>(false);
     const [isImportant, setIsImportant] = useState<boolean>(false);
-    const [isUpdate, setIsUpdate] = useState(false);
-
     const form = useForm<UpdateFormInterface>();
 
     const closeModal = () => {
@@ -48,53 +48,35 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
     }
 
     // 업데이트 핸들러
-    const handleUpdate = () => {
+    const handleUpdate = (auto: boolean) => {
         updateOrAddMemo({
             getTitle: form.getValues('update.memo.title'),
             getContent: form.getValues('update.memo.content'),
             getNewTags: form.getValues('update.newTags'),
-            memoId: memoId,
             getCateId: form.getValues('cateId'),
-            autoReq: false,
-            reqType: 'update',
             typingTimeout: typingTimout,
+            reqType: 'update',
+            memoId: memoId,
+            autoReq: auto,
+            isUpdate,
+            cateQueryStr,
+            tagQueryStr,
+            menuQueryStr,
+            isImportant,
             closeModal,
-            cateQueryStr,
-            tagQueryStr,
-            menuQueryStr,
-            isImportant,
-            setIsDone: setIsUpdate,
-            isDone: isUpdate,
-        });
-    };
-
-    // 타이핑 자동 업데이트 핸들러
-    const handleAutoUpdate = () => {
-        updateOrAddMemo({
-            getTitle: form.getValues('update.memo.title'),
-            getContent: form.getValues('update.memo.content'),
-            getNewTags: form.getValues('update.newTags'),
-            memoId: memoId,
-            getCateId: form.getValues('cateId'),
-            autoReq: true,
-            reqType: 'update',
-            typingTimeout: typingTimout,
-            cateQueryStr,
-            tagQueryStr,
-            menuQueryStr,
-            isImportant,
-            setIsDone: setIsUpdate,
-            isDone: isUpdate,
+            temporarySaveMemo,
         });
     };
 
     const handleOnChangeUpdate = () => {
+        isUpdate.current = false;
+
         if (typingTimout.current != null) {
             clearTimeout(typingTimout.current);
             typingTimout.current = null;
         }
         if (typingTimout.current === null) {
-            typingTimout.current = setTimeout(() => handleAutoUpdate(), 3000);
+            typingTimout.current = setTimeout(() => handleUpdate(true), 3000);
         }
     };
 
@@ -113,6 +95,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
             setIsShow(true);
             const targetMemo = data.memos.find(find => find.id === memoId);
             if (targetMemo) {
+                temporarySaveMemo.current = targetMemo;
                 const tags = targetMemo.tag.map(tag => ({ tagName: tag.tagName }));
                 form.setValue('update.newTags', tags);
                 form.setValue('update.memo.title', targetMemo.title.replace(/<br\/>/g, '\n'));
@@ -130,7 +113,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
             <Dialog
                 as="div"
                 className="relative z-40"
-                onClose={handleUpdate}
+                onClose={() => handleUpdate(false)}
             >
                 <Transition.Child
                     as={Fragment}

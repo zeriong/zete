@@ -9,6 +9,8 @@ import {CategoryIcon} from "../../../assets/vectors";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {SearchMemo} from "../components/searchMemo";
 import {loadAsideData} from "../../../store/slices/memo.slice";
+import {SET_SHOW_MENU} from "../../../store/slices/changedMenu.slice";
+import CustomScroller from "../../../common/components/customScroller";
 export const MemoLayout = () => {
     const { loading } = useSelector((state: RootState) => (state.user));
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
@@ -21,6 +23,11 @@ export const MemoLayout = () => {
         dispatch(sendMyProfile());
         loadAsideData();
     }, [dispatch]);
+
+    // 모바일사이즈로 렌더링되는경우 사이드바 숨기기
+    useEffect(() => {
+        if (window.innerWidth <= 767) dispatch(SET_SHOW_MENU(false));
+    },[]);
 
     const categoryName = useMemo(() => {
         if (!cateQueryStr && !menuQueryStr) return "전체메모";
@@ -52,8 +59,10 @@ export const MemoLayout = () => {
                             <SearchMemo/>
                         </div>
                     </header>
-                    <div className='w-full h-full bg-zete-light-gray-100'>
-                        <Outlet/>
+                    <div className='w-full h-full bg-zete-light-gray-100 overflow-auto'>
+                        <CustomScroller autoHide={false}>
+                            <Outlet/>
+                        </CustomScroller>
                     </div>
                 </div>
             </main>

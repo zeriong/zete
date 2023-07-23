@@ -27,6 +27,9 @@ export const AddMemo = () => {
     const gptAreaRef = useRef<HTMLElement>(null);
     const gptTextareaRef = useRef<HTMLTextAreaElement>(null);
     const typingTimout = useRef<NodeJS.Timeout>(null);
+    const moveGptContentToMemoContentBtn = useRef<HTMLButtonElement>(null);
+    const isUpdate = useRef<boolean>(false);
+    const temporarySaveMemo = useRef<Memo>(null);
 
     const { cateQueryStr, tagQueryStr, searchParams } = useHandleQueryStr();
     const { cate } = useSelector((state: RootState) => state.memo.data);
@@ -36,16 +39,15 @@ export const AddMemo = () => {
 
     const [isImportant, setIsImportant] = useState<boolean>(false);
     const [readyToMemo, setReadyToMemo] = useState<boolean | number>(0);
-    const [openGPT, setOpenGPT] = useState(false);
+    const [openGpt, setOpenGpt] = useState(false);
     const [gptTextInput, setGptTextInput] = useState('');
-    const [temporarySaveMemo, setTemporarySaveMemo] = useState<Memo>();
-    const [isDone, setIsDone] = useState(false);
     const [memoId, setMemoId] = useState(0);
     const [gptLoading, setGptLoading] = useState(false);
     const [gptContent, setGptContent] = useState('');
     const [titleFocus, setTitleFocus] = useState(false);
     const [contentFocus, setContentFocus] = useState(false);
-    const [waitText, setWaitText] = useState(false)
+    const [waitText, setWaitText] = useState(false);
+    const [hoverGptContent, setHoverGptContent] = useState(false);
 
     const form = useForm<CreateMemoInput>({ mode: 'onBlur' });
 
@@ -66,12 +68,22 @@ export const AddMemo = () => {
         },
     });
 
+    const titleOnFocus = () => setTitleFocus(true);
+    const titleOnBlur = () => setTitleFocus(false);
+    const contentOnFocus = () => setContentFocus(true);
+    const contentOnBlur = () => setContentFocus(false);
+
+    const gptContentOnMouseEnter = () => setHoverGptContent(true);
+    const gptContentOnMouseLeave = () => setHoverGptContent(false);
+
+    // 메모상자 초기화 함수
     const resetAddMemoForm = () => {
         form.reset({ title: '', content: '', cateId: Number(cateQueryStr) || 0, tags: [] });
         contentTextarea.current.style.height = 'auto';
         titleTextarea.current.style.height = 'auto';
     }
 
+    // 제목에서 Enter = textarea -> focus / shift + enter = 줄바꿈
     const handleKeyDown = (e) => {
         if (e.shiftKey && e.key === 'Enter') {
             const startPos = e.target.selectionStart;
@@ -88,57 +100,40 @@ export const AddMemo = () => {
         handleResizeHeight(titleTextarea);
     }
 
-    // 업데이트 핸들러
-    const handleUpdate = () => {
+    // 업데이트 핸들러 (함수를 실행할때 데이터를 넣어야 최신화된 데이터로 동작)
+    const handleMemoRequest = (auto: boolean) => {
         updateOrAddMemo({
             getTitle: form.getValues('title'),
             getContent: form.getValues('content'),
             getNewTags: form.getValues('tags'),
             getCateId: form.getValues('cateId'),
-            memoId,
-            autoReq: false,
-            reqType: 'create',
             typingTimeout: typingTimout,
+            reqType: 'create',
+            autoReq: auto,
             isImportant,
-            isDone,
-            setIsDone,
-            temporarySaveMemo,
-            setTemporarySaveMemo,
-        });
-    }
-
-    // 타이핑 자동 업데이트 핸들러
-    const handleAutoUpdateRequest = () => {
-        updateOrAddMemo({
-            getTitle: form.getValues('title'),
-            getContent: form.getValues('content'),
-            getNewTags: form.getValues('tags'),
             memoId,
             setMemoId,
-            getCateId: form.getValues('cateId'),
-            autoReq: true,
-            reqType: 'create',
-            typingTimeout: typingTimout,
-            isImportant,
-            isDone,
-            setIsDone,
+            isUpdate: isUpdate,
             temporarySaveMemo,
-            setTemporarySaveMemo,
         });
     }
 
+    // 중요메모 변경시에도 자동저장 필요
     const handleImportant = () => {
         handleOnChangeUpdate();
         setIsImportant(!isImportant);
     }
 
+    // 타이핑 자동저장 기능
     const handleOnChangeUpdate = () => {
+        isUpdate.current = false;
+
         if (typingTimout.current != null) {
             clearTimeout(typingTimout.current);
             typingTimout.current = null;
         }
         if (typingTimout.current === null) {
-            typingTimout.current = setTimeout(() => handleAutoUpdateRequest(), 3000);
+            typingTimout.current = setTimeout(() => handleMemoRequest(true), 3000);
         }
     }
 
@@ -154,17 +149,18 @@ export const AddMemo = () => {
 
     const requestGpt = () => {
         if (userState.gptAvailable === 0) return showAlert('질문가능 횟수가 초과하였습니다, 매일 자정이 지나면 충전됩니다.');
+        
         setGptLoading(true);
         Api.openAi.createCompletion({ content: gptTextInput })
             .then((res) => {
                 /* gpt 3.5 turbo 특성상 요청이 매우느리고 연속요청에 에러를 발생시키기 때문에 요청에러방지,
-                   사용자경험을 높이기 위해 요청을 받은 후 setWaitText를 통해 "답변이 거의 완성되었어요!" 문구를 띄움 */
+                   사용자경험을 향상을 위해 요청을 받은 후 setWaitText를 통해 "답변이 거의 완성되었어요!" 문구를 띄움 */
                 setWaitText(true);
-
+                
                 setTimeout(() => {
                     setWaitText(false);
                     setGptLoading(false);
-                }, 7000);
+                }, 5000);
 
                 if (!res.data.success) return showAlert(res.data.error);
                 if (res.data.message) return showAlert(res.data.message);
@@ -181,13 +177,14 @@ export const AddMemo = () => {
     }
 
     const handleGptSubmit = () => {
-        if (gptTextInput === '') showAlert('GPT: 대화내용을 입력해주세요');
-        else requestGpt();
+        if (gptTextInput === '') return showAlert('GPT: 대화내용을 입력해주세요');
+        
+        requestGpt();
         setGptTextInput('');
         gptTextareaRef.current.style.height = 'auto';
     }
 
-
+    // gptTextarea shift + enter 줄바꿈기능
     const handleKeydownForGptSubmit = (e) => {
         if (e.shiftKey && e.key === 'Enter') handleResizeHeight(gptTextareaRef);
         else if (e.key === 'Enter') {
@@ -196,13 +193,22 @@ export const AddMemo = () => {
         }
     }
 
+    // 새메모 작성중 취소할때 자동저장된 메모가 있다면 삭제하는 함수
     const HandleMemoCancel = () => {
         resetAddMemoForm();
         if (memoId === 0) return;
-        else {
-            deleteMemo(memoId, 'create');
-            setMemoId(0);
-        }
+        
+        deleteMemo(memoId, 'create');
+        setMemoId(0);
+    }
+
+    // gpt답변을 메모내용에 추가하는 함수
+    const moveGptContentToMemoContent = () => {
+        form.setValue('content', gptContent);
+        handleOnChangeUpdate();
+        setReadyToMemo(true);
+        handleResizeHeight(contentTextarea);
+        contentTextarea.current.focus();
     }
 
     useEffect(() => {
@@ -210,15 +216,15 @@ export const AddMemo = () => {
         form.setValue('tags', tagQueryStr ? [ { tagName: tagQueryStr } ] : []);
     },[searchParams]);
 
+
+    // 클릭시 메모상자인지 아닌지 감지
     useEffect(() => {
         const handleOutside = (e) => {
-            if (memoRef.current && memoRef.current.contains(e.target)) {
-                setReadyToMemo(true);
-            }
-            else if (gptBtnRef.current === e.target || gptAreaRef.current.contains(e.target)) return;
+            if (memoRef.current && memoRef.current.contains(e.target)) setReadyToMemo(true);
+            else if (gptAreaRef.current.contains(e.target)) return;
             else {
                 setReadyToMemo(false);
-                setOpenGPT(false);
+                setOpenGpt(false);
             }
         }
 
@@ -227,53 +233,71 @@ export const AddMemo = () => {
         return () => document.removeEventListener('mousedown', handleOutside);
     },[]);
 
+    // 메모상자가 메모를 적을 수 없는 상태일때 메모 업데이트 & 메모상자 초기화
     useEffect(() => {
         if (readyToMemo === false) {
-            handleUpdate();
+            handleMemoRequest(false);
             setIsImportant(false);
             resetAddMemoForm();
         }
     }, [readyToMemo]);
 
+    // gpt 질문가능횟수 통신함수
     const handleTryGptAvailable = (gptRefillAt) => {
         Api.user.tryGptAvailableRefill({ gptRefillAt })
             .then((res) => {
-                const data = res.data
-                if (data.success) {
-                    dispatchGptAvailable(data.gptAvailable);
-                    dispatchGptRefillAt(data.gptRefillAt);
-                }
+                // 성공시 success true만 존재함.
+                dispatchGptAvailable(res.data.gptAvailable);
+                dispatchGptRefillAt(res.data.gptRefillAt);
             }).catch(e => console.log(e));
     }
 
     /* gptOpen 일때 db에서 받아온 날짜비교하여 통신결정
        (initState가 null이기 때문에 최초에 반드시 1회 요청) */
     useEffect(() => {
-        if (openGPT) {
-            const gptRefillAt = getGptRefillAt();
-
-            if (userState.gptRefillAt !== gptRefillAt) {
-                handleTryGptAvailable(gptRefillAt);
-            }
+        if (!openGpt) return;
+        const gptRefillAt = getGptRefillAt();
+        
+        if (userState.gptRefillAt !== gptRefillAt) {
+            handleTryGptAvailable(gptRefillAt);
         }
-    }, [openGPT]);
+    }, [openGpt]);
 
+    // gpt 로딩이 끝나고 메모에 포커싱되지 않았다면 gptTextarea에 자동 포커싱
     useEffect(() => {
         if (!gptLoading && !titleFocus && !contentFocus) {
             gptTextareaRef.current.focus();
         }
-    }, [gptLoading])
+    }, [gptLoading]);
 
+    // gpt content hover 스타일 컨트롤
+    useEffect(() => {
+        if (moveGptContentToMemoContentBtn.current && gptContent && hoverGptContent && !waitText && !gptLoading) {
+            if (hoverGptContent) {
+                moveGptContentToMemoContentBtn.current.style.visibility = 'visible';
+                moveGptContentToMemoContentBtn.current.style.opacity = '100%';
+            }
+        }
+        else {
+            moveGptContentToMemoContentBtn.current.style.visibility = 'hidden';
+            moveGptContentToMemoContentBtn.current.style.opacity = '0%';
+        }
+    }, [hoverGptContent, waitText, gptLoading]);
+
+
+    // gpt button component
     const GptBtn = (props: { className?: string }) => {
         return (
             <button
                 ref={gptBtnRef}
                 type='button'
-                onClick={() => setOpenGPT(!openGPT)}
+                /* textarea에 onBlur이벤트 때문에 onClick시 동시에 이벤트가 일어나지 않고 onBlur만 실행
+                   이벤트 핸들러 작동 순서: mouseDown -> onBlur -> onClick -> mouseUp */
+                onMouseUp={() => setOpenGpt(!openGpt)}
                 className={`text-12 rounded-[8px] font-normal text-white border-2 border-zete-gpt-200
-                        py-4px px-8px ${openGPT ? 'bg-zete-gpt-100' : 'bg-zete-gpt-500'} ${props.className}`}
+                        py-4px px-8px ${openGpt ? 'bg-zete-gpt-100' : 'bg-zete-gpt-500'} ${props.className}`}
             >
-                GPT Action
+                AI에게 질문하기
             </button>
         )
     }
@@ -284,7 +308,7 @@ export const AddMemo = () => {
                 <article
                     ref={memoRef}
                     className={`relative flex flex-col justify-between transition-all duration-300 px-18px pb-10px pt-12px memo-shadow
-                    ${openGPT ? 'rounded-t-[8px] bg-white border-t-[10px] border-x-[10px] border-zete-gpt-100' : 'border border-zete-light-gray-500 rounded-[8px] bg-zete-primary-200'}`}
+                    ${openGpt ? 'rounded-t-[8px] bg-white border-t-[10px] border-x-[10px] border-zete-gpt-100' : 'border border-zete-light-gray-500 rounded-[8px] bg-zete-primary-200'}`}
                 >
                     <div className='relative w-full h-full flex flex-col'>
                         <div className='flex flex-col w-full h-full'>
@@ -299,8 +323,8 @@ export const AddMemo = () => {
                                     }}
                                     {...titleReg}
                                     onKeyDown={handleKeyDown}
-                                    onFocus={() => setTitleFocus(true)}
-                                    onBlur={() => setTitleFocus(false)}
+                                    onFocus={titleOnFocus}
+                                    onBlur={titleOnBlur}
                                     rows={1}
                                     placeholder='제목'
                                     className='resize-none w-full pr-6px max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
@@ -315,8 +339,8 @@ export const AddMemo = () => {
                                     contentTextarea.current = e;
                                 }}
                                 {...contentReg}
-                                onFocus={() => setContentFocus(true)}
-                                onBlur={() => setContentFocus(false)}
+                                onFocus={contentOnFocus}
+                                onBlur={contentOnBlur}
                                 rows={1}
                                 placeholder='메모 작성...'
                                 className={`${readyToMemo ? 'pt-9px' : 'pt-0'} resize-none max-h-[300px] w-full bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll`}
@@ -341,7 +365,10 @@ export const AddMemo = () => {
                                     ))}
                                     <form
                                         className='relative flex items-center text-zete-dark-400 text-12'
-                                        onSubmit={(e) => handleAddTagSubmit(e, form.getValues, form.setValue, 'tags')}
+                                        onSubmit={(e) => {
+                                            handleAddTagSubmit(e, form.getValues, form.setValue, 'tags');
+                                            handleMemoRequest(true);
+                                        }}
                                     >
                                         <input
                                             ref={tagsInput}
@@ -370,9 +397,7 @@ export const AddMemo = () => {
                                                 ))}
                                             </select>
                                         </div>
-                                        <>
-                                            <GptBtn className='ml-20px'/>
-                                        </>
+                                        <GptBtn className='ml-20px'/>
                                     </div>
                                     <button type='button' className='' onClick={HandleMemoCancel}>
                                         Cancel
@@ -384,16 +409,20 @@ export const AddMemo = () => {
                 </article>
             </div>
             {!readyToMemo &&
-                <GptBtn className={`absolute right-18px ${openGPT ? 'top-[calc(50%-10px)] -translate-[calc(50%-10px)]' : 'top-1/2 -translate-y-1/2'}`}/>
+                <GptBtn className={`absolute right-18px ${openGpt ? 'top-[calc(50%-10px)] -translate-[calc(50%-10px)]' : 'top-1/2 -translate-y-1/2'}`}/>
             }
             <article
                 ref={gptAreaRef}
                 className={`flex flex-col absolute transition-all duration-300 w-full bg-zete-gpt-100 h-0 rounded-b-[8px] overflow-hidden z-50 shadow-2xl
-                ${openGPT && 'h-[400px] p-10px'}`}
+                ${openGpt && 'h-[400px] p-10px'}`}
             >
                 <div className='flex flex-col relative w-full h-full'>
-                    <div className='relative grow text-start text-zete-dark-500 bg-white overflow-hidden rounded-[8px] p-8px bg-opacity-80'>
-                        <div className='relative text-center bg-zete-gpt-500 rounded-[8px] py-4px mb-4px'>
+                    <div
+                        onMouseEnter={gptContentOnMouseEnter}
+                        onMouseLeave={gptContentOnMouseLeave}
+                        className='relative grow text-start text-zete-dark-500 bg-white overflow-hidden rounded-[8px] p-8px bg-opacity-80'
+                    >
+                        <div className='relative text-center bg-zete-gpt-500 rounded-[8px] py-4px mb-16px'>
                             <span className='text-zete-gpt-black font-bold'>
                                 Chat GPT
                             </span>
@@ -404,7 +433,7 @@ export const AddMemo = () => {
                                 </span>
                             </div>
                         </div>
-                        <div className='overflow-auto max-h-[calc(100%-84px)] memo-custom-vertical-scroll'>
+                        <div className='relative h-[calc(100%-100px)] px-8px'>
                             {
                                 (!gptLoading && gptContent === '') ?
                                     (
@@ -428,16 +457,27 @@ export const AddMemo = () => {
                                         </>
                                     ) : gptContent !== '' && (
                                         // 답변을 받은 경우
-                                        <>
-                                            {gptContent}
-                                        </>
+                                        <textarea
+                                            readOnly={true}
+                                            value={gptContent}
+                                            rows={1}
+                                            className='resize-none w-full !h-full pb-46px bg-transparent memo-custom-vertical-scroll overflow-auto'
+                                        />
                                     )
                             }
                         </div>
+                        <button
+                            type='button'
+                            ref={moveGptContentToMemoContentBtn}
+                            onClick={moveGptContentToMemoContent}
+                            className='absolute bottom-[64px] left-1/2 -translate-x-1/2 transition-all duration-300 bg-zete-gpt-500 py-4px px-8px rounded-[8px] text-zete-light-gray-100'
+                        >
+                            메모에 추가하기 +
+                        </button>
                     </div>
                     <article
-                        className='flex items-center justify-between absolute bottom-10px p-8px bg-white shadow-1xl rounded-[12px] w-[calc(100%-20px)]
-                        border border-zete-light-gray-500 left-1/2 -translate-x-1/2 shadow-2xl'
+                        className={`flex items-center justify-between absolute bottom-10px p-8px shadow-1xl rounded-[12px] w-[calc(100%-20px)]
+                            border border-zete-light-gray-500 left-1/2 -translate-x-1/2 shadow-2xl ${gptLoading ? 'bg-zete-light-gray-300' : 'bg-white'}`}
                     >
                         <div className='relative flex items-center memo-custom-scroll overflow-auto max-h-[88px] w-[calc(100%-42px)]'>
                             <textarea

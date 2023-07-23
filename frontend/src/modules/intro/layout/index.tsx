@@ -8,11 +8,11 @@ import {Header} from "./header";
 export const HomeLayout = ()=> {
     /** state management */
     const dispatch = useDispatch<AppDispatch>();
-    const { data:{ isLoggedIn }, loading} = useSelector((state: RootState) => (state.auth));
+    const { isLoggedIn, loading } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         if (isLoggedIn) dispatch(sendMyProfile());
-    }, [dispatch])
+    }, [dispatch]);
 
     return ( loading ? (<div className="flex h-full items-center justify-center">로딩중...</div>) : (
         <>

@@ -8,9 +8,11 @@ interface PrivateRouterProps {
 }
 
 export const PrivateElement = ({ children }: PrivateRouterProps) : React.ReactElement => {
-    const { data: {isLoggedIn} } = useSelector((state: RootState) => (state.auth));
+    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+
     let location = useLocation();
 
     if (isLoggedIn) return children;
-    else return <Navigate to={'/'} state={{ from: location }}/>
+
+    return <Navigate to={'/'} state={{ from: location }}/>
 };

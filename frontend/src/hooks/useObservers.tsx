@@ -14,11 +14,11 @@ export const usePaginationObservers = () => {
     const paginationDivObsRef = useRef(null);
     const timeoutRef = useRef<NodeJS.Timeout>(null);
 
-    const [isReset,setIsReset] = useState<boolean>(false);
-    const [retryObs,setRetryObs] = useState<boolean>(false);
-
     const { menuQueryStr, cateQueryStr, tagQueryStr } = useHandleQueryStr();
     const { searchInput } = useSelector((state: RootState) => state.memo);
+
+    const [isReset,setIsReset] = useState<boolean>(false);
+    const [retryObs,setRetryObs] = useState<boolean>(false);
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -51,7 +51,7 @@ export const usePaginationObservers = () => {
                             preventRef.current = true;
                         }
                         else console.log(res.data.error);
-                    }, 50);
+                    }, 100);
                 })
                 .catch(e => console.log(e));
         })()

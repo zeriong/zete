@@ -34,11 +34,6 @@ export const Aside = () => {
         }
     }, [dispatch, showMenu]);
 
-    // 모바일사이즈로 렌더링되는 경우 사이드바 숨기기
-    useEffect(() => {
-        if (window.innerWidth <= 767) dispatch(SET_SHOW_MENU(false));
-    },[]);
-
     return <>
         <section
             className={`${showMenu ? "opacity-50 visible" : "opacity-0 invisible"}

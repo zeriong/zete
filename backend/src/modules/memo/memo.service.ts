@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { Category } from '../../entities/category.entity';
 import { Tag } from '../../entities/tag.entity';
 import { Memo } from '../../entities/memo.entity';
@@ -39,29 +39,69 @@ export class MemoService {
 
   /** getData ===================================================== */
 
+  // async getAsideData(user: User): Promise<AsideDataOutput> {
+  //   try {
+  //     const cateQb = await this.categoriesRepository
+  //       .createQueryBuilder()
+  //       .where('Category.userId = :userId', { userId: user.id });
+  //
+  //     const cateCount = await cateQb.getCount();
+  //
+  //     const cate = await cateQb
+  //       .leftJoinAndSelect('Category.tag', 'tag')
+  //       .loadRelationCountAndMap('Category.memoCount', 'Category.memo')
+  //       .groupBy('Category.id, tag.tagName')
+  //       .getMany();
+  //
+  //     const memosQb = await this.memoRepository
+  //       .createQueryBuilder()
+  //       .where('Memo.userId = :userId', { userId: user.id });
+  //
+  //     const memosCount = await memosQb.getCount();
+  //
+  //     const importantMemoCount = await memosQb
+  //       .andWhere('Memo.important = :important', { important: true })
+  //       .getCount();
+  //
+  //     return {
+  //       success: true,
+  //       asideData: {
+  //         cate,
+  //         cateCount,
+  //         importantMemoCount,
+  //         memosCount,
+  //       },
+  //     };
+  //   } catch (e) {
+  //     return {
+  //       success: false,
+  //       error: `데이터를 받아오지 못했습니다. error: ${e}`,
+  //     };
+  //   }
+  // }
+
   async getAsideData(user: User): Promise<AsideDataOutput> {
     try {
-      const cateQb = await this.categoriesRepository
-        .createQueryBuilder()
-        .where('Category.userId = :userId', { userId: user.id });
-
-      const cateCount = await cateQb.getCount();
-
-      const cate = await cateQb
-        .leftJoinAndSelect('Category.tag', 'tag')
-        .loadRelationCountAndMap('Category.memoCount', 'Category.memo')
-        .groupBy('Category.id, tag.tagName')
+      const cate = await this.categoriesRepository
+        .createQueryBuilder('category')
+        .leftJoinAndSelect('category.tag', 'tag')
+        .loadRelationCountAndMap('category.memoCount', 'category.memo')
+        .where('category.userId = :userId', { userId: user.id })
+        .groupBy('category.id, tag.tagName')
         .getMany();
 
-      const memosQb = await this.memoRepository
-        .createQueryBuilder()
-        .where('Memo.userId = :userId', { userId: user.id });
-
-      const memosCount = await memosQb.getCount();
-
-      const importantMemoCount = await memosQb
-        .andWhere('Memo.important = :important', { important: true })
+      const memosCount = await this.memoRepository
+        .createQueryBuilder('memo')
+        .where('memo.userId = :userId', { userId: user.id })
         .getCount();
+
+      const importantMemoCount = await this.memoRepository
+        .createQueryBuilder('memo')
+        .where('memo.userId = :userId', { userId: user.id })
+        .andWhere('memo.important = :important', { important: true })
+        .getCount();
+
+      const cateCount = cate.length;
 
       return {
         success: true,
@@ -127,13 +167,13 @@ export class MemoService {
         );
       }
 
-      const result = input.search
+      const memos = input.search
         ? await findSearch.skip(input.offset).take(input.limit).getMany()
         : await qb.skip(input.offset).take(input.limit).getMany();
 
       return {
         success: true,
-        memos: result,
+        memos,
         memosCount,
         importantMemoCount,
       };

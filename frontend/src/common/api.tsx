@@ -13,13 +13,13 @@ const instance = axios.create({
     withCredentials: true,
 });
 
-/** OpenAPI Autogen ajax 매서드 */
+/** OpenAPI Autogen Ajax 매서드 */
 export const Api = exportApis(instance);
 
 /** axios interceptor 사용하여 token 통신 */
 export const InitApi = () => {
     instance.interceptors.request.use((config) => {
-        config.headers['Authorization'] = `Bearer ${store.getState().auth.data.accessToken}`;
+        config.headers["Authorization"] = `Bearer ${store.getState().auth.accessToken}`;
         return config;
     });
 
@@ -31,7 +31,7 @@ export const InitApi = () => {
                 try {
                     await store.dispatch(sendRefreshAccessToken());
 
-                    originalConfig.headers['Authorization'] = `Bearer ${store.getState().auth.data.accessToken}`;
+                    originalConfig.headers["Authorization"] = `Bearer ${store.getState().auth.accessToken}`;
                     originalConfig.retry = true; // 아래 내용 처리 이후 해당 요청을 재실행
 
                     return instance(originalConfig);

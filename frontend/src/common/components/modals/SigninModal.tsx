@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import {Dialog, Transition } from "@headlessui/react";
 import {SET_LOGIN, SET_LOGOUT } from "../../../store/slices/auth.slice";
@@ -7,8 +7,8 @@ import {SET_USER} from "../../../store/slices/user.slice";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../store";
 import {FuncButton} from "../funcButton";
-import {exportApis} from "../../../openapi/generated";
 import {Api} from "../../api";
+import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 /** 폼항목 */
 type FormData = {
     email: string;
@@ -16,14 +16,17 @@ type FormData = {
 };
 
 export const SigninModal = () => {
-    // 쿼리를 이용한 모달 팝업 컨트롤
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [isShow, setIsShow] = useState(false);
-    const [PwShow, setPwShow] = useState(false);
-    const [occurError, setOccurError] = useState('');
-    const navigate = useNavigate();
+    const { loading } = useSelector((state: RootState) => state.auth);
+    const { searchParams, setSearchParams } = useHandleQueryStr();
 
-    // 폼 컨트롤
+    const [occurError, setOccurError] = useState("");
+    const [isShow, setIsShow] = useState(false);
+    const [showPW, setShowPW] = useState(false);
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+
+    // useForm 컨트롤
     const {
         reset,
         setValue,
@@ -31,59 +34,55 @@ export const SigninModal = () => {
         register,
         handleSubmit,
         formState: { errors, isValid },
-    } = useForm<FormData>({ mode: 'onChange' });
+    } = useForm<FormData>({ mode: "onChange" });
 
-    const setRouterQuery = (key: string, value:string) => {
-        searchParams.set(key, value);
+    const toggleShowPW = () => setShowPW(!showPW);
+
+    const openModal = () => {
+        searchParams.set("modal", "sign-up");
         setSearchParams(searchParams);
-    };
+    }
 
-    const dispatch = useDispatch<AppDispatch>();
-    const { loading } = useSelector((state: RootState) => (state.auth));
+    const closeModal = () => {
+        if (searchParams.get("modal") !== "sign-in") return;
+        searchParams.delete("modal");
+        setSearchParams(searchParams);
+        setValue("email", "");
+        setValue("password", "");
+        setOccurError("");
+        reset();
+    }
 
-    let closeModal = () => {
-        if (searchParams.get("modal") === "sign-in") {
-            searchParams.delete('modal');
-            setSearchParams(searchParams);
-            setValue('email', "");
-            setValue('password', "");
-            setOccurError('');
-            reset();
-        }
-    };
-
-    // submit
-    const onSubmit = handleSubmit(async () => {
-        const {email,password} = getValues();
+    const handleOnSubmit = handleSubmit(async () => {
+        const { email, password } = getValues();
         await Api.auth.login({ email, password })
             .then((res) => {
-                console.log(res.data);
-                if (res.data.success) {
-                    dispatch(SET_LOGIN(res.data.accessToken));
-                    dispatch(SET_USER(res.data.user));
-                    closeModal();
-                    setValue('email', "");
-                    setValue('password', "");
-                    navigate('/memo');
-                } else {
+                if (!res.data.success) {
                     setOccurError(res.data.error);
                     dispatch(SET_LOGOUT());
+                    return;
                 }
+                dispatch(SET_LOGIN(res.data.accessToken));
+                dispatch(SET_USER(res.data.user));
+                closeModal();
+                setValue("email", "");
+                setValue("password", "");
+                navigate("/memo");
             })
             .catch((e) => console.log(e));
     });
 
     useEffect(() => {
-        if (searchParams.get("modal") === "sign-in") setIsShow(true);
-        else setIsShow(false);
+        if (searchParams.get("modal") === "sign-in") return setIsShow(true);
+        setIsShow(false);
     },[searchParams]);
 
     return (
         <>
-            <Transition appear show={isShow} as={Fragment}>
-                <Dialog as="div" className="relative z-30" onClose={closeModal}>
+            <Transition appear show={ isShow } as={ Fragment }>
+                <Dialog as="div" className="relative z-30" onClose={ closeModal }>
                     <Transition.Child
-                        as={Fragment}
+                        as={ Fragment }
                         enter="ease-out duration-300"
                         enterFrom="opacity-0"
                         enterTo="opacity-100"
@@ -96,7 +95,7 @@ export const SigninModal = () => {
                     <div className="fixed inset-0 overflow-y-auto">
                         <div className="flex min-h-full items-center justify-center p-4 text-center">
                             <Transition.Child
-                                as={Fragment}
+                                as={ Fragment }
                                 enter="ease-out duration-300"
                                 enterFrom="opacity-0 scale-95"
                                 enterTo="opacity-100 scale-100"
@@ -105,19 +104,18 @@ export const SigninModal = () => {
                                 leaveTo="opacity-0 scale-95"
                             >
                                 <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-24px md:p-32px text-left align-middle shadow-xl transition-all">
-                                    <div className="text-28 font-bold">
+                                    <h1 className="text-28 font-bold">
                                         로그인
-                                    </div>
-                                    <div className="h-20px relative top-16px text-red-500">
-                                        {occurError}
-                                    </div>
+                                    </h1>
+                                    <p className="h-20px relative top-16px text-red-500">
+                                        { occurError }
+                                    </p>
                                     <form
                                         className="flex flex-col mx-auto mt-32px gap-y-16px"
-                                        onSubmit={onSubmit}
+                                        onSubmit={ handleOnSubmit }
                                     >
                                         <div>
                                             <input
-                                                className="border border-gray-400 rounded px-8px py-4px w-full"
                                                 {...register("email", {
                                                     required: true,
                                                     minLength: 6,
@@ -125,46 +123,50 @@ export const SigninModal = () => {
                                                     pattern: /^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i,
                                                 })}
                                                 placeholder="이메일을 입력해주세요."
+                                                className="border border-gray-400 rounded px-8px py-4px w-full"
                                             />
                                             <p className="mt-1 text-red-500 text-12 font-normal h-12px">
-                                                {errors.email && '이메일을 입력해주시기 바랍니다.'}
+                                                { errors.email && "이메일을 입력해주시기 바랍니다." }
                                             </p>
                                         </div>
                                         <div>
                                             <input
-                                                className="border border-gray-400 rounded px-8px py-4px w-full"
-                                                {...register("password", { required: true,  minLength: 8, maxLength: 100 })}
-                                                type={ PwShow ? "text" : "password" }
+                                                {...register("password", {
+                                                    required: true,
+                                                    minLength: 8,
+                                                    maxLength: 100,
+                                                })}
+                                                type={ showPW ? "text" : "password" }
                                                 placeholder="비밀번호를 입력해주세요."
+                                                className="border border-gray-400 rounded px-8px py-4px w-full"
                                             />
                                             <div className="flex justify-between">
                                                 <p className="mt-1 text-red-500 text-12 font-normal h-12px">
-                                                    {errors.password && '비밀번호는 최소 8자 이상입니다.'}
+                                                    { errors.password && "비밀번호는 최소 8자 이상입니다." }
                                                 </p>
                                                 <span
-                                                    onClick={()=>{setPwShow(!PwShow)}}
-                                                    className='cursor-pointer text-12 bg-gray-600 h-fit text-gray-100 px-8px mr-4px'
+                                                    onClick={ toggleShowPW }
+                                                    className="cursor-pointer text-12 bg-gray-600 h-fit text-gray-100 px-8px mr-4px"
                                                 >
-                                                    { PwShow ? "비밀번호 숨김" : "비밀번호 확인" }
+                                                    { showPW ? "비밀번호 숨김" : "비밀번호 확인" }
                                                 </span>
                                             </div>
                                         </div>
                                         <FuncButton
-                                            className="w-full py-4px bg-orange-500 text-white mx-auto mt-12px text-center cursor-pointer text-22 items-center rounded-[16px]"
-                                            type="submit"
                                             options={{
                                                 text: "로그인",
                                                 disabled: !isValid,
                                                 loading: loading,
                                             }}
+                                            type="submit"
+                                            className="w-full py-4px bg-orange-500 text-white mx-auto mt-12px text-center cursor-pointer text-22 items-center rounded-[16px]"
                                         />
                                         <button
+                                            type="button"
+                                            onClick={ openModal }
                                             className="w-full py-4px bg-orange-500 text-white mx-auto mb-12px text-center
                                             cursor-pointer text-22 items-center rounded-[16px]"
-                                            type="button"
-                                            onClick={() => {
-                                                setRouterQuery("modal","sign-up")
-                                            }}>
+                                        >
                                             회원가입
                                         </button>
                                     </form>

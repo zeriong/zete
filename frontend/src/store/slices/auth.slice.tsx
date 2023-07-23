@@ -2,18 +2,14 @@ import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Api} from "../../common/api";
 
 export interface AuthState {
-    data: {
-        isLoggedIn: boolean,
-        accessToken: string,
-    }
-    loading: boolean|undefined,
+    isLoggedIn: boolean;
+    accessToken: string;
+    loading: boolean | undefined;
 }
 
 const initAuthState: AuthState = {
-    data: {
-        isLoggedIn: false,
-        accessToken: '',
-    },
+    isLoggedIn: false,
+    accessToken: '',
     loading: true,
 }
 
@@ -54,14 +50,14 @@ export const authSlice = createSlice({
     initialState: initAuthState,
     reducers: {
         SET_LOGIN: (state: AuthState, { payload }: PayloadAction<string>) => {
-            state.data.accessToken = payload;
-            state.data.isLoggedIn = true;
+            state.accessToken = payload;
+            state.isLoggedIn = true;
 
-            localStorage.setItem('at', state.data.accessToken);
+            localStorage.setItem('at', state.accessToken);
         },
         SET_LOGOUT: (state: AuthState) => {
-            state.data.accessToken = '';
-            state.data.isLoggedIn = false;
+            state.accessToken = '';
+            state.isLoggedIn = false;
 
             localStorage.setItem('at', '');
         },
@@ -70,11 +66,11 @@ export const authSlice = createSlice({
         // sendRefreshAccessToken
         builder.addCase(sendRefreshAccessToken.fulfilled, (state: AuthState, { payload }) => {
             if (payload.success) {
-                state.data.isLoggedIn = true;
-                state.data.accessToken = payload.accessToken;
+                state.isLoggedIn = true;
+                state.accessToken = payload.accessToken;
                 state.loading = false;
 
-                localStorage.setItem('at', state.data.accessToken);
+                localStorage.setItem('at', state.accessToken);
             }
         });
         builder.addCase(sendRefreshAccessToken.rejected, (state: AuthState) => {
@@ -83,8 +79,8 @@ export const authSlice = createSlice({
         // sendLogout
         builder.addCase(sendLogout.fulfilled, (state: AuthState, { payload }) => {
             if (payload.success) {
-                state.data.isLoggedIn = false;
-                state.data.accessToken = '';
+                state.isLoggedIn = false;
+                state.accessToken = '';
 
                 localStorage.setItem('at', '');
             }

@@ -82,10 +82,7 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                     subtitle: "메모를 삭제하시면 다시 되돌릴 수 없습니다.",
                     confirmText: "삭제",
                     isNegative: true,
-                    confirmCallback: () => {
-                        console.log('됩니다~')
-                        handleDeleteMemo();
-                    }
+                    confirmCallback: handleDeleteMemo,
                 }}
                 className='absolute z-50'
             >
