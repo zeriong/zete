@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {TOGGLE_SHOW_MENU} from "../../../store/slices/changedMenu.slice";
 import {BarsMenuIcon} from "../../../assets/vectors";
 import {SearchMemo} from "../components/searchMemo";
+
 export const Header = () => {
     const dispatch = useDispatch();
     const toggleMenu = () => dispatch(TOGGLE_SHOW_MENU());
@@ -15,7 +16,7 @@ export const Header = () => {
                     <div className='flex items-center'>
                         <button
                             type="button"
-                            onClick={toggleMenu}
+                            onClick={ toggleMenu }
                             className="ease-in-out duration-300 mr-7px md:hidden p-10px h-full"
                         >
                             <BarsMenuIcon/>

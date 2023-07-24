@@ -21,18 +21,16 @@ export const Aside = () => {
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth > 767) {
-                if (showMenu) return;
-                dispatch(SET_SHOW_MENU(true));
+                if (!showMenu) dispatch(SET_SHOW_MENU(true));
             } else {
-                if (!showMenu) return;
-                dispatch(SET_SHOW_MENU(false));
+                if (showMenu) dispatch(SET_SHOW_MENU(false));
             }
         }
+
         window.addEventListener("resize", handleResize);
 
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        }
+        return () => window.removeEventListener("resize", handleResize);
+
     }, [dispatch, showMenu]);
 
     return (
@@ -40,12 +38,12 @@ export const Aside = () => {
             <section
                 onClick={toggleMenu}
                 className={`z-50 w-full h-full left-0 top-0 fixed bg-black opacity-0 hidden max-md:block ease-in-out duration-300
-                ${showMenu ? "opacity-50 visible" : "opacity-0 invisible"}`}
+                ${ showMenu ? "opacity-50 visible" : "opacity-0 invisible" }`}
             />
             <nav
                 className={`fixed w-asideWidth bg-white z-50 md:z-20 ease-in-out duration-300 pt-0 md:pt-headerHeight h-full
                 overflow-auto scroll-hidden border-r border-zete-light-gray-400
-                ${showMenu ? "left-0" : "-left-asideWidth"}`}
+                ${ showMenu ? "left-0" : "-left-asideWidth" }`}
             >
                 <CustomScroller>
                     <div className="flex flex-col h-full min-h-full w-full p-14px text-zete-dark-500 font-light text-14">
@@ -114,7 +112,7 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                     className={`flex justify-start w-full font-light transition-all duration-150
                     ${ props.cateId ? "items-start" : "items-center" }`}
                 >
-                    <props.iconComponent className={props.iconClassName}/>
+                    <props.iconComponent className={ props.iconClassName }/>
                     <span>
                         { props.cateName }
                     </span>
@@ -140,9 +138,7 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                             className={`flex w-full h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
                             ${ tagQueryStr === tags.tagName && "bg-zete-light-gray-500" }`}
                         >
-                            <>
-                                <TagIcon svgClassName="w-14px mr-8px" strokeClassName="fill-zete-dark-200"/>
-                            </>
+                            <TagIcon svgClassName="w-14px mr-8px" strokeClassName="fill-zete-dark-200"/>
                             <p>
                                 { tags.tagName }
                             </p>

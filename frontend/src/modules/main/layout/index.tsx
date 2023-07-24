@@ -12,9 +12,9 @@ import {loadAsideData} from "../../../store/slices/memo.slice";
 import {SET_SHOW_MENU} from "../../../store/slices/changedMenu.slice";
 import CustomScroller from "../../../common/components/customScroller";
 export const MemoLayout = () => {
-    const { loading } = useSelector((state: RootState) => (state.user));
-    const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
-    const { cate } = useSelector((state: RootState) => (state.memo.data));
+    const { loading } = useSelector((state: RootState) => state.user);
+    const { showMenu } = useSelector((state: RootState) => state.changedMenu);
+    const { cate } = useSelector((state: RootState) => state.memo.data);
     const { cateQueryStr, menuQueryStr, searchParams } = useHandleQueryStr();
 
     const dispatch = useDispatch<AppDispatch>();
@@ -32,11 +32,10 @@ export const MemoLayout = () => {
     const categoryName = useMemo(() => {
         if (!cateQueryStr && !menuQueryStr) return "전체메모";
         else if (menuQueryStr) return "중요메모";
-
         else {
             const matchCate = cate.find((cate) => Number(cate.id) === Number(cateQueryStr))?.cateName
             if (matchCate) return matchCate;
-            return '카테고리가 존재하지않습니다.'
+            return "카테고리가 존재하지않습니다."
         }
     }, [searchParams, cate]);
 
@@ -49,17 +48,17 @@ export const MemoLayout = () => {
                 flex relative flex-col justify-center h-full text-center items-center pt-headerHeight
                 overflow-auto duration-300 ease-in-out`}
             >
-                <div className='w-full h-full flex relative pt-headerHeight'>
+                <div className="w-full h-full flex relative pt-headerHeight">
                     <header className="flex fixed top-headerHeight h-headerHeight items-center justify-between w-full ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 pl-16px md:pl-20px">
-                        <div className={`flex items-center ${ categoryName === '카테고리가 존재하지않습니다.' && 'text-zete-scroll-gray' }`}>
-                            <CategoryIcon className='w-20px mr-10px'/>
+                        <div className={`flex items-center ${ categoryName === "카테고리가 존재하지않습니다." && "text-zete-scroll-gray" }`}>
+                            <CategoryIcon className="w-20px mr-10px"/>
                             { categoryName }
                         </div>
-                        <div className='block md:hidden pr-16px'>
+                        <div className="block md:hidden pr-16px">
                             <SearchMemo/>
                         </div>
                     </header>
-                    <div className='w-full h-full bg-zete-light-gray-100 overflow-auto'>
+                    <div className="w-full h-full bg-zete-light-gray-100 overflow-auto">
                         <CustomScroller autoHide={ false }>
                             <Outlet/>
                         </CustomScroller>

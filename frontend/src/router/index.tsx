@@ -18,20 +18,20 @@ export const Index = ()=> {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<HomeLayout/>}>
-                    <Route index element={<Home/>}/>
-                    <Route path="service" element={<Service/>}/>
-                    <Route path="guide" element={<Guide/>}/>
-                    <Route path="userExp" element={<UserExp/>}/>
-                    <Route path="payNotice" element={<PayNotice/>}/>
-                    <Route path="notice" element={<Notice/>}/>
-                    <Route path="e" element={<MemoInfoPopover/>}/>
+                <Route path="/" element={ <HomeLayout/> }>
+                    <Route index element={ <Home/> }/>
+                    <Route path="service" element={ <Service/> }/>
+                    <Route path="guide" element={ <Guide/> }/>
+                    <Route path="userExp" element={ <UserExp/> }/>
+                    <Route path="payNotice" element={ <PayNotice/> }/>
+                    <Route path="notice" element={ <Notice/> }/>
+                    <Route path="e" element={ <MemoInfoPopover/> }/>
                 </Route>
 
-                <Route path="/memo/*" element={<PrivateElement><MemoLayout/></PrivateElement>}>
-                    <Route index element={<MemoMain/>}/>
-                    <Route path="profile" element={<Profile/>}/>
-                    <Route path="profile/modify" element={<ProfileModify/>}/>
+                <Route path="/memo/*" element={ <PrivateElement><MemoLayout/></PrivateElement> }>
+                    <Route index element={ <MemoMain/> }/>
+                    <Route path="profile" element={ <Profile/> }/>
+                    <Route path="profile/modify" element={ <ProfileModify/> }/>
                 </Route>
             </Routes>
         </Router>

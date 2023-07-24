@@ -4,7 +4,7 @@ import { RootState} from "../../../store";
 import {Link} from "react-router-dom";
 
 export const Profile = () => {
-    const { data: userState, loading } = useSelector((state: RootState) => (state.user));
+    const { data: userState, loading } = useSelector((state: RootState) => state.user);
 
     return ( loading ? (<div>로딩중...</div>) : (
             <>
@@ -18,7 +18,7 @@ export const Profile = () => {
                     { `휴대전화번호: ${userState.mobile}` }
                 </p>
                 <Link
-                    to={ 'modify' }
+                    to={ "modify" }
                     className="mt-20px w-[180px] py-8px flex justify-center mb-12px cursor-pointer text-22 items-center bg-orange-500 rounded-[16px] text-white" >
                     회원정보 수정
                 </Link>

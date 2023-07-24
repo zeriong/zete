@@ -86,6 +86,6 @@ export const authSlice = createSlice({
             }
         });
     }
-})
+});
 
 export const { SET_LOGIN, SET_LOGOUT } = authSlice.actions;

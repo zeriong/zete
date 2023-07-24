@@ -10,9 +10,7 @@ function App() {
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(()=> {
-        (async () => {
-            await dispatch(sendRefreshAccessToken());
-        })()
+        ( async () => await dispatch(sendRefreshAccessToken()) )()
     },[dispatch]);
 
     return (
@@ -23,7 +21,7 @@ function App() {
             }
             <Alert/>
         </>
-    );
+    )
 }
 
 export default App;

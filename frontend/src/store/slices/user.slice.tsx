@@ -4,14 +4,14 @@ import {store} from "../index";
 
 export interface userState {
     data: {
-        name: string | null,
-        email: string | null,
-        mobile: string | null,
-        password: string | null,
-        gptAvailable: number | null,
-        gptRefillAt: number | null,
+        name: string | null;
+        email: string | null;
+        mobile: string | null;
+        password: string | null;
+        gptAvailable: number | null;
+        gptRefillAt: number | null;
     },
-    loading: boolean,
+    loading: boolean;
 }
 const initUserState: userState = {
     data: {

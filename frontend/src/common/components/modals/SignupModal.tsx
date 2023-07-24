@@ -41,9 +41,6 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
     const toggleShowPW = () => setShowPW(!showPW);
     const toggleShowConfirmPW = () => setShowConfirmPW(!showConfirmPW);
 
-    // passwordConfirm === password 검증을 위한 변수
-    const password: string = watch("password", "");
-
     const closeModal = () => {
         if (searchParams.get("modal") !== "sign-up") return;
         searchParams.delete("modal");
@@ -168,8 +165,8 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                         <div>
                                             <input
                                                 {...register("passwordConfirm", {
-                                                    required: true,
-                                                    validate: value => value === password,
+                                                    required: true,           // watch("password", "") === 비밀번호 재확인을 위한 변수
+                                                    validate: value => value === watch("password", ""),
                                                 })}
                                                 type={ showConfirmPW ? "text" : "password" }
                                                 placeholder="비밀번호를 다시 한번 입력해주세요."

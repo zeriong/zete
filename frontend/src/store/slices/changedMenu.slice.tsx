@@ -19,6 +19,6 @@ export const changedMenuSlice = createSlice({
             state.showMenu = payload;
         },
     },
-})
+});
 
 export const { TOGGLE_SHOW_MENU, SET_SHOW_MENU } = changedMenuSlice.actions;
