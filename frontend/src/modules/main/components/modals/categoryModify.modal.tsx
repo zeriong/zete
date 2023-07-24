@@ -102,7 +102,7 @@ export const CategoryModifyModal = (props: { buttonText: string }) => {
             <Transition appear show={ isShow } as={ Fragment }>
                 <Dialog
                     as="div"
-                    className="relative z-30"
+                    className="relative z-50"
                     onClose={ closeModal }
                 >
                     <Transition.Child
