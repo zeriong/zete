@@ -7,10 +7,7 @@ import {BarsMenuIcon} from "../../../assets/vectors";
 import {SearchMemo} from "../components/searchMemo";
 export const Header = () => {
     const dispatch = useDispatch();
-
-    const toggleMenu = () => {
-        dispatch(TOGGLE_SHOW_MENU());
-    }
+    const toggleMenu = () => dispatch(TOGGLE_SHOW_MENU());
 
     return (
             <header className="flex fixed h-headerHeight items-center w-full z-30 ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 py-10px">
@@ -18,8 +15,8 @@ export const Header = () => {
                     <div className='flex items-center'>
                         <button
                             type="button"
-                            className="ease-in-out duration-300 mr-7px md:hidden p-10px h-full"
                             onClick={toggleMenu}
+                            className="ease-in-out duration-300 mr-7px md:hidden p-10px h-full"
                         >
                             <BarsMenuIcon/>
                         </button>

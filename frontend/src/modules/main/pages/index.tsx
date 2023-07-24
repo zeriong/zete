@@ -15,20 +15,6 @@ import {importantConverter, refreshMemos, refreshTargetMemo} from "../../../stor
 export const MemoMain = () => {
     const intervalRef = useRef<NodeJS.Timeout>(null);
 
-    const [masonryCols] = useState({
-        default: 7,
-        2544: 6,
-        2222: 5,
-        1888: 4,
-        1566: 3,
-        1234: 2,
-        900: 1,
-        767: 2,
-        610: 1,
-    });
-
-    const [currentMemoId,setCurrentMemoId] = useState<number>(0);
-
     const { loading } = useSelector((state: RootState) => (state.user));
     const { data } = useSelector((state: RootState) => state.memo);
     const { paginationDivObsRef } = usePaginationObservers();
@@ -41,8 +27,22 @@ export const MemoMain = () => {
         setSearchParams,
     } = useHandleQueryStr();
 
+    const [currentMemoId,setCurrentMemoId] = useState<number>(0);
+    const [masonryCols] = useState({
+        default: 7,
+        2544: 6,
+        2222: 5,
+        1888: 4,
+        1566: 3,
+        1234: 2,
+        900: 1,
+        767: 2,
+        610: 1,
+    });
+
     const horizonScroll = useHorizontalScroll();
 
+    // 20분마다 렌더링된 모든 메모상태 최신화
     const handleInterval = () => {
         intervalRef.current = setInterval(() => {
             refreshMemos({

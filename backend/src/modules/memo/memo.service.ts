@@ -207,7 +207,10 @@ export class MemoService {
   ): Promise<CreateCateOutput> {
     try {
       if (!input.cateName) {
-        return { success: false };
+        return {
+          success: false,
+          error: '추가할 카테고리 이름을 입력해주세요.',
+        };
       }
 
       //중복 검증
