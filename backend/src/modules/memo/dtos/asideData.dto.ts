@@ -4,19 +4,19 @@ import { Memo } from '../../../entities/memo.entity';
 import { Tag } from '../../../entities/tag.entity';
 
 export class CategoriesAndMemoCount {
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   id?: number;
 
-  @ApiProperty({ nullable: true })
-  cateName?: string;
+  @ApiProperty({ nullable: true, required: false })
+  name?: string;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   userId?: number;
 
-  @ApiProperty({ type: [Memo] })
+  @ApiProperty({ type: [Memo], required: false })
   memo?: Memo[];
 
-  @ApiProperty({ type: [Tag] })
+  @ApiProperty({ type: [Tag], required: false })
   tag?: Tag[];
 
   @ApiProperty({ type: Number, required: false })
@@ -24,19 +24,19 @@ export class CategoriesAndMemoCount {
 }
 
 export class AsideData {
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   memosCount?: number;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   importantMemoCount?: number;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   cateCount?: number;
 
-  @ApiProperty({ type: [CategoriesAndMemoCount] })
+  @ApiProperty({ type: [CategoriesAndMemoCount], required: false })
   cate?: CategoriesAndMemoCount[];
 }
 export class AsideDataOutput extends CoreOutput {
-  @ApiProperty({ type: AsideData })
+  @ApiProperty({ type: AsideData, required: false })
   asideData?: AsideData;
 }

@@ -59,9 +59,9 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
     },[searchParams]);
 
     const handleOnSubmit = handleSubmit(async () => {
-        const {email,password,name,mobile} = getValues();
-        const gptRefillAt = getGptRefillAt();
-        const reqData: CreateAccountDto = { email, password, name, mobile, gptRefillAt };
+        const { email, password, name, mobile } = getValues();
+        const gptDailyResetDate = getGptRefillAt();
+        const reqData: CreateAccountDto = { email, password, name, mobile, gptDailyResetDate };
 
         await Api.user.createAccount(reqData)
             .then((res) => {

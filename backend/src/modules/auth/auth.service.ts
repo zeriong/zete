@@ -98,28 +98,28 @@ export class AuthService {
   /** accessToken 재발급 */
   async refreshToken(user: User, req: Request): Promise<AccessTokenOutput> {
     try {
-      console.log('refreshToken: 스탭 1-1:', user);
+      // console.log('refreshToken: 스탭 1-1:', user);
       // refreshToken 쿠키에서 받아오기
       const refreshToken = req.cookies['rt'];
       // accessToken 발행 조건 검사
-      console.log('refreshToken: 스탭 2');
+      // console.log('refreshToken: 스탭 2');
       if (
         !refreshToken ||
         !user ||
         !user.refreshToken ||
         refreshToken != user.refreshToken
       ) {
-        console.log('refreshToken: 검증 불일치 오류');
+        // console.log('refreshToken: 검증 불일치 오류');
         new UnauthorizedException();
       }
-      console.log('refreshToken: 스탭 3');
+      // console.log('refreshToken: 스탭 3');
       // accessToken 토큰 재생성
       const accessPayload: AccessPayload = {
         sub: user.id,
       };
       const accessToken = await this.jwtService.signAsync(accessPayload);
 
-      console.log('refreshToken: 검증');
+      // console.log('refreshToken: 검증');
 
       return { success: true, accessToken };
     } catch (e) {

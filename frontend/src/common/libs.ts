@@ -1,6 +1,6 @@
 import css from "dom-css";
 import {showAlert} from "../store/slices/alert.slice";
-import {CreateMemoInput, Memo} from "../openapi/generated";
+import {CreateMemoInput, Memo, TagNameInput} from "../openapi/generated";
 import {store} from "../store";
 import {deleteMemo, memoSlice, refreshMemos, refreshTargetMemo} from "../store/slices/memo.slice";
 import {Api} from "./api";
@@ -28,11 +28,11 @@ export const handleAddTagSubmit = (event, getVal, setValFunc, target) => {
     if (input.value === "") return;
 
     const tags = getVal(target) || [];
-    const exists = tags.find(tag => tag.tagName === input.value);
+    const exists = tags.find(tag => tag.name === input.value);
 
     if (exists) return showAlert("이미 존재하는 태그명 입니다.");
 
-    setValFunc(target, [ ...tags, { tagName: input.value } ]);
+    setValFunc(target, [ ...tags, { name: input.value } ]);
     input.value = "";
 }
 
@@ -94,7 +94,7 @@ export const returnFalse = () => false;
 export interface HandleUpdateOrAddMemoInterface {
     getTitle: string;
     getContent: string;
-    getNewTags: { tagName: string }[];
+    getNewTags: TagNameInput[];
     memoId: number;
     setMemoId?: React.Dispatch<React.SetStateAction<any>>;
     getCateId: string | number;
@@ -182,8 +182,8 @@ export const updateOrAddMemo = (props: HandleUpdateOrAddMemoInterface) => {
     const data = store.getState().memo.data;
     const targetMemo = temporarySaveMemo.current;
     const cateId = temporarySaveMemo.current.cateId || null;
-    const changedTagLength = targetMemo.tag.filter(tag => getNewTags.some(inputTag => inputTag.tagName === tag.tagName)).length;
-    const newTagLength = getNewTags.filter((newTag) => !targetMemo.tag.some((tag) => tag.tagName === newTag.tagName)).length;
+    const changedTagLength = targetMemo.tag.filter(tag => getNewTags.some(inputTag => inputTag.name === tag.name)).length;
+    const newTagLength = getNewTags.filter((newTag) => !targetMemo.tag.some((tag) => tag.name === newTag.name)).length;
 
     // 수정사항이 없는 경우 요청X
     if (
@@ -199,21 +199,21 @@ export const updateOrAddMemo = (props: HandleUpdateOrAddMemoInterface) => {
     ) return;
 
     // 삭제, 추가할 태그분류
-    let newTags: { tagName: string }[];
+    let newTags: { name: string }[];
     let deleteTagIds: number[];
 
     // 카테고리 변경시 태그의 소속 변경
     if (targetMemo.tag.length === 0) {
-        newTags = getNewTags.map(tag => ({ tagName: tag.tagName }));
+        newTags = getNewTags.map(tag => ({ name: tag.name }));
         deleteTagIds = [];
     } else if (targetMemo.cateId !== cateId) {
-        newTags = getNewTags.map(tag => ({ tagName: tag.tagName }));
+        newTags = getNewTags.map(tag => ({ name: tag.name }));
         deleteTagIds = targetMemo.tag.map(tag => tag.id);
     } else {
-        newTags = getNewTags.filter(tag => !targetMemo.tag.some(target => target.tagName === tag.tagName))
-            .map(tag => ({ tagName: tag.tagName }));
+        newTags = getNewTags.filter(tag => !targetMemo.tag.some(target => target.name === tag.name))
+            .map(tag => ({ name: tag.name }));
 
-        deleteTagIds = targetMemo.tag.filter(target => !getNewTags.some(tag => tag.tagName === target.tagName))
+        deleteTagIds = targetMemo.tag.filter(target => !getNewTags.some(tag => tag.name === target.name))
             .map(tag => tag.id);
     }
 

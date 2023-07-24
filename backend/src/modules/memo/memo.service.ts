@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Category } from '../../entities/category.entity';
 import { Tag } from '../../entities/tag.entity';
 import { Memo } from '../../entities/memo.entity';
@@ -27,8 +27,6 @@ import { AsideDataOutput } from './dtos/asideData.dto';
 @Injectable()
 export class MemoService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
     @InjectRepository(Category)
     private readonly categoriesRepository: Repository<Category>,
     @InjectRepository(Memo)
@@ -39,47 +37,6 @@ export class MemoService {
 
   /** getData ===================================================== */
 
-  // async getAsideData(user: User): Promise<AsideDataOutput> {
-  //   try {
-  //     const cateQb = await this.categoriesRepository
-  //       .createQueryBuilder()
-  //       .where('Category.userId = :userId', { userId: user.id });
-  //
-  //     const cateCount = await cateQb.getCount();
-  //
-  //     const cate = await cateQb
-  //       .leftJoinAndSelect('Category.tag', 'tag')
-  //       .loadRelationCountAndMap('Category.memoCount', 'Category.memo')
-  //       .groupBy('Category.id, tag.tagName')
-  //       .getMany();
-  //
-  //     const memosQb = await this.memoRepository
-  //       .createQueryBuilder()
-  //       .where('Memo.userId = :userId', { userId: user.id });
-  //
-  //     const memosCount = await memosQb.getCount();
-  //
-  //     const importantMemoCount = await memosQb
-  //       .andWhere('Memo.important = :important', { important: true })
-  //       .getCount();
-  //
-  //     return {
-  //       success: true,
-  //       asideData: {
-  //         cate,
-  //         cateCount,
-  //         importantMemoCount,
-  //         memosCount,
-  //       },
-  //     };
-  //   } catch (e) {
-  //     return {
-  //       success: false,
-  //       error: `데이터를 받아오지 못했습니다. error: ${e}`,
-  //     };
-  //   }
-  // }
-
   async getAsideData(user: User): Promise<AsideDataOutput> {
     try {
       const cate = await this.categoriesRepository
@@ -87,7 +44,7 @@ export class MemoService {
         .leftJoinAndSelect('category.tag', 'tag')
         .loadRelationCountAndMap('category.memoCount', 'category.memo')
         .where('category.userId = :userId', { userId: user.id })
-        .groupBy('category.id, tag.tagName')
+        .groupBy('category.id, tag.name')
         .getMany();
 
       const memosCount = await this.memoRepository
@@ -156,9 +113,9 @@ export class MemoService {
             .from('Tag', 'tag')
             .select('tag.memoId')
             .where(
-              'tag.tagName = :tagName AND tag.userId = :userId AND tag.cateId = :cateId',
+              'tag.name = :name AND tag.userId = :userId AND tag.cateId = :cateId',
               {
-                tagName: input.tagQueryStr,
+                name: input.tagQueryStr,
                 userId: user.id,
                 cateId: input.cateQueryStr,
               },
@@ -206,7 +163,7 @@ export class MemoService {
     user: User,
   ): Promise<CreateCateOutput> {
     try {
-      if (!input.cateName) {
+      if (!input.name) {
         return {
           success: false,
           error: '추가할 카테고리 이름을 입력해주세요.',
@@ -216,9 +173,9 @@ export class MemoService {
       //중복 검증
       const exists = await this.categoriesRepository
         .createQueryBuilder()
-        .where('userId = :userId AND cateName = :cateName', {
+        .where('userId = :userId AND name = :name', {
           userId: user.id,
-          cateName: input.cateName,
+          name: input.name,
         })
         .getOne();
 
@@ -230,7 +187,7 @@ export class MemoService {
       }
 
       const result = await this.categoriesRepository.save(
-        this.categoriesRepository.create({ cateName: input.cateName, user }),
+        this.categoriesRepository.create({ name: input.name, user }),
       );
 
       return {
@@ -245,7 +202,7 @@ export class MemoService {
 
   async updateCategory(input: CateInput, user: User): Promise<CoreOutput> {
     try {
-      if (input.cateName === '') {
+      if (input.name === '') {
         return {
           success: false,
           error: '비어있는 카테고리를 삭제하거나 수정할 이름을 입력하세요.',
@@ -254,7 +211,7 @@ export class MemoService {
 
       const result = await this.categoriesRepository
         .createQueryBuilder()
-        .update({ cateName: input.cateName })
+        .update({ name: input.name })
         .where('id = :id AND userId = :userId', {
           id: input.cateId,
           userId: user.id,
@@ -310,7 +267,7 @@ export class MemoService {
       }
 
       const tags: Tag[] = input.tags.map((tag) => ({
-        tagName: tag.tagName,
+        name: tag.name,
         user,
         cate: { id: input.cateId || null },
       }));

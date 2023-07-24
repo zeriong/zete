@@ -2,16 +2,16 @@ import { ApiProperty } from '@nestjs/swagger';
 import * as Validator from 'class-validator';
 import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 
-export class GptRefillInputDto {
+export class ResetGptDailyLimitInputDto {
   @ApiProperty({ type: Number })
   @Validator.IsNumber()
-  gptRefillAt: number;
+  gptDailyResetDate: number;
 }
 
-export class GptAvailableOutputDto extends CoreOutput {
-  @ApiProperty({ type: Number })
-  gptAvailable?: number;
+export class ResetGptDailyLimitOutputDto extends CoreOutput {
+  @ApiProperty({ type: Number, required: false })
+  gptDailyLimit?: number;
 
-  @ApiProperty({ type: Number })
-  gptRefillAt?: number;
+  @ApiProperty({ type: Number, required: false })
+  gptDailyResetDate?: number;
 }

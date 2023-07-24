@@ -9,8 +9,8 @@ import * as Validator from 'class-validator';
 import { UserDataOutput } from './dtos/userData.dto';
 import { UpdateAccountDto } from './dtos/updateAccount.dto';
 import {
-  GptRefillInputDto,
-  GptAvailableOutputDto,
+  ResetGptDailyLimitInputDto,
+  ResetGptDailyLimitOutputDto,
 } from './dtos/gptManagement.dto';
 
 /** 실질적인 서비스 구현 */
@@ -42,8 +42,8 @@ export class UserService {
           password: await bcrypt.hash(input.password, 10),
           name: input.name,
           mobile: input.mobile,
-          gptAvailable: 10,
-          gptRefillAt: input.gptRefillAt,
+          gptDailyLimit: 10,
+          gptDailyResetDate: input.gptDailyResetDate,
         }),
       );
 
@@ -88,34 +88,30 @@ export class UserService {
     }
   }
 
-  /** gpt Available 리필 시도 */
-  async tryGptAvailableRefill(
-    input: GptRefillInputDto,
+  /** gpt daily limit 리셋 */
+  async resetGptDailyLimit(
+    input: ResetGptDailyLimitInputDto,
     user: User,
-  ): Promise<GptAvailableOutputDto> {
+  ): Promise<ResetGptDailyLimitOutputDto> {
     try {
-      const findUser = await this.userRepository.findOne({
-        where: { id: user.id },
-      });
-
-      if (input.gptRefillAt === findUser.gptRefillAt) {
+      if (input.gptDailyResetDate === user.gptDailyResetDate) {
         return {
           success: true,
-          gptRefillAt: findUser.gptRefillAt,
-          gptAvailable: findUser.gptAvailable,
+          gptDailyResetDate: user.gptDailyResetDate,
+          gptDailyLimit: user.gptDailyLimit,
           message: '자정이 지나면 리필됩니다.',
         };
       }
 
-      findUser.gptRefillAt = input.gptRefillAt;
-      findUser.gptAvailable = 10;
+      user.gptDailyResetDate = input.gptDailyResetDate;
+      user.gptDailyLimit = 10;
 
-      await this.userRepository.save(findUser);
+      await this.userRepository.save(user);
 
       return {
         success: true,
-        gptRefillAt: findUser.gptRefillAt,
-        gptAvailable: 10,
+        gptDailyResetDate: user.gptDailyResetDate,
+        gptDailyLimit: 10,
       };
     } catch (error) {
       return { success: false, error: `gpt 통신 실패, error: ${error}` };
@@ -154,6 +150,12 @@ export class UserService {
       return { success: false, error: '유저 데이터 업데이트 실패' };
     }
   }
+
+  /** 유저 데이터 저장 */
+  async saveUser(user: User): Promise<User> {
+    return await this.userRepository.save(user);
+  }
+
   /** 프로필 업데이트 */
   async profileUpdate(
     user: User,

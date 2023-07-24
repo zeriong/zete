@@ -8,8 +8,8 @@ export interface userState {
         email: string | null;
         mobile: string | null;
         password: string | null;
-        gptAvailable: number | null;
-        gptRefillAt: number | null;
+        gptDailyLimit: number | null;
+        gptDailyResetDate: number | null;
     },
     loading: boolean;
 }
@@ -19,8 +19,8 @@ const initUserState: userState = {
         email: null,
         mobile: null,
         password: null,
-        gptAvailable: null,
-        gptRefillAt: null,
+        gptDailyLimit: null,
+        gptDailyResetDate: null,
     },
     loading: true,
 }
@@ -56,10 +56,10 @@ export const userSlice = createSlice({
             state.data = payload;
         },
         SET_GPT_AVAILABLE: (state: userState, { payload }) => {
-            state.data.gptAvailable = payload;
+            state.data.gptDailyLimit = payload;
         },
         SET_GPT_REFILL_AT: (state: userState, { payload }) => {
-            state.data.gptRefillAt = payload;
+            state.data.gptDailyResetDate = payload;
         }
     },
     extraReducers: (builder) => {

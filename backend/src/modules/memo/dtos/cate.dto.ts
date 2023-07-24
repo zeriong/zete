@@ -13,7 +13,7 @@ export class CateInput {
     message: '카테고리 제목은 최대 255자 까지 가능합니다.',
   })
   @Validator.IsString()
-  cateName: string;
+  name: string;
 }
 
 export class CreateCateInput {
@@ -21,18 +21,18 @@ export class CreateCateInput {
   @Validator.MaxLength(255, {
     message: '카테고리 제목은 최대 255자 까지 가능합니다.',
   })
-  cateName: string;
+  name: string;
 }
 
 export class CateIdInput {
-  @ApiProperty({ nullable: true, type: Number })
+  @ApiProperty({ nullable: true, type: Number, required: false })
   @Validator.IsOptional()
   @Validator.IsNumber()
   cateId?: number;
 }
 
 export class CreateCateOutput extends CoreOutput {
-  @ApiProperty({ type: Category })
+  @ApiProperty({ type: Category, required: false })
   savedCate?: Category;
 }
 

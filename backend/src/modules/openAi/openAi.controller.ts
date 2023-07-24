@@ -2,9 +2,9 @@ import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { OpenAiService } from './openAi.service';
 import {
-  CreateCompletionInputDto,
+  CreateCompletionDto,
   CreateCompletionOutputDto,
-} from './dto/createCompletionInputDto';
+} from './dto/createCompletionDto';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 
 @ApiTags('OpenAi')
@@ -16,7 +16,7 @@ export class OpenAiController {
   @ApiResponse({ type: CreateCompletionOutputDto })
   @Post('createCompletion')
   async createCompletion(
-    @Body() input: CreateCompletionInputDto,
+    @Body() input: CreateCompletionDto,
     @Req() req,
   ): Promise<CreateCompletionOutputDto> {
     return this.aiService.createCompletion(input, req.user);

@@ -83,7 +83,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
 
     const deleteTag = (tagName) => {
         const tags = form.getValues("update.newTags");
-        if (tags) form.setValue("update.newTags", tags.filter(tag => tag.tagName !== tagName));
+        if (tags) form.setValue("update.newTags", tags.filter(tag => tag.name !== tagName));
     }
 
     // 메모수정 모달 벨류세팅
@@ -93,7 +93,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
             const targetMemo = data.memos.find(find => find.id === memoId);
             if (targetMemo) {
                 temporarySaveMemo.current = targetMemo; // 메모처리 함수에서 비교할 메모 임시저장
-                const tags = targetMemo.tag.map(tag => ({ tagName: tag.tagName }));
+                const tags = targetMemo.tag.map(tag => ({ name: tag.name }));
                 form.setValue("update.newTags", tags);
                 form.setValue("update.memo.title", targetMemo.title.replace(/<br\/>/g, "\n"));
                 form.setValue("update.memo.content", targetMemo.content.replace(/<br\/>/g, "\n"));
@@ -192,11 +192,11 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
                                                         bg-opacity-10 cursor-default"
                                                     >
                                                         <span className="font-light text-11 text-zete-dark-400 whitespace-nowrap">
-                                                            { tag.tagName }
+                                                            { tag.name }
                                                         </span>
                                                         <button
                                                             type="button"
-                                                            onClick={ () => deleteTag(tag.tagName) }
+                                                            onClick={ () => deleteTag(tag.name) }
                                                             className="absolute right-2px group rounded-full grid place-content-center hover:bg-zete-dark-300
                                                             hover:bg-opacity-50 w-14px h-14px"
                                                         >
@@ -229,7 +229,7 @@ export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
                                                         <option value={0}>전체메모</option>
                                                         {data.cate.map((cate, idx) => (
                                                             <option key={ idx } value={ cate.id }>
-                                                                { cate.cateName }
+                                                                { cate.name }
                                                             </option>
                                                         ))}
                                                     </select>

@@ -143,7 +143,7 @@ export const memoSlice = createSlice({
                     tag.cateId = Number(tag.cateId);
                     return tag
                 }) || [],
-            })).sort((a, b) => a.cateName > b.cateName ? 1 : -1);
+            })).sort((a, b) => a.name > b.name ? 1 : -1);
             state.data.memosCount = leftStates.memosCount;
             state.data.importantMemoCount = leftStates.importantMemoCount;
         },
@@ -151,16 +151,16 @@ export const memoSlice = createSlice({
             state.data.cate = payload;
         },
         ADD_CATE: (state: CombineData, { payload }: PayloadAction<CategoriesAndMemoCount>) => {
-            state.data.cate = [...state.data.cate, payload].sort((a, b) => a.cateName > b.cateName ? 1 : -1);
+            state.data.cate = [...state.data.cate, payload].sort((a, b) => a.name > b.name ? 1 : -1);
         },
         UPDATE_CATE: (state: CombineData, { payload }: PayloadAction<CateInput>) => {
             state.data.cate = state.data.cate.map((cate) => {
                 if (cate.id === payload.cateId) {
-                    cate.cateName = payload.cateName;
+                    cate.name = payload.name;
                     return cate;
                 }
                 else return cate;
-            }).sort((a, b) => a.cateName > b.cateName ? 1 : -1);
+            }).sort((a, b) => a.name > b.name ? 1 : -1);
         },
         DELETE_CATE: (state: CombineData, { payload }: PayloadAction<{ importantMemoCount: number, cateId: number }>) => {
             const { cateId, importantMemoCount } = payload;

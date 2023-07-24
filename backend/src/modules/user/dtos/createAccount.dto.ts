@@ -1,6 +1,5 @@
 import * as Validator from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { CoreOutput } from '../../../common/dtos/coreOutput.dto';
 
 export class CreateAccountDto {
   /** email */
@@ -32,5 +31,5 @@ export class CreateAccountDto {
   /** gpt available */
   @ApiProperty({ type: Number })
   @Validator.IsNumber()
-  gptRefillAt: number;
+  gptDailyResetDate: number;
 }

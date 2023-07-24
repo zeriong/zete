@@ -9,9 +9,7 @@ import { UserService } from '../../user/user.service';
 
 const fromCookie = (req) => {
   let token = null;
-  if (req && req.cookies) {
-    token = req.cookies['rt']; // refreshToken 쿠키에서 받아옴
-  }
+  if (req && req.cookies) token = req.cookies['rt']; // refreshToken 쿠키에서 받아옴
   return token;
 };
 

@@ -1,21 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Configuration, OpenAIApi } from 'openai';
 import {
-  CreateCompletionInputDto,
+  CreateCompletionDto,
   CreateCompletionOutputDto,
-} from './dto/createCompletionInputDto';
-import { InjectRepository } from '@nestjs/typeorm';
+} from './dto/createCompletionDto';
 import { User } from '../../entities/user.entity';
-import { Repository } from 'typeorm';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class OpenAiService {
   private openAiApi: OpenAIApi;
 
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-  ) {
+  constructor(private readonly userService: UserService) {
     const configuration = new Configuration({
       organization: process.env.ORGANIZATION_ID,
       apiKey: process.env.OPENAI_API_KEY,
@@ -24,19 +20,11 @@ export class OpenAiService {
   }
 
   async createCompletion(
-    input: CreateCompletionInputDto,
+    input: CreateCompletionDto,
     user: User,
   ): Promise<CreateCompletionOutputDto> {
     try {
-      const findUser = await this.userRepository.findOne({
-        where: { id: user.id },
-      });
-
-      if (!findUser) {
-        return { success: false, error: '존재하지 않는 유저입니다.' };
-      }
-
-      if (findUser.gptAvailable === 0) {
+      if (user.gptDailyLimit === 0) {
         return { success: true, message: '질문 가능한 횟수를 초과하였습니다' };
       }
 
@@ -54,12 +42,12 @@ export class OpenAiService {
       });
 
       // 요청성공시 available감소 후 적용
-      findUser.gptAvailable--;
-      await this.userRepository.save(findUser);
+      user.gptDailyLimit--;
+      await this.userService.saveUser(user);
 
       return {
-        resGpt: response.data.choices[0].message.content,
-        gptAvailable: findUser.gptAvailable,
+        gptResponse: response.data.choices[0].message.content,
+        gptDailyLimit: user.gptDailyLimit,
         success: true,
       };
     } catch (e) {

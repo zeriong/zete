@@ -7,10 +7,10 @@ import { CateIdInput } from './cate.dto';
 import { CategoriesAndMemoCount } from './asideData.dto';
 
 export class TagNameInput {
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Validator.IsOptional()
   @Validator.IsString()
-  tagName?: string;
+  name?: string;
 }
 
 export class MemoIdInput {
@@ -20,7 +20,7 @@ export class MemoIdInput {
 }
 
 export class GetMemosInput {
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   @Validator.IsOptional()
   @Validator.IsString()
   search?: string;
@@ -33,17 +33,17 @@ export class GetMemosInput {
   @Validator.IsNumber()
   limit: number;
 
-  @ApiProperty({ type: Number, nullable: true })
+  @ApiProperty({ type: Number, nullable: true, required: false })
   @Validator.IsOptional()
   @Validator.IsNumber()
   cateQueryStr?: number;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   @Validator.IsOptional()
   @Validator.IsString()
   tagQueryStr?: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   @Validator.IsOptional()
   @Validator.IsString()
   menuQueryStr?: string;
@@ -68,26 +68,26 @@ export class CreateMemoInput extends CateIdInput {
 }
 
 export class CreateMemoOutput extends CoreOutput {
-  @ApiProperty({ type: Memo })
+  @ApiProperty({ type: Memo, required: false })
   savedMemo?: Memo;
 }
 
 export class GetMemosOutput extends CoreOutput {
-  @ApiProperty({ type: [Memo] })
+  @ApiProperty({ type: [Memo], required: false })
   memos?: Memo[];
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   memosCount?: number;
 
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false })
   importantMemoCount?: number;
 
-  @ApiProperty({ type: [CategoriesAndMemoCount] })
+  @ApiProperty({ type: [CategoriesAndMemoCount], required: false })
   cate?: CategoriesAndMemoCount[];
 }
 
 export class GetOneMemoOutput extends CoreOutput {
-  @ApiProperty({ type: Memo })
+  @ApiProperty({ type: Memo, required: false })
   memo?: Memo;
 }
 
@@ -110,22 +110,22 @@ export class UpdateMemoObject {
   @Validator.IsString()
   content?: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   @Validator.IsOptional()
   @Validator.IsNumber()
   cateId?: number | null;
 }
 
 export class UpdateMemoInput {
-  @ApiProperty({ type: UpdateMemoObject })
+  @ApiProperty({ type: UpdateMemoObject, required: false })
   @Validator.IsObject()
   memo?: UpdateMemoObject;
 
-  @ApiProperty({ type: [Tag] })
+  @ApiProperty({ type: [Tag], required: false })
   @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
   newTags?: Tag[];
 
-  @ApiProperty({ type: [Number] })
+  @ApiProperty({ type: [Number], required: false })
   @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
   deleteTagIds?: number[];
 }

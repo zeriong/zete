@@ -22,13 +22,7 @@ export class LoginOutput extends CoreOutput {
   @ApiProperty({ required: false, type: User })
   user?: User;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, nullable: true })
   @Validator.IsString()
   accessToken?: string;
-}
-
-export class LogOutInput {
-  @ApiProperty({ type: Number })
-  @Validator.IsNumber()
-  userId: number;
 }

@@ -17,8 +17,8 @@ import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import { UpdateAccountDto } from './dtos/updateAccount.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
-  GptRefillInputDto,
-  GptAvailableOutputDto,
+  ResetGptDailyLimitInputDto,
+  ResetGptDailyLimitOutputDto,
 } from './dtos/gptManagement.dto';
 
 @Controller('user')
@@ -67,12 +67,12 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @ApiResponse({ type: GptAvailableOutputDto })
-  @Patch('tryGptAvailableRefill')
-  async tryGptAvailableRefill(
-    @Body() input: GptRefillInputDto,
+  @ApiResponse({ type: ResetGptDailyLimitOutputDto })
+  @Patch('resetGptDailyLimit')
+  async resetGptDailyLimit(
+    @Body() input: ResetGptDailyLimitInputDto,
     @Req() req,
-  ): Promise<GptAvailableOutputDto> {
-    return this.userService.tryGptAvailableRefill(input, req.user);
+  ): Promise<ResetGptDailyLimitOutputDto> {
+    return this.userService.resetGptDailyLimit(input, req.user);
   }
 }

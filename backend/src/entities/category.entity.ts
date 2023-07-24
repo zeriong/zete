@@ -13,13 +13,13 @@ import { Tag } from './tag.entity';
 
 @Entity({ name: 'category' })
 export class Category {
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false, nullable: true })
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id?: number;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   @Column({ type: 'tinytext' }) //tinytext: 	255
-  cateName?: string;
+  name?: string;
 
   @ManyToOne(() => User, (user) => user.cate, { onDelete: 'CASCADE' })
   user?: User;

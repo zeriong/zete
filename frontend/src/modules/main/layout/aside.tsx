@@ -74,7 +74,7 @@ export const Aside = () => {
                                     key={idx}
                                     to={{ pathname: "/memo", search: `?cate=${cate.id}` }}
                                     cateId={ String(cate.id) }
-                                    cateName={ cate.cateName }
+                                    cateName={ cate.name }
                                     iconComponent={ CategoryIcon }
                                     iconClassName="mr-10px mt-4px min-w-[21px]"
                                     tags={ cate.tag }
@@ -134,13 +134,13 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                         ${ isActive ? "max-h-[200px] mt-6px" : "h-[0vh] p-0 m-0" }`}
                     >
                         <Link
-                            to={{ pathname: "/memo", search: `${ props.to.search }&tag=${ tags.tagName }` }}
+                            to={{ pathname: "/memo", search: `${ props.to.search }&tag=${ tags.name }` }}
                             className={`flex w-full h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
-                            ${ tagQueryStr === tags.tagName && "bg-zete-light-gray-500" }`}
+                            ${ tagQueryStr === tags.name && "bg-zete-light-gray-500" }`}
                         >
                             <TagIcon svgClassName="w-14px mr-8px" strokeClassName="fill-zete-dark-200"/>
                             <p>
-                                { tags.tagName }
+                                { tags.name }
                             </p>
                         </Link>
                     </div>

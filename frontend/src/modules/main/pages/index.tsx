@@ -121,7 +121,7 @@ export const MemoMain = () => {
                                                 {memo.tag?.map((tag, idx) => (
                                                     <div key={ idx } className="flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default">
                                                         <span className="font-light text-11 text-zete-dark-400 whitespace-nowrap">
-                                                            { tag.tagName }
+                                                            { tag.name }
                                                         </span>
                                                     </div>
                                                 ))}

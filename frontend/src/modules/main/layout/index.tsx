@@ -33,7 +33,7 @@ export const MemoLayout = () => {
         if (!cateQueryStr && !menuQueryStr) return "전체메모";
         else if (menuQueryStr) return "중요메모";
         else {
-            const matchCate = cate.find((cate) => Number(cate.id) === Number(cateQueryStr))?.cateName
+            const matchCate = cate.find((cate) => Number(cate.id) === Number(cateQueryStr))?.name
             if (matchCate) return matchCate;
             return "카테고리가 존재하지않습니다."
         }

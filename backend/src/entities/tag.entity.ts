@@ -16,9 +16,9 @@ export class Tag {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id?: number;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @Column()
-  tagName?: string;
+  name?: string;
 
   @ManyToOne(() => User, (user) => user.tag, { onDelete: 'CASCADE' })
   user?: User;
@@ -34,7 +34,7 @@ export class Tag {
 
   @ManyToOne(() => Category, (cate) => cate.tag, { onDelete: 'CASCADE' })
   cate?: Category;
-  @ApiProperty({ type: Number, required: false })
+  @ApiProperty({ type: Number, nullable: true, required: false })
   @RelationId((tags: Tag) => tags.cate)
   cateId?: number;
 }

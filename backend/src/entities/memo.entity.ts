@@ -15,15 +15,15 @@ export class Memo extends coreEntity {
   @Column({ type: 'text' }) //text: 	65,535
   content: string;
 
-  @ApiProperty({ type: Boolean })
+  @ApiProperty({ type: Boolean, required: false })
   @Column({ type: 'boolean' }) //text: 	65,535
-  important: boolean;
+  important?: boolean;
 
   @ManyToOne(() => User, (user) => user.memo, { onDelete: 'CASCADE' })
-  user: User;
+  user?: User;
   @ApiProperty({ type: Number, required: false })
   @RelationId((memos: Memo) => memos.user)
-  userId: number;
+  userId?: number;
 
   @ManyToOne(() => Category, (cate) => cate.memo, { onDelete: 'CASCADE' })
   cate: Category;
@@ -31,7 +31,7 @@ export class Memo extends coreEntity {
   @RelationId((memo: Memo) => memo.cate)
   cateId: number;
 
-  @ApiProperty({ type: [Tag], required: false })
+  @ApiProperty({ type: [Tag] })
   @OneToMany(() => Tag, (tags) => tags.memo, { cascade: true })
   tag: Tag[];
 }

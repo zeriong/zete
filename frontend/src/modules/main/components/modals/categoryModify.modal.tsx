@@ -27,7 +27,7 @@ export const CategoryModifyModal = (props: { buttonText: string }) => {
     // 카테고리 생성 submit
     const handleSubmit = (e) => {
         e.preventDefault();
-        createCategory({ cateName: addInputValues.addCateName });
+        createCategory({ name: addInputValues.addCateName });
         setAddInputValues({ addCateName: "" });
     }
 
@@ -43,11 +43,11 @@ export const CategoryModifyModal = (props: { buttonText: string }) => {
     const handleUpdateOnSubmit = (id: number, prevVal: string, input: any) => {
         const val = input.value
         if (val && val.length > 1 && val !== prevVal) {
-            Api.memo.updateCategory({ cateId: id, cateName: val })
+            Api.memo.updateCategory({ cateId: id, name: val })
                 .then((res) => {
                     if (res.data) {
                         if (res.data.success) {
-                            return dispatch(UPDATE_CATE({ cateId: id, cateName: val }));
+                            return dispatch(UPDATE_CATE({ cateId: id, name: val }));
                         }
                         // 입력 초기화
                         input.value = prevVal;
@@ -75,7 +75,7 @@ export const CategoryModifyModal = (props: { buttonText: string }) => {
     useEffect(() => {
         let values = {}
         cate.map((cate) => (
-            values = { ...values, [cate.id]: cate.cateName }
+            values = { ...values, [cate.id]: cate.name }
         ));
         setUpdateInputValues(values);
     }, [cate]);
@@ -162,12 +162,12 @@ export const CategoryModifyModal = (props: { buttonText: string }) => {
                                                                     event.preventDefault()
                                                                     // 서브밋이벤트의 타겟은 form내부 input, button 등 몇번째요소의 벨류인지 적어주어야 함.
                                                                     const input = event.target[0];
-                                                                    handleUpdateOnSubmit(val.id, val.cateName, input);
+                                                                    handleUpdateOnSubmit(val.id, val.name, input);
                                                                 }}
                                                                 onBlur={(event) => {
                                                                     // form에서의 onBlur타겟은 인풋이 몇개가 있든 가장 첫번째인풋을 타겟함
                                                                     const input = event.target;
-                                                                    handleUpdateOnSubmit(val.id, val.cateName, input);
+                                                                    handleUpdateOnSubmit(val.id, val.name, input);
                                                                 }}
                                                                 className="flex items-center"
                                                             >
@@ -180,7 +180,7 @@ export const CategoryModifyModal = (props: { buttonText: string }) => {
                                                                 />
                                                                 <ConfirmButton
                                                                     options={{
-                                                                        subject: `"${val.cateName}"를 삭제하시겠습니까?`,
+                                                                        subject: `"${val.name}"를 삭제하시겠습니까?`,
                                                                         subtitle: "카테고리가 삭제되면 하위 메모가<br/>모두 삭제됩니다.",
                                                                         confirmText: "삭제",
                                                                         isNegative: true,

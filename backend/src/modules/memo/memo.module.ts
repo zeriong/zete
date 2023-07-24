@@ -5,13 +5,12 @@ import { Memo } from '../../entities/memo.entity';
 import { Tag } from '../../entities/tag.entity';
 import { MemoService } from './memo.service';
 import { MemoController } from './memo.controller';
-import { User } from '../../entities/user.entity';
-import { UserService } from '../user/user.service';
+import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Memo, Category, Tag, User])],
+  imports: [TypeOrmModule.forFeature([Memo, Category, Tag])],
   controllers: [MemoController],
-  providers: [MemoService, UserService],
+  providers: [MemoService],
   exports: [MemoService],
 })
 export class MemoModule {}

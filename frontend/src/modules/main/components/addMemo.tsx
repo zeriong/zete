@@ -133,7 +133,7 @@ export const AddMemo = () => {
 
     const deleteTag = (tagName) => {
         const tags = form.getValues("tags");
-        if (tags) form.setValue("tags", tags.filter(tag => tag.tagName !== tagName));
+        if (tags) form.setValue("tags", tags.filter(tag => tag.name !== tagName));
     }
 
     const gptTextareaOnChange = (e) => {
@@ -143,7 +143,7 @@ export const AddMemo = () => {
 
     // gpt api 요청 함수
     const requestGpt = () => {
-        if (userState.gptAvailable === 0) return showAlert("질문가능 횟수가 초과하였습니다, 매일 자정이 지나면 충전됩니다.");
+        if (userState.gptDailyLimit === 0) return showAlert("질문가능 횟수가 초과하였습니다, 매일 자정이 지나면 충전됩니다.");
         
         setGptLoading(true);
         Api.openAi.createCompletion({ content: gptTextInput })
@@ -159,9 +159,9 @@ export const AddMemo = () => {
 
                 if (!res.data.success) return showAlert(res.data.error);
                 if (res.data.message) return showAlert(res.data.message);
-                if (res.data.resGpt) {
-                    dispatchGptAvailable(res.data.gptAvailable);
-                    setGptContent(res.data.resGpt);
+                if (res.data.gptResponse) {
+                    dispatchGptAvailable(res.data.gptDailyLimit);
+                    setGptContent(res.data.gptResponse);
                 }
             })
             .catch((e) => {
@@ -210,7 +210,7 @@ export const AddMemo = () => {
     // 파라미터쿼리에 따른 기본값 설정
     useEffect(() => {
         form.setValue("cateId", cateQueryStr ? Number(cateQueryStr) : 0);
-        form.setValue("tags", tagQueryStr ? [ { tagName: tagQueryStr } ] : []);
+        form.setValue("tags", tagQueryStr ? [ { name: tagQueryStr } ] : []);
     },[searchParams]);
 
 
@@ -240,12 +240,12 @@ export const AddMemo = () => {
     }, [readyToMemo]);
 
     // gpt 질문가능횟수 통신함수
-    const handleTryGptAvailable = (gptRefillAt) => {
-        Api.user.tryGptAvailableRefill({ gptRefillAt })
+    const handleTryGptAvailable = (gptDailyResetDate) => {
+        Api.user.resetGptDailyLimit({ gptDailyResetDate })
             .then((res) => {
                 // 성공시 success true만 존재.
-                dispatchGptAvailable(res.data.gptAvailable);
-                dispatchGptRefillAt(res.data.gptRefillAt);
+                dispatchGptAvailable(res.data.gptDailyLimit);
+                dispatchGptRefillAt(res.data.gptDailyResetDate);
             }).catch(e => console.log(e));
     }
 
@@ -255,7 +255,7 @@ export const AddMemo = () => {
         if (!openGpt) return;
         const gptRefillAt = getGptRefillAt();
         
-        if (userState.gptRefillAt !== gptRefillAt) {
+        if (userState.gptDailyResetDate !== gptRefillAt) {
             handleTryGptAvailable(gptRefillAt);
         }
     }, [openGpt]);
@@ -354,10 +354,10 @@ export const AddMemo = () => {
                                     {form.watch("tags")?.map((tag, idx) => (
                                         <div key={idx} className="relative flex items-center pl-9px pr-21px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default">
                                             <span className="font-light text-11 text-zete-dark-400 whitespace-nowrap">
-                                                { tag.tagName }
+                                                { tag.name }
                                             </span>
                                             <button
-                                                onClick={ () => deleteTag(tag.tagName) }
+                                                onClick={ () => deleteTag(tag.name) }
                                                 className="absolute right-2px group rounded-full grid place-content-center hover:bg-zete-dark-300 hover:bg-opacity-50 w-14px h-14px"
                                             >
                                                 <CloseIcon className="w-10px fill-zete-dark-400 group-hover:fill-white"/>
@@ -396,7 +396,7 @@ export const AddMemo = () => {
                                                 {
                                                     cate.map((cate, idx) => (
                                                         <option key={idx} value={cate.id}>
-                                                            {cate.cateName}
+                                                            {cate.name}
                                                         </option>
                                                     ))
                                                 }
@@ -437,7 +437,7 @@ export const AddMemo = () => {
                             <div className="absolute top-1/2 -translate-y-1/2 text-13 right-13px text-white font-semibold">
                                 질문 가능 횟수:
                                 <span>
-                                    {` ${ userState.gptAvailable }`}
+                                    {` ${ userState.gptDailyLimit }`}
                                 </span>
                             </div>
                         </div>

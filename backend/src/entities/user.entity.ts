@@ -32,14 +32,14 @@ export class User extends coreEntity {
   @Column({ nullable: true, type: 'tinytext' })
   refreshToken?: string;
 
-  /** gpt available */
+  /** gpt daily limit */
   @ApiProperty({ type: Number })
   @Column()
-  gptRefillAt: number;
+  gptDailyResetDate: number;
 
   @ApiProperty({ type: Number })
   @Column()
-  gptAvailable: number;
+  gptDailyLimit: number;
 
   @ApiProperty({ type: [Category] })
   @OneToMany(() => Category, (categories) => categories.user, {
