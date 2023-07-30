@@ -2,7 +2,6 @@ import React, {Fragment, ReactNode, useEffect, useState} from "react";
 import {Dialog, Transition} from "@headlessui/react";
 import {FuncButton} from "./funcButton";
 import * as DOMPurify from "dompurify";
-import {stopBubbling} from "../libs";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     options: {
@@ -30,6 +29,8 @@ export const ConfirmButton = (props: ButtonProps) => {
     }
 
     const buttonPropsOptions = Object.fromEntries(Object.entries(props).filter(([key]) => key !== "options"));
+
+    const stopBubbling = (e) => e.stopPropagation();
 
     const handleFuncButtonOnClick = () => {
         if (props.options.confirmCallback) {

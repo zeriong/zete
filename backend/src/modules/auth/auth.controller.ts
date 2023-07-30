@@ -47,7 +47,6 @@ export class AuthController {
     @Req() req,
     @Res({ passthrough: true }) res: Response,
   ): Promise<CoreOutput> {
-    console.log('logout: 접근');
     return this.authService.logout(req.user, res);
   }
 }

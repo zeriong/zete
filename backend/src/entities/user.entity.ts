@@ -4,54 +4,62 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Category } from './category.entity';
 import { Memo } from './memo.entity';
 import { Tag } from './tag.entity';
+import * as Validator from 'class-validator';
 
 @Entity({ name: 'user' })
 export class User extends coreEntity {
-  /** email */
+  // email
   @ApiProperty()
-  @Column({ unique: true, length: 32, comment: '유저 이메일' })
+  @Column({ unique: true, length: 64, comment: '유저 이메일' })
+  @Validator.IsEmail({}, { message: '이메일을 입력해 주시기 바랍니다.' })
+  @Validator.Length(6, 64, { message: '이메일을 입력해 주시기 바랍니다.' })
   email: string;
 
-  /** password */
+  // password
   @ApiProperty()
   @Column({ select: false, length: 128 }) //select할 수 없게 만듦
+  @Validator.IsString()
+  @Validator.Length(8, 64, { message: '비밀번호는 최소 8자 이상이어야 합니다.' })
   password: string;
 
-  /** name */
+  // name
   @ApiProperty()
   @Column({ length: 32, comment: '유저 이름' })
+  @Validator.IsString()
+  @Validator.Length(2, 32, { message: '이름은 최소 2자 이상이어야 합니다.' })
   name: string;
 
-  /** mobile */
+  // mobile
   @ApiProperty()
-  @Column({ length: 16, comment: '휴대폰변호' })
+  @Column({ length: 13, comment: '휴대폰 변호' })
+  @Validator.IsString()
+  @Validator.Length(13, 13, { message: '휴대폰 번호를 입력해주세요.' })
   mobile: string;
 
-  /** refreshToken */
+  // refreshToken
   @ApiProperty({ required: false })
-  @Column({ nullable: true, type: 'tinytext' })
+  @Column({ type: 'tinytext', nullable: true })
   refreshToken?: string;
 
-  /** gpt daily limit */
-  @ApiProperty({ type: Number })
-  @Column()
-  gptDailyResetDate: number;
+  // gpt usable count
+  @ApiProperty({ type: Number, required: false })
+  @Column({ type: 'tinyint', default: 0 })
+  gptUsableCount?: number;
 
-  @ApiProperty({ type: Number })
-  @Column()
-  gptDailyLimit: number;
+  // gpt usable count reset At
+  @ApiProperty({ type: Date, required: false })
+  @Column({ type: 'date', nullable: true })
+  gptUsableCountResetAt?: Date;
 
-  @ApiProperty({ type: [Category] })
-  @OneToMany(() => Category, (categories) => categories.user, {
-    cascade: true,
-  })
-  cate: Category[];
+  @ApiProperty({ type: Category, isArray: true, required: false })
+  @OneToMany(() => Category, (inverse) => inverse.user, { cascade: true })
+  cates?: Category[];
 
-  @ApiProperty({ type: [Memo] })
-  @OneToMany(() => Memo, (memos) => memos.user, { cascade: true })
-  memo: Memo[];
+  @ApiProperty({ type: Memo, isArray: true, required: false })
+  @OneToMany(() => Memo, (inverse) => inverse.user, { cascade: true })
+  memos?: Memo[];
 
-  @ApiProperty({ type: [Tag] })
-  @OneToMany(() => Tag, (tags) => tags.user, { cascade: true })
-  tag: Tag[];
+  @ApiProperty({ type: Tag, isArray: true, required: false })
+  @OneToMany(() => Tag, (inverse) => inverse.user, { cascade: true })
+  tags?: Tag[];
 }

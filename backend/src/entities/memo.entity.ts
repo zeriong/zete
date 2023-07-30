@@ -4,34 +4,47 @@ import { Tag } from './tag.entity';
 import { User } from './user.entity';
 import { coreEntity } from '../common/entities/core.entity';
 import { Category } from './category.entity';
+import * as Validator from 'class-validator';
 
 @Entity({ name: 'memo' })
 export class Memo extends coreEntity {
   @ApiProperty({ required: false })
-  @Column({ type: 'varchar', length: 64 })
-  title: string;
+  @Column({ type: 'varchar', length: 255 })
+  @Validator.IsOptional()
+  @Validator.IsString()
+  @Validator.MaxLength(255, { message: '제목명은 최대 255자까지 입력 가능합니다.' })
+  title?: string;
 
   @ApiProperty({ required: false })
   @Column({ type: 'text' }) //text: 	65,535
-  content: string;
+  @Validator.IsOptional()
+  @Validator.IsString()
+  @Validator.MaxLength(65535, { message: '최대 65,535자까지 메모 가능합니다.' })
+  content?: string;
 
   @ApiProperty({ type: Boolean, required: false })
-  @Column({ type: 'boolean' }) //text: 	65,535
+  @Column({ type: 'boolean' })
+  @Validator.IsOptional()
+  @Validator.IsBoolean()
   important?: boolean;
 
-  @ManyToOne(() => User, (user) => user.memo, { onDelete: 'CASCADE' })
-  user?: User;
+  @ManyToOne(() => User, (inverse) => inverse.memos, { onDelete: 'CASCADE' })
+  user: User;
   @ApiProperty({ type: Number, required: false })
-  @RelationId((memos: Memo) => memos.user)
+  @RelationId((memo: Memo) => memo.user)
   userId?: number;
 
-  @ManyToOne(() => Category, (cate) => cate.memo, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Category, (inverse) => inverse.memo, { onDelete: 'CASCADE' })
   cate: Category;
-  @ApiProperty({ nullable: true, type: Number })
+  @ApiProperty({ type: Number, required: false })
   @RelationId((memo: Memo) => memo.cate)
-  cateId: number;
+  @Validator.IsOptional()
+  @Validator.IsNumber()
+  cateId?: number;
 
-  @ApiProperty({ type: [Tag] })
-  @OneToMany(() => Tag, (tags) => tags.memo, { cascade: true })
-  tag: Tag[];
+  @ApiProperty({ type: Tag, isArray: true, required: false })
+  @OneToMany(() => Tag, (inverse) => inverse.memo, { cascade: true })
+  @Validator.IsOptional()
+  @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
+  tag?: Tag[];
 }

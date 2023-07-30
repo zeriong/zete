@@ -36,7 +36,7 @@ export const handleAddTagSubmit = (event, getVal, setValFunc, target) => {
     input.value = "";
 }
 
-export const getGptRefillAt = () => {
+export const getToday = () => {
     const date = new Date();
     const year = String(date.getFullYear());
     const month = String(date.getMonth() + 1);
@@ -44,9 +44,6 @@ export const getGptRefillAt = () => {
 
     return Number(year + month + day);
 }
-
-export const stopBubbling = (e) => e.stopPropagation();
-
 
 /** -------- 커스텀스크롤 function start ------- */
 export const getInnerHeight = (el: HTMLDivElement) => {

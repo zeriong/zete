@@ -7,7 +7,7 @@ import {Dialog, Transition } from "@headlessui/react";
 import {FuncButton} from "../funcButton";
 import {CreateAccountDto} from "../../../openapi/generated";
 import {Api} from "../../api";
-import {getGptRefillAt} from "../../libs";
+import {getToday} from "../../libs";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 
 /** 폼항목 */
@@ -60,7 +60,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
 
     const handleOnSubmit = handleSubmit(async () => {
         const { email, password, name, mobile } = getValues();
-        const gptDailyResetDate = getGptRefillAt();
+        const gptDailyResetDate = getToday();
         const reqData: CreateAccountDto = { email, password, name, mobile, gptDailyResetDate };
 
         await Api.user.createAccount(reqData)

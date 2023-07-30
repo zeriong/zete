@@ -1,7 +1,13 @@
 import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from "../../../assets/vectors";
 import React, {useEffect, useRef, useState} from "react";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
-import {handleTagInput, handleResizeHeight, handleAddTagSubmit, updateOrAddMemo, getGptRefillAt} from "../../../common/libs";
+import {
+    handleTagInput,
+    handleResizeHeight,
+    handleAddTagSubmit,
+    updateOrAddMemo,
+    getToday
+} from "../../../common/libs";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
@@ -253,10 +259,10 @@ export const AddMemo = () => {
        (initState가 null이기 때문에 최초에 반드시 1회 요청) */
     useEffect(() => {
         if (!openGpt) return;
-        const gptRefillAt = getGptRefillAt();
+        const today = getToday();
         
-        if (userState.gptDailyResetDate !== gptRefillAt) {
-            handleTryGptAvailable(gptRefillAt);
+        if (userState.gptDailyResetDate !== today) {
+            handleTryGptAvailable(today);
         }
     }, [openGpt]);
 
