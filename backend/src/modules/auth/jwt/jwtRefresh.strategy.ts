@@ -14,10 +14,7 @@ const fromCookie = (req) => {
 };
 
 @Injectable()
-export class JwtRefreshStrategy extends PassportStrategy(
-  Strategy,
-  'jwt-refresh',
-) {
+export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   constructor(
     private readonly config: ConfigService,
     private readonly usersService: UserService,

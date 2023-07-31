@@ -25,13 +25,13 @@ export class Tag {
   @RelationId((tag: Tag) => tag.user)
   userId?: number;
 
-  @ManyToOne(() => Memo, (inverse) => inverse.tag, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Memo, (inverse) => inverse.tags, { onDelete: 'CASCADE' })
   memo: Memo;
   @ApiProperty({ type: Number, required: false })
   @RelationId((tag: Tag) => tag.memo)
   memoId?: number;
 
-  @ManyToOne(() => Category, (inverse) => inverse.tag, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Category, (inverse) => inverse.tags, { onDelete: 'CASCADE' })
   cate: Category;
   @ApiProperty({ type: Number, nullable: true, required: false })
   @RelationId((tag: Tag) => tag.cate)

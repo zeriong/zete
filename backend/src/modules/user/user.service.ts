@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
@@ -6,16 +6,13 @@ import { CreateAccountDto } from './dtos/createAccount.dto';
 import * as bcrypt from 'bcrypt';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
 import * as Validator from 'class-validator';
-import { UserDataOutput } from './dtos/userData.dto';
 import { UpdateAccountDto } from './dtos/updateAccount.dto';
-import {
-  ResetGptDailyLimitInputDto,
-  ResetGptDailyLimitOutputDto,
-} from './dtos/gptManagement.dto';
+import { ResetGptDailyLimitInputDto, ResetGptDailyLimitOutputDto } from './dtos/gptManagement.dto';
 
 /** 실질적인 서비스 구현 */
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -52,10 +49,9 @@ export class UserService {
       return { success: false, error: `${e}` };
     }
   }
-  async logInValidate(
-    email: string,
-    password: string,
-  ): Promise<UserDataOutput> {
+
+  /** 로그인 검증 */
+  async validate(email: string, password: string): Promise<User | null> {
     try {
       let user: User = null;
       //이메일 유효성 검사
@@ -65,27 +61,15 @@ export class UserService {
           .select('*') //쿼리빌더 이후로 지정해준 쿼리같은 메소드
           .where('email = :email', { email: email }) //조회조건
           .getRawOne(); //Raw통째로 가져온다. 유효성이 검증되면 user를 반환하고, user = 해당유저의 데이터이다.(email,password,id,token 등등)
-      } else {
-        return {
-          success: false,
-          error: '잘못된 로그인 아이디입니다.',
-        };
       }
 
       if (user && bcrypt.compareSync(password, user.password)) {
-        console.log('인증 성공');
-        return {
-          success: true,
-          user,
-        };
+        return user;
       }
-      return {
-        success: false,
-        error: '비밀번호 검증 실패.',
-      };
-    } catch (error) {
-      return { success: false, error: '로그인 검증 실패.' };
+    } catch (e) {
+      this.logger.error(e);
     }
+    return null;
   }
 
   /** gpt daily limit 리셋 */

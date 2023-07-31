@@ -20,16 +20,16 @@ export class Category {
   name?: string;
 
   @ManyToOne(() => User, (inverse) => inverse.cates, { onDelete: 'CASCADE' })
-  user: User;
+  user?: User;
   @ApiProperty({ type: Number })
   @RelationId((category: Category) => category.user)
   userId?: number;
 
   @ApiProperty({ type: Memo, isArray: true, required: false })
   @OneToMany(() => Memo, (inverse) => inverse.cate, { cascade: true })
-  memo?: Memo[];
+  memos?: Memo[];
 
   @ApiProperty({ type: Tag, isArray: true, required: false })
   @OneToMany(() => Tag, (inverse) => inverse.cate, { cascade: true })
-  tag?: Tag[];
+  tags?: Tag[];
 }

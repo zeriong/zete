@@ -26,16 +26,16 @@ export class Memo extends coreEntity {
   @Column({ type: 'boolean' })
   @Validator.IsOptional()
   @Validator.IsBoolean()
-  important?: boolean;
+  isImportant?: boolean;
 
   @ManyToOne(() => User, (inverse) => inverse.memos, { onDelete: 'CASCADE' })
-  user: User;
+  user?: User;
   @ApiProperty({ type: Number, required: false })
   @RelationId((memo: Memo) => memo.user)
   userId?: number;
 
-  @ManyToOne(() => Category, (inverse) => inverse.memo, { onDelete: 'CASCADE' })
-  cate: Category;
+  @ManyToOne(() => Category, (inverse) => inverse.memos, { onDelete: 'CASCADE' })
+  cate?: Category;
   @ApiProperty({ type: Number, required: false })
   @RelationId((memo: Memo) => memo.cate)
   @Validator.IsOptional()
@@ -46,5 +46,5 @@ export class Memo extends coreEntity {
   @OneToMany(() => Tag, (inverse) => inverse.memo, { cascade: true })
   @Validator.IsOptional()
   @Validator.IsArray({ message: '잘못된 태그형식입니다.' })
-  tag?: Tag[];
+  tags?: Tag[];
 }
