@@ -5,7 +5,6 @@ import { Memo } from '../../entities/memo.entity';
 import { Tag } from '../../entities/tag.entity';
 import { MemoService } from './memo.service';
 import { MemoController } from './memo.controller';
-import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Memo, Category, Tag])],

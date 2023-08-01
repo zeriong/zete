@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Category } from '../../entities/category.entity';
 import { Tag } from '../../entities/tag.entity';
 import { Memo } from '../../entities/memo.entity';
@@ -127,10 +127,7 @@ export class MemoService {
         .groupBy('Category.id, tags.name')
         .getMany();
 
-      const memosCount = await this.memoRepository
-        .createQueryBuilder()
-        .where('Memo.userId = :userId', { userId: user.id })
-        .getCount();
+      const memosCount = await this.memoRepository.createQueryBuilder().where('Memo.userId = :userId', { userId: user.id }).getCount();
 
       const importantMemoCount = await this.memoRepository
         .createQueryBuilder()

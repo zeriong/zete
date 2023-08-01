@@ -17,8 +17,7 @@ import { MemoModule } from './modules/memo/memo.module';
     ConfigModule.forRoot({
       // cache: true,
       isGlobal: true,
-      envFilePath:
-        process.env.NODE_ENV === 'development' ? '.env.dev' : '.env.prod',
+      envFilePath: process.env.NODE_ENV === 'development' ? '.env.dev' : '.env.prod',
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('development', 'production').required(),

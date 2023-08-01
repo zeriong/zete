@@ -27,7 +27,7 @@ export class AuthService {
   async login({ email, password }: LoginInput, response: Response): Promise<LoginOutput> {
     try {
       // 계정, 비밀번호 검증
-      const user: User = await this.userService.validate(email, password);
+      const user: User = await this.userService.validateUser(email, password);
       // 계정, 비밀번호 검증 성공
       if (user !== null) {
         // jwt 토큰 발급

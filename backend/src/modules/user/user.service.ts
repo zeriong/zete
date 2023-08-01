@@ -2,12 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { CreateAccountDto } from './dtos/createAccount.dto';
 import * as bcrypt from 'bcrypt';
 import { CoreOutput } from '../../common/dtos/coreOutput.dto';
 import * as Validator from 'class-validator';
-import { UpdateAccountDto } from './dtos/updateAccount.dto';
-import { ResetGptDailyLimitInputDto, ResetGptDailyLimitOutputDto } from './dtos/gptManagement.dto';
+import { CreateAccountInput } from './dtos/createAccount.dto';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { GetGptUsableCountOutput } from './dtos/getGptUsableCount.dto';
+import { UpdateAccountInput } from './dtos/updateAccount.dto';
 
 /** 실질적인 서비스 구현 */
 @Injectable()
@@ -17,41 +18,108 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-  async createAccount(input: CreateAccountDto): Promise<CoreOutput> {
+
+  /**
+   * 계정생성
+   * @description 컨트롤러 주입 용도
+   * */
+  async createAccount(input: CreateAccountInput): Promise<CoreOutput> {
     try {
       //중복 검증
-      const exists = await this.userRepository.findOne({
-        where: { email: input.email },
-      });
+      const exists = await this.userRepository.findOne({ where: { email: input.email } });
 
-      if (exists) {
-        return {
-          success: false,
-          target: 'email',
-          error: `이미 등록된 이메일입니다.`,
-        };
-      }
+      if (exists) return { success: false, target: 'email', error: `이미 등록된 이메일입니다.` };
 
-      /** 계정생성 */
+      // 유저 데이터 생성 후 저장
       await this.userRepository.save(
         await this.userRepository.create({
           email: input.email,
           password: await bcrypt.hash(input.password, 10),
           name: input.name,
           mobile: input.mobile,
-          gptDailyLimit: 10,
-          gptDailyResetDate: input.gptDailyResetDate,
+          gptUsableCount: 10,
+          gptUsableCountResetAt: new Date(),
         }),
       );
 
       return { success: true };
     } catch (e) {
-      return { success: false, error: `${e}` };
+      this.logger.error(e);
+    }
+
+    return { success: false, error: '계정 생성에 실패했습니다.' };
+  }
+
+  /**
+   * gpt 사용 가능 횟수
+   * @return 잔여 횟수를 포함하여 반환
+   * @description 컨트롤러 주입 용도
+   * */
+  async getGptUsableCount(user: User): Promise<GetGptUsableCountOutput> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const resetAt = new Date(user.gptUsableCountResetAt);
+      resetAt.setHours(0, 0, 0, 0);
+
+      // 당일이 아니면 횟수 초기화
+      if (resetAt.getTime() !== today.getTime()) {
+        const res = await this.userRepository.update(user.id, { gptUsableCount: 10, gptUsableCountResetAt: today });
+        if (res.affected > 0) return { success: true, count: 10 };
+        else return { success: false, error: '잘못된 접근입니다.' };
+      }
+
+      return { success: true, count: user.gptUsableCount };
+    } catch (e) {
+      this.logger.error(e);
+    }
+
+    return { success: false, error: 'Chat GPT 통신 실패.' };
+  }
+
+  /**
+   * 프로필 업데이트
+   * @description 컨트롤러 주입 용도
+   * */
+  async updateProfile(user: User, updateData: UpdateAccountInput): Promise<CoreOutput> {
+    try {
+      const thisEmail = user.email;
+      const emailExists = await this.userRepository.findOne({ where: [{ email: updateData.email }] });
+      const mobileExists = await this.userRepository.findOne({ where: [{ mobile: updateData.mobile }] });
+
+      if (thisEmail != updateData.email && emailExists) return { success: false, error: '중복된 이메일입니다.', target: 'email' };
+      if (thisEmail != updateData.email && mobileExists) return { success: false, error: '중복된 휴대폰입니다.' };
+
+      const userData = { email: updateData.email, name: updateData.name, mobile: updateData.mobile };
+
+      if (updateData.password === '') {
+        await this.userRepository.update(user.id, userData);
+        return { success: true };
+      }
+
+      const password = await bcrypt.hash(updateData.password, 10);
+      await this.userRepository.update(user.id, { ...userData, password });
+
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: '유저 데이터 업데이트 실패' };
     }
   }
 
+  /**
+   * 유저 삭제
+   * @description 컨트롤러 주입 용도
+   * */
+  async deleteAccount(userId: number): Promise<CoreOutput> {
+    const result = await this.userRepository.delete(userId);
+    if (result.affected > 0) return { success: true };
+
+    return { success: false, error: '해당 아이디는 존재하지 않습니다.' };
+  }
+
   /** 로그인 검증 */
-  async validate(email: string, password: string): Promise<User | null> {
+  async validateUser(email: string, password: string): Promise<User | null> {
     try {
       let user: User = null;
       //이메일 유효성 검사
@@ -71,118 +139,23 @@ export class UserService {
     }
     return null;
   }
-
-  /** gpt daily limit 리셋 */
-  async resetGptDailyLimit(
-    input: ResetGptDailyLimitInputDto,
-    user: User,
-  ): Promise<ResetGptDailyLimitOutputDto> {
-    try {
-      if (input.gptDailyResetDate === user.gptDailyResetDate) {
-        return {
-          success: true,
-          gptDailyResetDate: user.gptDailyResetDate,
-          gptDailyLimit: user.gptDailyLimit,
-          message: '자정이 지나면 리필됩니다.',
-        };
-      }
-
-      user.gptDailyResetDate = input.gptDailyResetDate;
-      user.gptDailyLimit = 10;
-
-      await this.userRepository.save(user);
-
-      return {
-        success: true,
-        gptDailyResetDate: user.gptDailyResetDate,
-        gptDailyLimit: 10,
-      };
-    } catch (error) {
-      return { success: false, error: `gpt 통신 실패, error: ${error}` };
-    }
-  }
-
   /** 모든유저정보 */
   async getAll(): Promise<User[]> {
     return this.userRepository.find();
   }
-  /** id 검색 */
+  /** id 검색 (실패시 오류반환) */
   async findById(id: number): Promise<User> {
     return await this.userRepository.findOneByOrFail({ id });
   }
-  /** 프로필 response */
-  async profile(id: number): Promise<User> {
-    return await this.userRepository.findOneBy({ id });
-  }
-  /** id 삭제 */
-  async delete(userId: number): Promise<CoreOutput> {
-    const result = await this.userRepository.delete(userId);
-    if (result.affected === 0) {
-      return { success: false, error: '해당 아이디는 존재하지 않습니다.' };
-    } else {
-      return { success: true };
-    }
-  }
-  /** id 업데이트 */
-  async update(userId: number, updateData: object): Promise<CoreOutput> {
+  /** 업데이트 */
+  async update(userId: number, updateData: QueryDeepPartialEntity<User>): Promise<boolean> {
     try {
-      await this.userRepository.update(userId, updateData);
-      return {
-        success: true,
-      };
-    } catch (error) {
-      return { success: false, error: '유저 데이터 업데이트 실패' };
-    }
-  }
-
-  /** 유저 데이터 저장 */
-  async saveUser(user: User): Promise<User> {
-    return await this.userRepository.save(user);
-  }
-
-  /** 프로필 업데이트 */
-  async profileUpdate(
-    user: User,
-    updateData: UpdateAccountDto,
-  ): Promise<CoreOutput> {
-    try {
-      const thisEmail = user.email;
-      const emailExists = await this.userRepository.findOne({
-        where: [{ email: updateData.email }],
-      });
-      const mobileExists = await this.userRepository.findOne({
-        where: [{ mobile: updateData.mobile }],
-      });
-
-      if (thisEmail != updateData.email && emailExists) {
-        return {
-          success: false,
-          error: '중복된 이메일입니다.',
-          target: 'email',
-        };
-      }
-      if (thisEmail != updateData.email && mobileExists) {
-        return { success: false, error: '중복된 휴대폰입니다.' };
-      }
-
-      const userData = {
-        email: updateData.email,
-        name: updateData.name,
-        mobile: updateData.mobile,
-      };
-
-      if (updateData.password === '') {
-        await this.userRepository.update(user.id, userData);
-        return { success: true };
-      } else {
-        await this.userRepository.update(user.id, {
-          ...userData,
-          password: await bcrypt.hash(updateData.password, 10),
-        });
-        return { success: true };
-      }
+      const res = await this.userRepository.update(userId, updateData);
+      if (res.affected > 0) return true;
     } catch (e) {
-      return { success: false, error: '유저 데이터 업데이트 실패' };
+      this.logger.error(e);
     }
+
+    return false;
   }
 }
