@@ -3,7 +3,7 @@ import {showAlert} from "../store/slices/alert.slice";
 import {CreateMemoInput, Memo, TagNameInput} from "../openapi/generated";
 import {store} from "../store";
 import {deleteMemo, memoSlice, refreshMemos, refreshTargetMemo} from "../store/slices/memo.slice";
-import {Api} from "./api";
+import {Api} from "../openapi/api";
 import React from "react";
 
 /** ---- In Content Method ---- */

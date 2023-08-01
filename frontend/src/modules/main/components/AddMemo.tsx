@@ -14,7 +14,7 @@ import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
 import {useForm} from "react-hook-form";
 import {showAlert} from "../../../store/slices/alert.slice";
 import {CreateMemoInput, Memo} from "../../../openapi/generated";
-import {Api} from "../../../common/api";
+import {Api} from "../../../openapi/api";
 import {deleteMemo} from "../../../store/slices/memo.slice";
 import {dispatchGptAvailable, dispatchGptRefillAt} from "../../../store/slices/user.slice";
 

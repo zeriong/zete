@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
-import {SuccessSignupModal} from "../../../common/components/modals/SuccessSignupModal";
-import {SignupModal} from "../../../common/components/modals/SignupModal";
-import {SigninModal} from "../../../common/components/modals/SigninModal";
+import {SuccessSignupModal} from "../../../common/components/modals/SuccessSignup.modal";
+import {SignupModal} from "../../../common/components/modals/Signup.modal";
+import {SigninModal} from "../../../common/components/modals/Signin.modal";
 import {Link} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../store";

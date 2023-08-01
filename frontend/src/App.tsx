@@ -1,9 +1,9 @@
 import React, {useEffect} from "react";
-import { Index } from "./router";
+import { Router } from "./router/Router";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "./store";
 import {sendRefreshAccessToken} from "./store/slices/auth.slice";
-import {Alert} from "./common/components/alert";
+import {Alert} from "./common/components/Alert";
 
 function App() {
     const { loading } = useSelector((state: RootState) => (state.auth));
@@ -17,7 +17,7 @@ function App() {
         <>
             {
                 loading ? <div className="flex h-full items-center justify-center">로딩중...</div>
-                    : <Index/>
+                    : <Router/>
             }
             <Alert/>
         </>

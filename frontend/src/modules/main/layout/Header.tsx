@@ -4,9 +4,9 @@ import {useDispatch} from "react-redux";
 import {Link} from "react-router-dom";
 import {TOGGLE_SHOW_MENU} from "../../../store/slices/changedMenu.slice";
 import {BarsMenuIcon} from "../../../assets/vectors";
-import {SearchMemo} from "../components/searchMemo";
+import {SearchMemo} from "../components/SearchMemo";
 
-export const Header = () => {
+export const MemoHeader = () => {
     const dispatch = useDispatch();
     const toggleMenu = () => dispatch(TOGGLE_SHOW_MENU());
 

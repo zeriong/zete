@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Api} from "../../common/api";
+import {Api} from "../../openapi/api";
 
 export interface AuthState {
     isLoggedIn: boolean;

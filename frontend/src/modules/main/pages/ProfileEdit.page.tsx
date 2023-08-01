@@ -2,10 +2,10 @@ import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {useForm} from "react-hook-form";
-import {FuncButton} from "../../../common/components/funcButton";
+import {FuncButton} from "../../../common/components/FuncButton";
 import {showAlert} from "../../../store/slices/alert.slice";
 import {useNavigate} from "react-router-dom";
-import {Api} from "../../../common/api";
+import {Api} from "../../../openapi/api";
 import {SET_USER} from "../../../store/slices/user.slice";
 
 type FormData = {
@@ -16,7 +16,7 @@ type FormData = {
     mobile: string;
 }
 
-export const ProfileModify = () => {
+export const ProfileEdit = () => {
     const { data: userState, loading } = useSelector((state: RootState) => (state.user));
 
     const [showPW, setShowPW] = useState(false);

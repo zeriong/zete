@@ -4,9 +4,9 @@ import {useForm} from "react-hook-form";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {Dialog, Transition } from "@headlessui/react";
-import {FuncButton} from "../funcButton";
+import {FuncButton} from "../FuncButton";
 import {CreateAccountDto} from "../../../openapi/generated";
-import {Api} from "../../api";
+import {Api} from "../../../openapi/api";
 import {getToday} from "../../libs";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 

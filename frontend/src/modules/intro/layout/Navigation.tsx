@@ -7,7 +7,7 @@ import {sendMyProfile} from "../../../store/slices/user.slice";
 import {GiHamburgerMenu} from "@react-icons/all-files/gi/GiHamburgerMenu";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 
-export const Header = ()=> {
+export const HomeNav = ()=> {
     const { name } = useSelector((state: RootState) => state.user.data);
     const { searchParams, setSearchParams } = useHandleQueryStr();
 
@@ -67,7 +67,7 @@ export const Header = ()=> {
             className="flex justify-between max-lg:h-48px max-lg:px-20px items-center px-40px py-12px border-b border-gray-300
             whitespace-nowrap fixed bg-white w-full z-30"
         >
-            <section
+            <div
                 onClick={ closeMenu }
                 className={`transition-all ease-in-out fixed w-full h-full bg-black opacity-0 left-0 top-0 duration-300 z-30
                 ${openMenu ? "opacity-50 visible" : "opacity-0 invisible"}`}

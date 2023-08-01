@@ -14,7 +14,7 @@ interface UpdateFormInterface {
     cateId: number | null;
 }
 
-export const MemoModifyModal = ({ memoId }: { memoId: number }) => {
+export const MemoEditModal = ({ memoId }: { memoId: number }) => {
     const tagsInput = useRef<HTMLInputElement>(null);
     const typingTimout = useRef<NodeJS.Timeout>(null);
     const isUpdate = useRef<boolean>(false);

@@ -3,13 +3,13 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../store";
 import {SET_SHOW_MENU, TOGGLE_SHOW_MENU} from "../../../store/slices/changedMenu.slice";
 import CustomScroller from "../../../common/components/customScroller";
-import {CategoryModifyModal} from "../components/modals/categoryModify.modal";
+import {CategoryEditModal} from "../components/modals/CategoryEdit.modal";
 import {Link, To} from "react-router-dom";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from "../../../assets/vectors";
 import {Tag} from "../../../openapi/generated";
 
-export const Aside = () => {
+export const MemoAside = () => {
     const { showMenu } = useSelector((state: RootState) => (state.changedMenu));
     const { data } = useSelector((state: RootState) => state.memo);
 
@@ -82,7 +82,7 @@ export const Aside = () => {
                                 />
                             ))}
                         </ul>
-                        <CategoryModifyModal buttonText={ data.cate.length > 0 ? "카테고리 수정" : "카테고리 추가" }/>
+                        <CategoryEditModal buttonText={ data.cate.length > 0 ? "카테고리 수정" : "카테고리 추가" }/>
                     </div>
                 </CustomScroller>
             </nav>

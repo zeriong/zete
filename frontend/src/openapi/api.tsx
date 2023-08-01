@@ -1,7 +1,7 @@
 import {store} from "../store";
 import axios, {AxiosRequestConfig} from "axios";
 import {sendRefreshAccessToken, SET_LOGOUT} from "../store/slices/auth.slice";
-import {exportApis} from "../openapi/generated";
+import {exportApis} from "./generated";
 
 const API_URL = process.env.REACT_APP_SERVER_PORT;
 

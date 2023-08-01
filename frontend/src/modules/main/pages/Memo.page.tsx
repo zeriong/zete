@@ -1,18 +1,18 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../../store";
-import {AddMemo} from "../components/addMemo";
+import {AddMemo} from "../components/AddMemo";
 import Masonry from "react-masonry-css";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 import * as DOMPurify from "dompurify";
 import {FillStarIcon, StarIcon} from "../../../assets/vectors";
 import {useHorizontalScroll} from "../../../hooks/useHorizontalScroll";
-import {MemoModifyModal} from "../components/modals/memoModify.modal";
-import {SavedMemoMenuPopover} from "../components/popovers/savedMemoMenu.popover";
+import {MemoEditModal} from "../components/modals/MemoEdit.modal";
+import {SavedMemoMenuPopover} from "../components/popovers/SavedMemoMenu.popover";
 import {usePaginationObservers} from "../../../hooks/useObservers";
 import {importantConverter, refreshMemos, refreshTargetMemo} from "../../../store/slices/memo.slice";
 
-export const MemoMain = () => {
+export const Memo = () => {
     const intervalRef = useRef<NodeJS.Timeout>(null);
 
     const { loading } = useSelector((state: RootState) => (state.user));
@@ -143,7 +143,7 @@ export const MemoMain = () => {
                         ))}
                     </Masonry>
                     <>
-                        <MemoModifyModal memoId={ currentMemoId }/>
+                        <MemoEditModal memoId={ currentMemoId }/>
                     </>
                 </section>
                 <div className="relative w-full h-1px">

@@ -3,16 +3,12 @@ import {RootState} from "../store";
 import React from "react";
 import {useSelector} from "react-redux";
 
-interface PrivateRouterProps {
-    children? : React.ReactElement;
-}
-
-export const PrivateElement = ({ children }: PrivateRouterProps) : React.ReactElement => {
+export const PrivateElement = (props: { children? : React.ReactElement }) : React.ReactElement => {
     const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 
     let location = useLocation();
 
-    if (isLoggedIn) return children;
+    if (isLoggedIn) return props.children;
 
     return <Navigate to={'/'} state={{ from: location }}/>
 };

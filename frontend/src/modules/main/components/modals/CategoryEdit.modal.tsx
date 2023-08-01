@@ -5,11 +5,11 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../../store";
 import CustomScroller from "../../../../common/components/customScroller";
 import {showAlert} from "../../../../store/slices/alert.slice";
-import {ConfirmButton} from "../../../../common/components/confirmButton";
+import {ConfirmButton} from "../../../../common/components/ConfirmButton";
 import {createCategory, deleteCategory, loadAsideData, UPDATE_CATE} from "../../../../store/slices/memo.slice";
-import {Api} from "../../../../common/api";
+import {Api} from "../../../../openapi/api";
 
-export const CategoryModifyModal = (props: { buttonText: string }) => {
+export const CategoryEditModal = (props: { buttonText: string }) => {
     const { cate } = useSelector((state: RootState) => state.memo.data);
 
     const [isShow, setIsShow] = useState(false);

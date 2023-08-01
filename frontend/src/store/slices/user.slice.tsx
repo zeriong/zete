@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {Api} from "../../common/api";
+import {Api} from "../../openapi/api";
 import {store} from "../index";
 
 export interface userState {

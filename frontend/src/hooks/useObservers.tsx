@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {resetMemos, SET_MEMO} from "../store/slices/memo.slice";
-import {Api} from "../common/api";
+import {Api} from "../openapi/api";
 import {useHandleQueryStr} from "./useHandleQueryStr";
 import {AppDispatch, RootState} from "../store";
 import {useDispatch, useSelector} from "react-redux";

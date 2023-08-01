@@ -3,11 +3,11 @@ import {useDispatch, useSelector} from "react-redux";
 import {sendMyProfile} from "../../../store/slices/user.slice";
 import {AppDispatch, RootState} from "../../../store";
 import {Outlet} from "react-router-dom";
-import {Header} from "./header";
-import {Aside} from "./aside";
+import {MemoHeader} from "./Header";
+import {MemoAside} from "./Aside";
 import {CategoryIcon} from "../../../assets/vectors";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
-import {SearchMemo} from "../components/searchMemo";
+import {SearchMemo} from "../components/SearchMemo";
 import {loadAsideData} from "../../../store/slices/memo.slice";
 import {SET_SHOW_MENU} from "../../../store/slices/changedMenu.slice";
 import CustomScroller from "../../../common/components/customScroller";
@@ -41,8 +41,8 @@ export const MemoLayout = () => {
 
     return loading ? <div className="flex h-full items-center justify-center">로딩중...</div> :
         <>
-            <Header/>
-            <Aside/>
+            <MemoHeader/>
+            <MemoAside/>
             <main
                 className={`${ showMenu ? "pl-asideWidth max-md:pl-0" : "pl-0" }
                 flex relative flex-col justify-center h-full text-center items-center pt-headerHeight

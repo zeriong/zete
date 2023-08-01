@@ -7,7 +7,7 @@ import {
     Memo,
 } from "../../openapi/generated";
 import {store} from "../index";
-import {Api} from "../../common/api";
+import {Api} from "../../openapi/api";
 import {showAlert} from "./alert.slice";
 
 

@@ -1,6 +1,6 @@
 import React, {Fragment, ReactNode, useEffect, useState} from "react";
 import {Dialog, Transition} from "@headlessui/react";
-import {FuncButton} from "./funcButton";
+import {FuncButton} from "./FuncButton";
 import * as DOMPurify from "dompurify";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

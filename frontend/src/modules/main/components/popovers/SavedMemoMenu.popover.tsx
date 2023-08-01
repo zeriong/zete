@@ -1,7 +1,7 @@
 import { Popover, Transition} from "@headlessui/react";
 import React, {Fragment, useState} from "react";
 import {DeleteIcon, EditIcon, ThreeDotMenuIcon} from "../../../../assets/vectors";
-import {ConfirmButton} from "../../../../common/components/confirmButton";
+import {ConfirmButton} from "../../../../common/components/ConfirmButton";
 import {RootState} from "../../../../store";
 import {useSelector} from "react-redux";
 import {useHandleQueryStr} from "../../../../hooks/useHandleQueryStr";

@@ -6,8 +6,8 @@ import {SET_LOGIN, SET_LOGOUT } from "../../../store/slices/auth.slice";
 import {SET_USER} from "../../../store/slices/user.slice";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../store";
-import {FuncButton} from "../funcButton";
-import {Api} from "../../api";
+import {FuncButton} from "../FuncButton";
+import {Api} from "../../../openapi/api";
 import {useHandleQueryStr} from "../../../hooks/useHandleQueryStr";
 /** 폼항목 */
 type FormData = {
