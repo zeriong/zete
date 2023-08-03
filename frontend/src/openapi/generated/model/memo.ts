@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Cats example
- * The cats API description
+ * Zete
+ * 메모 서비스
  *
  * The version of the OpenAPI document: v1
  * 
@@ -58,7 +58,7 @@ export interface Memo {
      * @type {boolean}
      * @memberof Memo
      */
-    'important'?: boolean;
+    'isImportant'?: boolean;
     /**
      * 
      * @type {number}
@@ -70,12 +70,12 @@ export interface Memo {
      * @type {number}
      * @memberof Memo
      */
-    'cateId': number | null;
+    'cateId'?: number;
     /**
      * 
      * @type {Array<Tag>}
      * @memberof Memo
      */
-    'tag': Array<Tag>;
+    'tags'?: Array<Tag>;
 }
 

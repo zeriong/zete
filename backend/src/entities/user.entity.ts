@@ -17,7 +17,7 @@ export class User extends coreEntity {
 
   /** password */
   @ApiProperty()
-  @Column({ select: false, length: 128 }) //select할 수 없게 만듦
+  @Column({ select: false, length: 64 }) //select할 수 없게 만듦
   @Validator.IsString()
   @Validator.Length(8, 64, { message: '비밀번호는 최소 8자 이상이어야 합니다.' })
   password: string;

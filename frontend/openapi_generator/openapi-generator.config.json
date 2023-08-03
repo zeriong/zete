@@ -4,5 +4,6 @@
   "apiPackage": "api",
   "modelPackage": "model",
   "allowUnicodeIdentifiers": true,
-  "withoutPrefixEnums": true
+  "withoutPrefixEnums": true,
+  "enumPropertyNaming": "UPPERCASE"
 }

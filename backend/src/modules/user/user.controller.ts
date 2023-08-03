@@ -35,8 +35,8 @@ export class UserController {
   /** 유저데이터 수정 */
   @UseGuards(JwtAuthGuard)
   @ApiResponse({ type: CoreOutput })
-  @Patch('profileUpdate')
-  async profileUpdate(@Req() req, @Body() updateData: UpdateAccountInput): Promise<CoreOutput> {
+  @Patch('updateProfile')
+  async updateProfile(@Req() req, @Body() updateData: UpdateAccountInput): Promise<CoreOutput> {
     return this.userService.updateProfile(req.user, updateData);
   }
 

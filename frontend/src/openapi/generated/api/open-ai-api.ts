@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Cats example
- * The cats API description
+ * Zete
+ * 메모 서비스
  *
  * The version of the OpenAPI document: v1
  * 

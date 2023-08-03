@@ -2,9 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './common/style/global.css';
-import {Provider} from "react-redux";
-import {store} from "./store";
-import {InitApi} from "./openapi/api";
+import {Provider} from 'react-redux';
+import {store} from './store';
+import {InitApi} from './openapi/api';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

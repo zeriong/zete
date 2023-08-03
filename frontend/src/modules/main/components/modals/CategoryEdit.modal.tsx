@@ -1,26 +1,26 @@
-import React, {Fragment, useEffect, useState} from "react";
-import {Dialog, Transition} from "@headlessui/react";
-import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from "../../../../assets/vectors";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../../../store";
-import CustomScroller from "../../../../common/components/customScroller";
-import {showAlert} from "../../../../store/slices/alert.slice";
-import {ConfirmButton} from "../../../../common/components/ConfirmButton";
-import {createCategory, deleteCategory, loadAsideData, UPDATE_CATE} from "../../../../store/slices/memo.slice";
-import {Api} from "../../../../openapi/api";
+import React, {Fragment, useEffect, useState} from 'react';
+import {Dialog, Transition} from '@headlessui/react';
+import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from '../../../../assets/vectors';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../../../store';
+import CustomScroller from '../../../../common/components/customScroller';
+import {showAlert} from '../../../../store/alert/alert.slice';
+import {ConfirmButton} from '../../../../common/components/ConfirmButton';
+import {createCategory, deleteCategory, loadAsideData, UPDATE_CATE} from '../../../../store/memo/memo.slice';
+import {Api} from '../../../../openapi/api';
 
 export const CategoryEditModal = (props: { buttonText: string }) => {
     const { cate } = useSelector((state: RootState) => state.memo.data);
 
     const [isShow, setIsShow] = useState(false);
-    const [addInputValues, setAddInputValues] = useState({ addCateName: "" });
+    const [addInputValues, setAddInputValues] = useState({ addCateName: '' });
     const [updateInputValues, setUpdateInputValues] = useState<{ [key: number]: string }>({});
 
     const dispatch = useDispatch();
 
     const openModal = () => setIsShow(true);
     const closeModal = () => {
-        setAddInputValues({ addCateName: "" });
+        setAddInputValues({ addCateName: '' });
         setIsShow(false);
     }
 
@@ -28,7 +28,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         createCategory({ name: addInputValues.addCateName });
-        setAddInputValues({ addCateName: "" });
+        setAddInputValues({ addCateName: '' });
     }
 
     // 카테고리 생성 onChange
@@ -57,8 +57,8 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                 .catch((e) => {
                     // 입력 초기화
                     input.value = prevVal;
-                    console.log("에러: ", e);
-                    showAlert("카테고리 업데이트에 실패하였습니다.");
+                    console.log('에러: ', e);
+                    showAlert('카테고리 업데이트에 실패하였습니다.');
                 });
         }
     }
@@ -88,12 +88,12 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
     return (
         <>
             <button
-                type="button"
+                type='button'
                 onClick={ openModal }
-                className="flex w-full justify-between items-center px-10px py-8px rounded-[5px] mt-4px h-42px"
+                className='flex w-full justify-between items-center px-10px py-8px rounded-[5px] mt-4px h-42px'
             >
-                <div className="flex justify-start items-center w-full font-light transition-all duration-150">
-                    <ModifyIcon className="mr-10px"/>
+                <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
+                    <ModifyIcon className='mr-10px'/>
                     <span>
                         { props.buttonText }
                     </span>
@@ -101,60 +101,60 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
             </button>
             <Transition appear show={ isShow } as={ Fragment }>
                 <Dialog
-                    as="div"
-                    className="relative z-50"
+                    as='div'
+                    className='relative z-50'
                     onClose={ closeModal }
                 >
                     <Transition.Child
                         as={ Fragment }
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
+                        enter='ease-out duration-300'
+                        enterFrom='opacity-0'
+                        enterTo='opacity-100'
+                        leave='ease-in duration-200'
+                        leaveFrom='opacity-100'
+                        leaveTo='opacity-0'
                     >
-                        <div className="fixed inset-0 bg-black bg-opacity-40"/>
+                        <div className='fixed inset-0 bg-black bg-opacity-40'/>
                     </Transition.Child>
-                    <div className="fixed inset-0 overflow-y-auto">
-                        <div className="close-modal-background flex min-h-full items-center justify-center p-4 text-center">
+                    <div className='fixed inset-0 overflow-y-auto'>
+                        <div className='close-modal-background flex min-h-full items-center justify-center p-4 text-center'>
                             <Transition.Child
                                 as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
+                                enter='ease-out duration-300'
+                                enterFrom='opacity-0 scale-95'
+                                enterTo='opacity-100 scale-100'
+                                leave='ease-in duration-200'
+                                leaveFrom='opacity-100 scale-100'
+                                leaveTo='opacity-0 scale-95'
                             >
-                                <Dialog.Panel className="w-[300px] relative transform overflow-hidden bg-white text-left align-middle shadow-xl transition-all">
-                                    <div className="relative h-[430px] w-full p-16px">
+                                <Dialog.Panel className='w-[300px] relative transform overflow-hidden bg-white text-left align-middle shadow-xl transition-all'>
+                                    <div className='relative h-[430px] w-full p-16px'>
                                         <CustomScroller>
-                                            <p className="text-zete-dark-400">
+                                            <p className='text-zete-dark-400'>
                                                 카테고리 추가/수정
                                             </p>
-                                            <div className="py-16px px-8px text-15">
+                                            <div className='py-16px px-8px text-15'>
                                                 <form
                                                     onSubmit={ handleSubmit }
-                                                    className="flex items-center"
+                                                    className='flex items-center'
                                                 >
-                                                    <ModifyIcon className="min-w-[22px] mr-16px"/>
+                                                    <ModifyIcon className='min-w-[22px] mr-16px'/>
                                                     <input
-                                                        name="addCateName"
-                                                        placeholder="새 카테고리 만들기"
+                                                        name='addCateName'
+                                                        placeholder='새 카테고리 만들기'
                                                         onChange={ addCategoryOnChange }
-                                                        value={ addInputValues.addCateName || "" }
-                                                        className="placeholder:text-zete-dark-300 placeholder:font-thin pb-5px border-b border-zete-memo-border
-                                                        text-zete-dark-300 w-full"
+                                                        value={ addInputValues.addCateName || '' }
+                                                        className='placeholder:text-zete-dark-300 placeholder:font-thin pb-5px border-b border-zete-memo-border
+                                                        text-zete-dark-300 w-full'
                                                     />
                                                     <button
-                                                        type="submit"
-                                                        className="flex justify-center items-center rounded-full p-2px ml-8px hover:bg-zete-light-gray-200"
+                                                        type='submit'
+                                                        className='flex justify-center items-center rounded-full p-2px ml-8px hover:bg-zete-light-gray-200'
                                                     >
-                                                        <CatePlusIcon className="fill-zete-dark-100"/>
+                                                        <CatePlusIcon className='fill-zete-dark-100'/>
                                                     </button>
                                                 </form>
-                                                <ul className="text-zete-dark-200 grid gap-16px py-20px">
+                                                <ul className='text-zete-dark-200 grid gap-16px py-20px'>
                                                     {cate?.map((val, idx) => (
                                                         <li key={ idx }>
                                                             <form
@@ -169,26 +169,26 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                                                     const input = event.target;
                                                                     handleUpdateOnSubmit(val.id, val.name, input);
                                                                 }}
-                                                                className="flex items-center"
+                                                                className='flex items-center'
                                                             >
-                                                                <FillCategoryIcon className="relative -left-3px fill-zete-dark-100 mr-10px"/>
+                                                                <FillCategoryIcon className='relative -left-3px fill-zete-dark-100 mr-10px'/>
                                                                 <input
-                                                                    placeholder="카테고리 이름을 입력해주세요."
-                                                                    value={ updateInputValues[val.id] || "" }
+                                                                    placeholder='카테고리 이름을 입력해주세요.'
+                                                                    value={ updateInputValues[val.id] || '' }
                                                                     onChange={ (event) => updateCategoryOnChange(val.id, event.target.value) }
-                                                                    className="font-medium w-full flex items-center"
+                                                                    className='font-medium w-full flex items-center'
                                                                 />
                                                                 <ConfirmButton
                                                                     options={{
-                                                                        subject: `"${val.name}"를 삭제하시겠습니까?`,
-                                                                        subtitle: "카테고리가 삭제되면 하위 메모가<br/>모두 삭제됩니다.",
-                                                                        confirmText: "삭제",
+                                                                        subject: `'${val.name}'를 삭제하시겠습니까?`,
+                                                                        subtitle: '카테고리가 삭제되면 하위 메모가<br/>모두 삭제됩니다.',
+                                                                        confirmText: '삭제',
                                                                         isNegative: true,
                                                                         confirmCallback: () => deleteCategory({cateId: val.id}),
                                                                     }}
-                                                                    className="relative group p-6px rounded-full hover:bg-zete-light-gray-200 -right-2px"
+                                                                    className='relative group p-6px rounded-full hover:bg-zete-light-gray-200 -right-2px'
                                                                 >
-                                                                    <DeleteIcon className="fill-zete-dark-100 group-hover:fill-black"/>
+                                                                    <DeleteIcon className='fill-zete-dark-100 group-hover:fill-black'/>
                                                                 </ConfirmButton>
                                                             </form>
                                                         </li>
@@ -197,11 +197,11 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                             </div>
                                         </CustomScroller>
                                     </div>
-                                    <div className="w-full flex justify-end p-4px py-16px pr-14px border-t border-zete-memo-border">
+                                    <div className='w-full flex justify-end p-4px py-16px pr-14px border-t border-zete-memo-border'>
                                         <button
-                                            type="button"
+                                            type='button'
                                             onClick={ closeModal }
-                                            className="text-15 font-normal text-zete-dark-500 py-8px px-22px hover:bg-zete-light-gray-200 rounded-[4px]"
+                                            className='text-15 font-normal text-zete-dark-500 py-8px px-22px hover:bg-zete-light-gray-200 rounded-[4px]'
                                         >
                                             완료
                                         </button>

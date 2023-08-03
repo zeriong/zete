@@ -44,7 +44,7 @@ export class OpenAiService {
       if (res) {
         return {
           gptResponse: response.data.choices[0].message.content,
-          gptDailyLimit: user.gptUsableCount,
+          usableCount: user.gptUsableCount,
           success: true,
         };
       }

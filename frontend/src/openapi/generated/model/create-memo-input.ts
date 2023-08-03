@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Cats example
- * The cats API description
+ * Zete
+ * 메모 서비스
  *
  * The version of the OpenAPI document: v1
  * 
@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { TagNameInput } from './tag-name-input';
+import { Tag } from './tag';
 
 /**
  * 
@@ -25,33 +25,33 @@ import { TagNameInput } from './tag-name-input';
 export interface CreateMemoInput {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof CreateMemoInput
      */
-    'cateId'?: number | null;
+    'title'?: string;
     /**
      * 
      * @type {string}
      * @memberof CreateMemoInput
      */
-    'title': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateMemoInput
-     */
-    'content': string;
+    'content'?: string;
     /**
      * 
      * @type {boolean}
      * @memberof CreateMemoInput
      */
-    'important': boolean;
+    'isImportant'?: boolean;
     /**
      * 
-     * @type {Array<TagNameInput>}
+     * @type {number}
      * @memberof CreateMemoInput
      */
-    'tags'?: Array<TagNameInput>;
+    'cateId'?: number;
+    /**
+     * 
+     * @type {Array<Tag>}
+     * @memberof CreateMemoInput
+     */
+    'tags'?: Array<Tag>;
 }
 

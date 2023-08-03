@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Cats example
- * The cats API description
+ * Zete
+ * 메모 서비스
  *
  * The version of the OpenAPI document: v1
  * 
@@ -82,30 +82,30 @@ export interface User {
      * @type {number}
      * @memberof User
      */
-    'gptDailyResetDate': number;
+    'gptUsableCount'?: number;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof User
      */
-    'gptDailyLimit': number;
+    'gptUsableCountResetAt'?: string;
     /**
      * 
      * @type {Array<Category>}
      * @memberof User
      */
-    'cate': Array<Category>;
+    'cates'?: Array<Category>;
     /**
      * 
      * @type {Array<Memo>}
      * @memberof User
      */
-    'memo': Array<Memo>;
+    'memos'?: Array<Memo>;
     /**
      * 
      * @type {Array<Tag>}
      * @memberof User
      */
-    'tag': Array<Tag>;
+    'tags'?: Array<Tag>;
 }
 

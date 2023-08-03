@@ -1,9 +1,9 @@
-import {useEffect, useRef, useState} from "react";
-import {resetMemos, SET_MEMO} from "../store/slices/memo.slice";
-import {Api} from "../openapi/api";
-import {useHandleQueryStr} from "./useHandleQueryStr";
-import {AppDispatch, RootState} from "../store";
-import {useDispatch, useSelector} from "react-redux";
+import {useEffect, useRef, useState} from 'react';
+import {resetMemos, SET_MEMO} from '../store/memo/memo.slice';
+import {Api} from '../openapi/api';
+import {useHandleQueryStr} from './useHandleQueryStr';
+import {AppDispatch, RootState} from '../store';
+import {useDispatch, useSelector} from 'react-redux';
 
 export const usePaginationObservers = () => {
     const loadEndRef = useRef(false); // 모든 데이터로드시 true

@@ -1,9 +1,9 @@
-import React, {useEffect} from "react";
-import { Router } from "./router/Router";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "./store";
-import {sendRefreshAccessToken} from "./store/slices/auth.slice";
-import {Alert} from "./common/components/Alert";
+import React, {useEffect} from 'react';
+import { Router } from './router/Router';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from './store';
+import {sendRefreshAccessToken} from './store/auth/auth.slice';
+import {Alert} from './common/components/Alert';
 
 function App() {
     const { loading } = useSelector((state: RootState) => (state.auth));
@@ -16,7 +16,7 @@ function App() {
     return (
         <>
             {
-                loading ? <div className="flex h-full items-center justify-center">로딩중...</div>
+                loading ? <div className='flex h-full items-center justify-center'>로딩중...</div>
                     : <Router/>
             }
             <Alert/>

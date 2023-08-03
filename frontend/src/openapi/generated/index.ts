@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Cats example
- * The cats API description
+ * Zete
+ * 메모 서비스
  *
  * The version of the OpenAPI document: v1
  * 
@@ -13,32 +13,32 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./model";
+export * from './api';
+export * from './configuration';
+export * from './model';
 
-import {AxiosInstance} from "axios";
+import {AxiosInstance} from 'axios';
 
 
-import { AuthApiFactory } from "./api/auth-api";
+import { AuthApiFactory } from './api/auth-api';
 
-import { MemoApiFactory } from "./api/memo-api";
+import { MemoApiFactory } from './api/memo-api';
 
-import { OpenAiApiFactory } from "./api/open-ai-api";
+import { OpenAiApiFactory } from './api/open-ai-api';
 
-import { UserApiFactory } from "./api/user-api";
+import { UserApiFactory } from './api/user-api';
 
 
 export const exportApis = (axios: AxiosInstance) => {
     return {
         
-            auth: AuthApiFactory(undefined, "", axios),
+            auth: AuthApiFactory(undefined, '', axios),
         
-            memo: MemoApiFactory(undefined, "", axios),
+            memo: MemoApiFactory(undefined, '', axios),
         
-            openAi: OpenAiApiFactory(undefined, "", axios),
+            openAi: OpenAiApiFactory(undefined, '', axios),
         
-            user: UserApiFactory(undefined, "", axios),
+            user: UserApiFactory(undefined, '', axios),
         
     }
 }

@@ -1,9 +1,9 @@
 import {configureStore} from '@reduxjs/toolkit';
-import {authSlice} from "./slices/auth.slice";
-import {userSlice} from "./slices/user.slice";
-import {alertSlice} from "./slices/alert.slice";
-import {changedMenuSlice} from "./slices/changedMenu.slice";
-import {memoSlice} from "./slices/memo.slice";
+import {authSlice} from './auth/auth.slice';
+import {userSlice} from './user/user.slice';
+import {alertSlice} from './alert/alert.slice';
+import {layoutSlice} from './layout/layout.slice';
+import {memoSlice} from './memo/memo.slice';
 
 export const store = configureStore({
     reducer: {
@@ -11,7 +11,7 @@ export const store = configureStore({
         auth: authSlice.reducer,
         user: userSlice.reducer,
         alert: alertSlice.reducer,
-        changedMenu: changedMenuSlice.reducer,
+        layout: layoutSlice.reducer,
     },
 })
 

@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Cats example
- * The cats API description
+ * Zete
+ * 메모 서비스
  *
  * The version of the OpenAPI document: v1
  * 
@@ -31,13 +31,13 @@ export interface Category {
      * @type {number}
      * @memberof Category
      */
-    'id'?: number | null;
+    'id': number;
     /**
      * 
      * @type {string}
      * @memberof Category
      */
-    'name'?: string | null;
+    'name'?: string;
     /**
      * 
      * @type {number}
@@ -49,12 +49,12 @@ export interface Category {
      * @type {Array<Memo>}
      * @memberof Category
      */
-    'memo': Array<Memo>;
+    'memos'?: Array<Memo>;
     /**
      * 
      * @type {Array<Tag>}
      * @memberof Category
      */
-    'tag': Array<Tag>;
+    'tags'?: Array<Tag>;
 }
 

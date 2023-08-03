@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Cats example
- * The cats API description
+ * Zete
+ * 메모 서비스
  *
  * The version of the OpenAPI document: v1
  * 
@@ -24,13 +24,11 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { CoreOutput } from '../model';
 // @ts-ignore
-import { CreateAccountDto } from '../model';
+import { CreateAccountInput } from '../model';
 // @ts-ignore
-import { ResetGptDailyLimitInputDto } from '../model';
+import { GetGptUsableCountOutput } from '../model';
 // @ts-ignore
-import { ResetGptDailyLimitOutputDto } from '../model';
-// @ts-ignore
-import { UpdateAccountDto } from '../model';
+import { UpdateAccountInput } from '../model';
 // @ts-ignore
 import { User } from '../model';
 /**
@@ -41,15 +39,50 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
     return {
         /**
          * 
+         * @param {CreateAccountInput} createAccountInput 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createAccount: async (createAccountInput: CreateAccountInput, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createAccountInput' is not null or undefined
+            assertParamExists('createAccount', 'createAccountInput', createAccountInput)
+            const localVarPath = `/user/createAccount`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createAccountInput, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {number} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        _delete: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteAccount: async (id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('_delete', 'id', id)
+            assertParamExists('deleteAccount', 'id', id)
             const localVarPath = `/user/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+                .replace(`{${'id'}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -74,14 +107,11 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
-         * @param {CreateAccountDto} createAccountDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createAccount: async (createAccountDto: CreateAccountDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createAccountDto' is not null or undefined
-            assertParamExists('createAccount', 'createAccountDto', createAccountDto)
-            const localVarPath = `/user/register`;
+        getAll: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user/getAll`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -89,18 +119,15 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
 
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createAccountDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -112,8 +139,8 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAll: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/user/all`;
+        getGptUsableCount: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/user/getGptUsableCount`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -121,7 +148,7 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -167,14 +194,14 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
-         * @param {UpdateAccountDto} updateAccountDto 
+         * @param {UpdateAccountInput} updateAccountInput 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        profileUpdate: async (updateAccountDto: UpdateAccountDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'updateAccountDto' is not null or undefined
-            assertParamExists('profileUpdate', 'updateAccountDto', updateAccountDto)
-            const localVarPath = `/user/modify`;
+        profileUpdate: async (updateAccountInput: UpdateAccountInput, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'updateAccountInput' is not null or undefined
+            assertParamExists('profileUpdate', 'updateAccountInput', updateAccountInput)
+            const localVarPath = `/user/profileUpdate`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -193,42 +220,7 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateAccountDto, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {ResetGptDailyLimitInputDto} resetGptDailyLimitInputDto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        resetGptDailyLimit: async (resetGptDailyLimitInputDto: ResetGptDailyLimitInputDto, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'resetGptDailyLimitInputDto' is not null or undefined
-            assertParamExists('resetGptDailyLimit', 'resetGptDailyLimitInputDto', resetGptDailyLimitInputDto)
-            const localVarPath = `/user/resetGptDailyLimit`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(resetGptDailyLimitInputDto, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(updateAccountInput, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -247,22 +239,22 @@ export const UserApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {number} id 
+         * @param {CreateAccountInput} createAccountInput 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async _delete(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator._delete(id, options);
+        async createAccount(createAccountInput: CreateAccountInput, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createAccount(createAccountInput, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {CreateAccountDto} createAccountDto 
+         * @param {number} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createAccount(createAccountDto: CreateAccountDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createAccount(createAccountDto, options);
+        async deleteAccount(id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteAccount(id, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -279,28 +271,27 @@ export const UserApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        async getGptUsableCount(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetGptUsableCountOutput>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getGptUsableCount(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         async profile(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.profile(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
-         * @param {UpdateAccountDto} updateAccountDto 
+         * @param {UpdateAccountInput} updateAccountInput 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async profileUpdate(updateAccountDto: UpdateAccountDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.profileUpdate(updateAccountDto, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {ResetGptDailyLimitInputDto} resetGptDailyLimitInputDto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async resetGptDailyLimit(resetGptDailyLimitInputDto: ResetGptDailyLimitInputDto, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResetGptDailyLimitOutputDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.resetGptDailyLimit(resetGptDailyLimitInputDto, options);
+        async profileUpdate(updateAccountInput: UpdateAccountInput, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.profileUpdate(updateAccountInput, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -315,21 +306,21 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
     return {
         /**
          * 
+         * @param {CreateAccountInput} createAccountInput 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createAccount(createAccountInput: CreateAccountInput, options?: any): AxiosPromise<CoreOutput> {
+            return localVarFp.createAccount(createAccountInput, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {number} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        _delete(id: number, options?: any): AxiosPromise<CoreOutput> {
-            return localVarFp._delete(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {CreateAccountDto} createAccountDto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createAccount(createAccountDto: CreateAccountDto, options?: any): AxiosPromise<CoreOutput> {
-            return localVarFp.createAccount(createAccountDto, options).then((request) => request(axios, basePath));
+        deleteAccount(id: number, options?: any): AxiosPromise<CoreOutput> {
+            return localVarFp.deleteAccount(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -344,26 +335,25 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        getGptUsableCount(options?: any): AxiosPromise<GetGptUsableCountOutput> {
+            return localVarFp.getGptUsableCount(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         profile(options?: any): AxiosPromise<User> {
             return localVarFp.profile(options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {UpdateAccountDto} updateAccountDto 
+         * @param {UpdateAccountInput} updateAccountInput 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        profileUpdate(updateAccountDto: UpdateAccountDto, options?: any): AxiosPromise<CoreOutput> {
-            return localVarFp.profileUpdate(updateAccountDto, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {ResetGptDailyLimitInputDto} resetGptDailyLimitInputDto 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        resetGptDailyLimit(resetGptDailyLimitInputDto: ResetGptDailyLimitInputDto, options?: any): AxiosPromise<ResetGptDailyLimitOutputDto> {
-            return localVarFp.resetGptDailyLimit(resetGptDailyLimitInputDto, options).then((request) => request(axios, basePath));
+        profileUpdate(updateAccountInput: UpdateAccountInput, options?: any): AxiosPromise<CoreOutput> {
+            return localVarFp.profileUpdate(updateAccountInput, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -377,24 +367,24 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
 export class UserApi extends BaseAPI {
     /**
      * 
+     * @param {CreateAccountInput} createAccountInput 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public createAccount(createAccountInput: CreateAccountInput, options?: AxiosRequestConfig) {
+        return UserApiFp(this.configuration).createAccount(createAccountInput, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {number} id 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UserApi
      */
-    public _delete(id: number, options?: AxiosRequestConfig) {
-        return UserApiFp(this.configuration)._delete(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {CreateAccountDto} createAccountDto 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UserApi
-     */
-    public createAccount(createAccountDto: CreateAccountDto, options?: AxiosRequestConfig) {
-        return UserApiFp(this.configuration).createAccount(createAccountDto, options).then((request) => request(this.axios, this.basePath));
+    public deleteAccount(id: number, options?: AxiosRequestConfig) {
+        return UserApiFp(this.configuration).deleteAccount(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -413,29 +403,28 @@ export class UserApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof UserApi
      */
+    public getGptUsableCount(options?: AxiosRequestConfig) {
+        return UserApiFp(this.configuration).getGptUsableCount(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
     public profile(options?: AxiosRequestConfig) {
         return UserApiFp(this.configuration).profile(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {UpdateAccountDto} updateAccountDto 
+     * @param {UpdateAccountInput} updateAccountInput 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UserApi
      */
-    public profileUpdate(updateAccountDto: UpdateAccountDto, options?: AxiosRequestConfig) {
-        return UserApiFp(this.configuration).profileUpdate(updateAccountDto, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {ResetGptDailyLimitInputDto} resetGptDailyLimitInputDto 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UserApi
-     */
-    public resetGptDailyLimit(resetGptDailyLimitInputDto: ResetGptDailyLimitInputDto, options?: AxiosRequestConfig) {
-        return UserApiFp(this.configuration).resetGptDailyLimit(resetGptDailyLimitInputDto, options).then((request) => request(this.axios, this.basePath));
+    public profileUpdate(updateAccountInput: UpdateAccountInput, options?: AxiosRequestConfig) {
+        return UserApiFp(this.configuration).profileUpdate(updateAccountInput, options).then((request) => request(this.axios, this.basePath));
     }
 }

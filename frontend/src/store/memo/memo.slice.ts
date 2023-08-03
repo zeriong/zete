@@ -1,14 +1,14 @@
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {
     AsideData,
     CategoriesAndMemoCount,
     Category, CateIdInput,
     CateInput, CreateCateInput, GetMemosInput,
     Memo,
-} from "../../openapi/generated";
-import {store} from "../index";
-import {Api} from "../../openapi/api";
-import {showAlert} from "./alert.slice";
+} from '../../openapi/generated';
+import {store} from '../index';
+import {Api} from '../../openapi/api';
+import {showAlert} from '../alert/alert.slice';
 
 
 /** state dispatch 매서드 */
@@ -79,7 +79,7 @@ export const createCategory = (input: CreateCateInput) => {
             }
             else showAlert(res.data.error);
         })
-        .catch((e) => showAlert("카테고리 생성에 실패하였습니다."));
+        .catch((e) => showAlert('카테고리 생성에 실패하였습니다.'));
 }
 
 export const deleteCategory = (input: CateIdInput) => {
@@ -93,7 +93,7 @@ export const deleteCategory = (input: CateIdInput) => {
             }
             else showAlert(res.data.error);
         })
-        .catch((e) => showAlert("카테고리 삭제에 실패하였습니다."));
+        .catch((e) => showAlert('카테고리 삭제에 실패하였습니다.'));
 }
 
 export const deleteMemo = (memoId: number, create?: string) => {

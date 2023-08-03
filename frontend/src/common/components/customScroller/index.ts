@@ -1,7 +1,7 @@
 import css from 'dom-css';
 import { Component, createElement, cloneElement } from 'react';
 
-import {isString, getScrollbarWidth, returnFalse, getInnerWidth, getInnerHeight} from '../../libs';
+import {isString, getScrollbarWidth, returnFalse, getInnerWidth, getInnerHeight} from '../../../libs/common';
 
 import './customScroller.css'
 

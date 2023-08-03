@@ -13,5 +13,5 @@ export class CreateCompletionOutputDto extends CoreOutput {
   gptResponse?: string;
 
   @ApiProperty({ type: Number, required: false })
-  gptDailyLimit?: number;
+  usableCount?: number;
 }

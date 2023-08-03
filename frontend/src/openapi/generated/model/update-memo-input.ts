@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Cats example
- * The cats API description
+ * Zete
+ * 메모 서비스
  *
  * The version of the OpenAPI document: v1
  * 
@@ -16,9 +16,6 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import { Tag } from './tag';
-// May contain unused imports in some cases
-// @ts-ignore
-import { UpdateMemoObject } from './update-memo-object';
 
 /**
  * 
@@ -28,21 +25,39 @@ import { UpdateMemoObject } from './update-memo-object';
 export interface UpdateMemoInput {
     /**
      * 
-     * @type {UpdateMemoObject}
+     * @type {number}
      * @memberof UpdateMemoInput
      */
-    'memo'?: UpdateMemoObject;
+    'id': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateMemoInput
+     */
+    'title'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateMemoInput
+     */
+    'content'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdateMemoInput
+     */
+    'isImportant'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof UpdateMemoInput
+     */
+    'cateId'?: number;
     /**
      * 
      * @type {Array<Tag>}
      * @memberof UpdateMemoInput
      */
-    'newTags'?: Array<Tag>;
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof UpdateMemoInput
-     */
-    'deleteTagIds'?: Array<number>;
+    'tags'?: Array<Tag>;
 }
 

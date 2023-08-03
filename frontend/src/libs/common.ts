@@ -1,39 +1,39 @@
-import css from "dom-css";
-import {showAlert} from "../store/slices/alert.slice";
-import {CreateMemoInput, Memo, TagNameInput} from "../openapi/generated";
-import {store} from "../store";
-import {deleteMemo, memoSlice, refreshMemos, refreshTargetMemo} from "../store/slices/memo.slice";
-import {Api} from "../openapi/api";
-import React from "react";
+import css from 'dom-css';
+import {showAlert} from '../store/alert/alert.slice';
+import {CreateMemoInput, Memo} from '../openapi/generated';
+import {store} from '../store';
+import {deleteMemo, memoSlice, refreshMemos, refreshTargetMemo} from '../store/memo/memo.slice';
+import {Api} from '../openapi/api';
+import React from 'react';
 
 /** ---- In Content Method ---- */
 
 export const handleResizeHeight = (textareaRef) => {
     const ref = textareaRef.current;
     if (ref) {
-        ref.style.height = "auto";
-        ref.style.height = ref.scrollHeight + "px";
+        ref.style.height = 'auto';
+        ref.style.height = ref.scrollHeight + 'px';
     }
 }
 export const handleTagInput = (inputRef) => {
     const input = inputRef.current;
-    input.style.width = "50px";
+    input.style.width = '50px';
     input.style.width = `${input.scrollWidth}px`;
-    input.style.whiteSpace = "nowrap"; // 추가
+    input.style.whiteSpace = 'nowrap'; // 추가
 };
 
 export const handleAddTagSubmit = (event, getVal, setValFunc, target) => {
     event.preventDefault();
     const input = event.target[0];
-    if (input.value === "") return;
+    if (input.value === '') return;
 
     const tags = getVal(target) || [];
     const exists = tags.find(tag => tag.name === input.value);
 
-    if (exists) return showAlert("이미 존재하는 태그명 입니다.");
+    if (exists) return showAlert('이미 존재하는 태그명 입니다.');
 
     setValFunc(target, [ ...tags, { name: input.value } ]);
-    input.value = "";
+    input.value = '';
 }
 
 export const getToday = () => {
@@ -62,15 +62,15 @@ let scrollbarWidth: boolean | number = false;
 
 export const getScrollbarWidth = (cacheEnabled = true) => {
     if (cacheEnabled && scrollbarWidth !== false) return scrollbarWidth;
-    if (typeof document !== "undefined") {
-        const div = document.createElement("div");
+    if (typeof document !== 'undefined') {
+        const div = document.createElement('div');
         css(div, {
             width: 100,
             height: 100,
-            position: "absolute",
+            position: 'absolute',
             top: -9999,
-            overflow: "scroll",
-            MsOverflowStyle: "scrollbar",
+            overflow: 'scroll',
+            MsOverflowStyle: 'scrollbar',
         });
         document.body.appendChild(div);
         scrollbarWidth = div.offsetWidth - div.clientWidth;
@@ -81,7 +81,7 @@ export const getScrollbarWidth = (cacheEnabled = true) => {
     return scrollbarWidth || 0;
 }
 
-export const isString = (maybe: string | number) => typeof maybe === "string";
+export const isString = (maybe: string | number) => typeof maybe === 'string';
 
 export const returnFalse = () => false;
 /** -------- close ------- */
@@ -96,7 +96,7 @@ export interface HandleUpdateOrAddMemoInterface {
     setMemoId?: React.Dispatch<React.SetStateAction<any>>;
     getCateId: string | number;
     autoReq: boolean;  // 요청이 자동저장인지 아닌지를 받음
-    reqType: string;  // "update" || "create" 로 요청타입
+    reqType: string;  // 'update' || 'create' 로 요청타입
     typingTimeout: React.MutableRefObject<NodeJS.Timeout | null>;  // 자동저장 timeout ref
     closeModal?: Function;
     cateQueryStr?: string;
@@ -123,30 +123,30 @@ export const updateOrAddMemo = (props: HandleUpdateOrAddMemoInterface) => {
     }
 
     // 업데이트상황에서만 사용되는 closeModal
-    if (!autoReq && reqType === "update") closeModal();
+    if (!autoReq && reqType === 'update') closeModal();
 
     // 줄바꿈 및 공백 제거하여 제목, 내용여부 체크 후 처리
-    const titleDeleteSpace = getTitle.replace(/\s*|\n/g,"");
-    const contentDeleteSpace = getContent.replace(/\s*|\n/g,"");
+    const titleDeleteSpace = getTitle.replace(/\s*|\n/g,'');
+    const contentDeleteSpace = getContent.replace(/\s*|\n/g,'');
 
-    if (titleDeleteSpace === "" && contentDeleteSpace === "") {
+    if (titleDeleteSpace === '' && contentDeleteSpace === '') {
         // 업데이트일때
-        if (reqType === "update") return showAlert("메모수정이 취소되었습니다.");
+        if (reqType === 'update') return showAlert('메모수정이 취소되었습니다.');
 
         // 새 메모 작성중, 자동저장이 안되어있는 경우
         if (memoId === 0) return;
 
         // 새 메모 작성중, 메모가 자동저장되어 있다면
         setMemoId(0);
-        deleteMemo(memoId, "create");
+        deleteMemo(memoId, 'create');
     }
 
     // 제목, 내용을 DB에 저장 가능한 형태로 변환
-    const parsingTitle = getTitle.replace(/\n/g, "<br/>");
-    const parsingContent = getContent.replace(/\n/g, "<br/>");
+    const parsingTitle = getTitle.replace(/\n/g, '<br/>');
+    const parsingContent = getContent.replace(/\n/g, '<br/>');
 
     // 새 메모생성이고 자동저장 안되어있다면
-    if (reqType === "create" && memoId === 0) {
+    if (reqType === 'create' && memoId === 0) {
         // 새 메모 할당 값
         const newMemoContent: CreateMemoInput = {
             important: isImportant,
@@ -184,8 +184,8 @@ export const updateOrAddMemo = (props: HandleUpdateOrAddMemoInterface) => {
 
     // 수정사항이 없는 경우 요청X
     if (
-        getTitle === targetMemo.title.replace(/<br\/>/g, "\n") &&
-        getContent === targetMemo.content.replace(/<br\/>/g, "\n") &&
+        getTitle === targetMemo.title.replace(/<br\/>/g, '\n') &&
+        getContent === targetMemo.content.replace(/<br\/>/g, '\n') &&
         cateId === targetMemo.cateId &&
         isImportant === targetMemo.important &&
         newTagLength === 0 &&
@@ -240,7 +240,7 @@ export const updateOrAddMemo = (props: HandleUpdateOrAddMemoInterface) => {
                     // success: false 이면 모든메모 refresh
                     console.log(res.data.error);
                     refreshMemos({
-                        search: "",
+                        search: '',
                         offset: 0,
                         limit: data.memos.length,
                         menuQueryStr,
