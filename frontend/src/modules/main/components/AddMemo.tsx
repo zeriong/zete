@@ -7,7 +7,7 @@ import {
     handleAddTagSubmit,
     updateOrAddMemo,
     getToday
-} from '../../../libs/common';
+} from '../../../libs/common.lib';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../store';
 import {useHorizontalScroll} from '../../../hooks/useHorizontalScroll';
@@ -306,7 +306,7 @@ export const AddMemo = () => {
     }
 
     return (
-        <div className='relative w-full browser-width-900px:w-[500px]'>
+        <div className='relative w-full mobile:w-[500px]'>
             <div className='relative min-w-0 h-fit'>
                 <article
                     ref={ memoRef }

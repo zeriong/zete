@@ -44,12 +44,12 @@ export const MemoLayout = () => {
             <MemoHeader/>
             <MemoAside/>
             <main
-                className={`${ showMenu ? 'pl-asideWidth max-md:pl-0' : 'pl-0' }
-                flex relative flex-col justify-center h-full text-center items-center pt-headerHeight
+                className={`${ showMenu ? 'pl-[256px] max-md:pl-0' : 'pl-0' }
+                flex relative flex-col justify-center h-full text-center items-center pt-[46px]
                 overflow-auto duration-300 ease-in-out`}
             >
-                <div className='w-full h-full flex relative pt-headerHeight'>
-                    <header className='flex fixed top-headerHeight h-headerHeight items-center justify-between w-full ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 pl-16px md:pl-20px'>
+                <div className='w-full h-full flex relative pt-[46px]'>
+                    <header className='flex fixed top-[46px] h-[46px] items-center justify-between w-full ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 pl-16px md:pl-20px'>
                         <div className={`flex items-center ${ categoryName === '카테고리가 존재하지않습니다.' && 'text-zete-scroll-gray' }`}>
                             <CategoryIcon className='w-20px mr-10px'/>
                             { categoryName }

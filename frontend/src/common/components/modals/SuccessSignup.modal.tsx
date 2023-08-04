@@ -30,16 +30,16 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                             leaveTo='opacity-0 scale-95'
                         >
                             <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-24px md:p-32px text-left align-middle shadow-xl transition-all'>
-                                <h1 className='text-24 mb-20px'>
+                                <h1 className='text-[24px] mb-[20px]'>
                                     회원가입 성공!
                                 </h1>
-                                <h2 className='mb-24px'>
+                                <h2 className='mb-[24px]'>
                                     Zeriong Kepp 서비스를 무료로 이용해보세요.
                                 </h2>
                                 <button
                                     type='button'
                                     onClick={ closeModal }
-                                    className='w-[160px] flex justify-center cursor-pointer rounded-[8px] p-4px bg-orange-500 text-white m-auto'
+                                    className='w-[160px] flex justify-center cursor-pointer rounded-[8px] p-[4px] bg-orange-500 text-white m-auto'
                                 >
                                     확인
                                 </button>

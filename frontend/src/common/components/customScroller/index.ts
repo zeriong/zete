@@ -1,7 +1,7 @@
 import css from 'dom-css';
-import { Component, createElement, cloneElement } from 'react';
+import React, { Component, createElement, cloneElement } from 'react';
 
-import {isString, getScrollbarWidth, returnFalse, getInnerWidth, getInnerHeight} from '../../../libs/common';
+import {isString, getScrollbarWidth, returnFalse, getInnerWidth, getInnerHeight} from '../../../libs/common.lib';
 
 import './customScroller.css'
 
@@ -51,6 +51,8 @@ interface Props {
     autoHeight: Boolean;
     autoHeightMin: number | string;
     autoHeightMax: number | string;
+    customTrackHorizontalStyle?: React.CSSProperties;
+    customTrackVerticalStyle?: React.CSSProperties;
     universal: Boolean;
     style: Record<string, any>;
     children: React.ReactNode;
@@ -582,6 +584,8 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
             autoHeight,
             autoHeightMin,
             autoHeightMax,
+            customTrackHorizontalStyle,
+            customTrackVerticalStyle,
             style,
             children,
             ...props
@@ -595,7 +599,7 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
             ...(autoHeight && {
                 ...containerStyleAutoHeight,
                 minHeight: autoHeightMin,
-                //maxHeight: autoHeightMax
+                maxHeight: autoHeightMax
             }),
             ...style
         };
@@ -612,9 +616,9 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
                 minHeight: isString(autoHeightMin)
                     ? `calc(${autoHeightMin} + ${scrollbarWidth}px)`
                     : (Number(autoHeightMin) + Number(scrollbarWidth)),
-                /*maxHeight: isString(autoHeightMax)
+                maxHeight: isString(autoHeightMax)
                     ? `calc(${autoHeightMax} + ${scrollbarWidth}px)`
-                    : autoHeightMax + scrollbarWidth*/
+                    : (Number(autoHeightMax) + Number(scrollbarWidth))
             }),
             // Override min/max height for initial universal rendering
             ...((autoHeight && universal && !didMountUniversal) && {
@@ -632,6 +636,7 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
 
         const trackHorizontalStyle = {
             ...trackHorizontalStyleDefault,
+            ...customTrackHorizontalStyle,
             ...(autoHide && trackAutoHeightStyle),
             ...((!scrollbarWidth || (universal && !didMountUniversal)) && {
                 display: 'none'
@@ -640,6 +645,7 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
 
         const trackVerticalStyle = {
             ...trackVerticalStyleDefault,
+            ...customTrackVerticalStyle,
             ...(autoHide && trackAutoHeightStyle),
             ...((!scrollbarWidth || (universal && !didMountUniversal)) && {
                 display: 'none'

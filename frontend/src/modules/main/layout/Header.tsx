@@ -11,7 +11,7 @@ export const MemoHeader = () => {
     const toggleMenu = () => dispatch(toggleSideNav());
 
     return (
-            <header className='flex fixed h-headerHeight items-center w-full z-30 ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 py-10px'>
+            <header className='flex fixed h-[46px] items-center w-full z-30 ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 py-10px'>
                 <div className='flex relative items-center justify-between pr-10px md:px-10px w-full'>
                     <div className='flex items-center'>
                         <button
@@ -21,7 +21,7 @@ export const MemoHeader = () => {
                         >
                             <BarsMenuIcon/>
                         </button>
-                        <div className='w-26px h-26px bg-primary-500 rounded-[4px] mr-10px'/>
+                        <div className='w-26px h-26px bg-primary rounded-[4px] mr-10px'/>
                         <Link
                             to='/memo'
                             className='flex relative justify-start items-center text-17 font-medium transition-all duration-300 h-full'

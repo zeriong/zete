@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {store} from '../index';
 
-interface IAlertObject {
+export interface IAlertObject {
     message?: string;
 }
 

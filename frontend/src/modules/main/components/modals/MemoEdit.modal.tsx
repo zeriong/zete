@@ -2,7 +2,7 @@ import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 import {useHandleQueryStr} from '../../../../hooks/useHandleQueryStr';
 import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from '../../../../assets/vectors';
-import {handleAddTagSubmit, handleTagInput, updateOrAddMemo} from '../../../../libs/common';
+import {handleAddTagSubmit, handleTagInput, updateOrAddMemo} from '../../../../libs/common.lib';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../../store';
 import {useHorizontalScroll} from '../../../../hooks/useHorizontalScroll';
@@ -139,7 +139,7 @@ export const MemoEditModal = ({ memoId }: { memoId: number }) => {
                         >
                             <Dialog.Panel className='relative transform overflow-hidden bg-white text-left align-middle shadow-xl transition-all rounded-[5px]'>
                                 <article
-                                    className='relative min-w-0 w-[300px] browser-width-900px:w-[400px] flex flex-col justify-between
+                                    className='relative min-w-0 w-[300px] mobile:w-[400px] flex flex-col justify-between
                                     border border-zete-light-gray-500 rounded-[8px] px-18px pb-10px pt-12px min-h-[212px] h-fit bg-zete-primary-200 memo-shadow'
                                 >
                                     <div className='w-full h-full flex flex-col min-h-[212px]'>

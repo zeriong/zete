@@ -52,7 +52,7 @@ export const Alert = () => {
             {!isRender ? <div ref={ alarm }/> :
                 <div
                     ref={ alarm }
-                    className={`bg-[#202124] flex items-center justify-center fixed h-[40px] pl-[20px] pr-[26px] py-[30px] z-[200] left-[26px]
+                    className={`bg-black/90 flex items-center justify-center fixed h-[40px] pl-[20px] pr-[26px] py-[30px] z-[200] left-[26px]
                     rounded-[4px] transition-all duration-300 ${ isShow ? 'bottom-[26px] opacity-100' : 'opacity-0 bottom-0' }`}
                 >
                     <div className='mr-[6px]'>

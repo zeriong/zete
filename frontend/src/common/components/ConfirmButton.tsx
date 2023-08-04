@@ -72,7 +72,7 @@ export const ConfirmButton = (props: ButtonProps) => {
                         leaveFrom='opacity-100'
                         leaveTo='opacity-0'
                     >
-                        <div className='fixed inset-0 bg-black bg-opacity-40'/>
+                        <div className='fixed inset-0 bg-black/40'/>
                     </Transition.Child>
                     <div
                         className='fixed inset-0 overflow-y-auto'
@@ -90,41 +90,41 @@ export const ConfirmButton = (props: ButtonProps) => {
                                 leaveTo='opacity-0 scale-95'
                             >
                                 <Dialog.Panel className='w-full max-w-[320px] transform overflow-hidden rounded-[8px] bg-white align-middle shadow-xl transition-all'>
-                                    <div className='px-16px py-16px'>
+                                    <div className='px-[16px] py-[16px]'>
                                         <p
-                                            className='font-bold text-18'
+                                            className='font-bold text-[18px]'
                                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(props.options.subject) }}
                                         />
                                         {props.options.subtitle && (
                                             <p
-                                                className='font-light text-15 text-gray-600 mt-32px'
+                                                className='font-light text-[15px] text-gray-600 mt-[32px]'
                                                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(props.options.subtitle) }}
                                             />
                                         )}
                                         {Boolean(props.options.isMatchText) && (
-                                            <div className='mt-12px'>
-                                                <p className='text-11 text-gray-500 text-opacity-90 pl-2px mb-2px'>
+                                            <div className='mt-[12px]'>
+                                                <p className='text-[11px] text-gray-500 text-opacity-90 pl-[2px] mb-[2px]'>
                                                     {`아래 입력창에 '${ props.options.matchText }'를 입력해주세요`}
                                                 </p>
                                                 <input
                                                     value={ input }
                                                     onChange={ handleInput }
                                                     placeholder={ props.options.matchText }
-                                                    className='w-full text-center border border-gray-300 rounded-[6px] px-8px py-4px placeholder:text-gray-400 placeholder:font-light placeholder:text-opacity-80'
+                                                    className='w-full text-center border border-gray-300 rounded-[6px] px-[8px] py-[4px] placeholder:text-gray-400/80 placeholder:font-light'
                                                 />
                                             </div>
                                         )}
                                     </div>
-                                    <div className='grid grid-cols-2 text-14 font-medium'>
+                                    <div className='grid grid-cols-2 text-[14px] font-medium'>
                                         <FuncButton
                                             onClick={ handleFuncButtonOnClick }
                                             options={ funcButtonOptions }
                                             type='button'
-                                            className={`py-12px ${ props.options.isNegative ? 'bg-red-500 bg-opacity-80 text-white' : 'bg-blue-500 bg-opacity-90 text-white' }`}
+                                            className={`py-[12px] ${ props.options.isNegative ? 'bg-red-500/80 text-white' : 'bg-blue-500/90 text-white' }`}
                                         />
                                         <button
                                             type='button'
-                                            className='ml-1px py-12px bg-gray-200'
+                                            className='ml-[1px] py-[12px] bg-gray-200'
                                             onClick={ closeModal }
                                         >
                                             닫기

@@ -18,19 +18,14 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'browser-width-900px': '900px',
+        mobile: '900px',
       },
       fontSize: {...createRemEntries(50)},
       colors: {
-        'primary': {
-          500: '#fec107',
-        },
-        'layoutGray': {
-          lightUp: '#f8f8f6',
-          light: '#E6E6E6',
-          DEFAULT: '#C6C7CD', // f9d270
-          deep: '#92929A',
-        },
+        primary: '#fec107',
+        scrollBar: '#a0a0a0',
+        placeHolder: '#767676',
+
         'zete': {
           'scroll-gray': '#a0a0a0',
           'placeHolder': '#767676',
@@ -60,16 +55,7 @@ module.exports = {
           'gpt-100': '#a0e3c7',
         }
       },
-      width: {
-        'signUpLayout': '120px',
-        'login': '500px',
-      },
-      height: {
-        'signUpLayout': '360px',
-      },
       spacing: {
-        'asideWidth': '256px',
-        'headerHeight': '46px',
         ...createPxEntries(100),
       },
     },

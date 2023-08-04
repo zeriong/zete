@@ -132,7 +132,7 @@ export class MemoService {
       const importantMemoCount = await this.memoRepository
         .createQueryBuilder()
         .where('Memo.userId = :userId', { userId: user.id })
-        .andWhere('Memo.important = :important', { important: true })
+        .andWhere('Memo.isImportant = :isImportant', { isImportant: true })
         .getCount();
 
       return {

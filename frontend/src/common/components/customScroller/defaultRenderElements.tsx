@@ -32,6 +32,7 @@ export function renderThumbHorizontalDefault({ style, ...props }) {
         cursor: 'pointer',
         borderRadius: 'inherit',
         backgroundColor: 'rgba(0,0,0,.2)',
+        height: '3px' // custom line
     };
     return <div style={finalStyle} {...props} />;
 }

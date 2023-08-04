@@ -118,7 +118,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                     minLength: 8, maxLength: 64,
                                                     pattern: VALID_PASSWORD,
                                                     onChange: (event) => {
-                                                        // value filter
+                                                        // mask
                                                         const value = event.target.value;
                                                         event.target.value = value.replace(INPUT_PASSWORD, '');
                                                     },
@@ -158,7 +158,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                     pattern: VALID_PASSWORD,
                                                     validate: (value, data) => value === data.password,
                                                     onChange: (event) => {
-                                                        // value filter
+                                                        // mask
                                                         const value = event.target.value;
                                                         event.target.value = value.replace(INPUT_PASSWORD, '');
                                                     },

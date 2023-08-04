@@ -78,15 +78,15 @@ export const Memo = () => {
     return (
         loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
             <>
-                <section className='relative top-0 gap-28px w-full p-16px browser-width-900px:p-30px'>
+                <section className='relative top-0 gap-28px w-full p-16px mobile:p-30px'>
                     {!menuQueryStr && (
-                        <div className='relative flex justify-center mt-6px mb-22px browser-width-900px:mb-30px browser-width-900px:mt-0'>
+                        <div className='relative flex justify-center mt-6px mb-22px mobile:mb-30px mobile:mt-0'>
                             <AddMemo/>
                         </div>
                     )}
                     <Masonry
                         breakpointCols={ masonryCols }
-                        className='my-masonry-grid flex justify-center gap-x-16px browser-width-900px:gap-x-30px w-full browser-width-900px:w-auto'
+                        className='my-masonry-grid flex justify-center gap-x-16px mobile:gap-x-30px w-full mobile:w-auto'
                         columnClassName='my-masonry-grid_column'
                     >
                         {data.memos?.map((memo) => (
@@ -95,7 +95,7 @@ export const Memo = () => {
                                 className='relative w-full'
                             >
                                 <div
-                                    className='mb-16px w-full browser-width-900px:w-[300px] browser-width-900px:mb-30px flex rounded-[8px] memo-shadow'
+                                    className='mb-16px w-full mobile:w-[300px] mobile:mb-30px flex rounded-[8px] memo-shadow'
                                     onClick={ () => memoModifier(memo.id) }
                                 >
                                     <article

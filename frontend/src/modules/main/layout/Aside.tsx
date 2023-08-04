@@ -41,9 +41,9 @@ export const MemoAside = () => {
                 ${ showMenu ? 'opacity-50 visible' : 'opacity-0 invisible' }`}
             />
             <nav
-                className={`fixed w-asideWidth bg-white z-50 md:z-20 ease-in-out duration-300 pt-0 md:pt-headerHeight h-full
+                className={`fixed w-[256px] bg-white z-50 md:z-20 ease-in-out duration-300 pt-0 md:pt-[46px] h-full
                 overflow-auto scroll-hidden border-r border-zete-light-gray-400
-                ${ showMenu ? 'left-0' : '-left-asideWidth' }`}
+                ${ showMenu ? 'left-0' : '-left-[256px]' }`}
             >
                 <CustomScroller>
                     <div className='flex flex-col h-full min-h-full w-full p-14px text-zete-dark-500 font-light text-14'>
