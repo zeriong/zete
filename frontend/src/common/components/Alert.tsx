@@ -7,14 +7,13 @@ import {AlarmIcon} from '../../assets/vectors';
 export const Alert = () => {
     const alarm = useRef<HTMLDivElement>(null);
 
-    const { alerts } = useSelector((state:RootState) => state.alert);
-
     const [alert, setAlert] = useState<IAlertObject>({ message: '' });
     const [isShow, setIsShow] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
     const [isRender, setIsRender] = useState(false);
 
     const dispatch = useDispatch();
+    const { alerts } = useSelector((state:RootState) => state.alert);
 
     const showAlert = () => {
         setIsRender(true);
@@ -39,7 +38,9 @@ export const Alert = () => {
         }
     }
 
-    useEffect(() => showAlert(), [alerts]);
+    useEffect(() => {
+        showAlert();
+    }, [alerts]);
 
     useEffect(() => {
         if (!isRunning && store.getState().alert.alerts.length === 0) {

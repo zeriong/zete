@@ -12,13 +12,14 @@ import {PATTERNS} from '../../constants';
 
 export const SignupModal = (props: { successControl: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL } = PATTERNS;
-    const { loading } = useSelector((state: RootState) => state.auth);
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+
+    const { loading } = useSelector((state: RootState) => state.auth);
 
     const form = useForm<CreateAccountInput & { passwordConfirm?: string }>({ mode: 'onChange' });
 
@@ -30,11 +31,6 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
         setSearchParams(searchParams);
     };
 
-    useEffect(() => {
-        if (searchParams.get('modal') === 'sign-up') return setIsShow(true);
-        setIsShow(false);
-    },[searchParams]);
-
     const handleOnSubmit = form.handleSubmit(async () => {
         await Api.user.createAccount(form.getValues())
             .then((res) => {
@@ -45,6 +41,11 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
             })
             .catch(e => console.log(e));
     });
+
+    useEffect(() => {
+        if (searchParams.get('modal') === 'sign-up') return setIsShow(true);
+        setIsShow(false);
+    },[searchParams]);
 
     return (
         <>

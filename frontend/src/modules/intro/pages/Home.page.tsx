@@ -9,10 +9,10 @@ import memoImg from '../../../assets/scroll-g6570d2351_1920.png';
 
 export const Home = ()=> {
     const [searchParams, setSearchParams] = useSearchParams();
+    const [modalControl, setModalControl] = useState(false);
+
     const { isLoggedIn } = useSelector((state: RootState) => state.auth);
     const { data } = useSelector((state: RootState) => state.user);
-
-    const [modalControl, setModalControl] = useState(false);
 
     const openSignInModal = () => {
         searchParams.set('modal','sign-in');

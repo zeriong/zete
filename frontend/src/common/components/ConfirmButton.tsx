@@ -50,7 +50,9 @@ export const ConfirmButton = (props: ButtonProps) => {
 
     const handleInput = (e) => setInput(e.target.value);
 
-    useEffect(() => setInput(''), [isOpen]);
+    useEffect(() => {
+        setInput('');
+    }, [isOpen]);
 
     return (
         <>

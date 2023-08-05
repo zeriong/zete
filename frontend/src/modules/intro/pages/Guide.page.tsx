@@ -4,6 +4,7 @@ import {RootState} from '../../../store';
 
 export const Guide = () => {
     const { loading } = useSelector((state: RootState) => state.user);
+
     return (
         loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
             <div className='m-auto text-center'>
