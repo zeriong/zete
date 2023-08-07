@@ -10,13 +10,12 @@ import {createCategory, deleteCategory, getCategories, updateCategory} from '../
 import {CoreOutput} from '../../../../openapi/generated';
 
 export const CategoryEditModal = (props: { buttonText: string }) => {
-    const { cate } = useSelector((state: RootState) => state.memo);
-
     const [isShow, setIsShow] = useState(false);
     const [createInputValue, setCreateInputValue] = useState('');
     const [updateInputValues, setUpdateInputValues] = useState<{ [key: number]: string }>({});
 
     const dispatch = useDispatch<AppDispatch>();
+    const { cate } = useSelector((state: RootState) => state.memo);
 
     const openModal = () => setIsShow(true);
 
@@ -39,7 +38,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
 
     // 카테고리 업데이트 submit
     const handleUpdateOnSubmit = (id: number, prevVal: string, input: any) => {
-        const val = input.value
+        const val = input.value;
         // 입력 값이 있고 기존 값과 다르다면
         if (val && val.length > 1 && val !== prevVal) {
             dispatch(updateCategory({ id: id, name: val })).then((value) => {
@@ -65,10 +64,10 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
             <button
                 type='button'
                 onClick={ openModal }
-                className='flex w-full justify-between items-center px-10px py-8px rounded-[5px] mt-[4px] h-[42px]'
+                className='flex w-full justify-between items-center px-[10px] py-[8px] rounded-[5px] mt-[4px] h-[42px]'
             >
                 <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
-                    <ModifyIcon className='mr-10px'/>
+                    <ModifyIcon className='mr-[10px]'/>
                     <span>
                         { props.buttonText }
                     </span>
@@ -92,7 +91,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                         <div className='fixed inset-0 bg-black bg-opacity-40'/>
                     </Transition.Child>
                     <div className='fixed inset-0 overflow-y-auto'>
-                        <div className='close-modal-background flex min-h-full items-center justify-center p-4 text-center'>
+                        <div className='close-modal-background flex min-h-full items-center justify-center p-[16px] text-center'>
                             <Transition.Child
                                 as={Fragment}
                                 enter='ease-out duration-300'

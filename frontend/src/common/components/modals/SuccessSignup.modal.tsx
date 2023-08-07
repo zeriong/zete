@@ -18,7 +18,7 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                 >
                     <div className='fixed inset-0 bg-black bg-opacity-40' />
                 </Transition.Child>
-                <article className='fixed inset-0 overflow-y-auto'>
+                <section className='fixed inset-0 overflow-y-auto'>
                     <div className='flex min-h-full items-center justify-center p-4 text-center'>
                         <Transition.Child
                             as={ Fragment }
@@ -46,7 +46,7 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                             </Dialog.Panel>
                         </Transition.Child>
                     </div>
-                </article>
+                </section>
             </Dialog>
         </Transition>
     );

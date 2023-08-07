@@ -1,116 +1,126 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react';
-import {Dialog, Transition} from '@headlessui/react';
-import {useHandleQueryStr} from '../../../../hooks/useHandleQueryStr';
-import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from '../../../../assets/vectors';
-import {handleAddTagSubmit, handleTagInput, updateOrAddMemo} from '../../../../libs/common.lib';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../../../store';
-import {useHorizontalScroll} from '../../../../hooks/useHorizontalScroll';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../../../store';
 import {useForm} from 'react-hook-form';
-import {Memo, UpdateMemoInput} from '../../../../openapi/generated';
+import {CreateMemoInput, Memo} from '../../../../openapi/generated';
+import {useSearchParams} from 'react-router-dom';
+import {Dialog, Transition} from '@headlessui/react';
+import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from '../../../../assets/vectors';
+import {setDynamicInputWidth} from '../../../../libs/common.lib';
+import {showAlert} from '../../../../store/alert/alert.slice';
+import {Api} from '../../../../openapi/api';
+import {handleAddMemoTagSubmit, loadMemoList} from '../../../../libs/memo.lib';
+import {HorizontalScroll} from '../../../../common/components/HorizontalScroll';
 
-interface UpdateFormInterface {
-    update: UpdateMemoInput;
-    cateId: number | null;
-}
+export const MemoEditModal = () => {
+    const savedMemo = useRef<Memo | null>(null);
+    const saveDelayTimer = useRef<NodeJS.Timeout | null>(null);
+    const isSavingMemo = useRef(false);
 
-export const MemoEditModal = ({ memoId }: { memoId: number }) => {
-    const tagsInput = useRef<HTMLInputElement>(null);
-    const typingTimout = useRef<NodeJS.Timeout>(null);
-    const isUpdate = useRef<boolean>(false);
-    const temporarySaveMemo = useRef<Memo>(null);
-
-    const { data } = useSelector((state:RootState) => state.memo);
-    const {
-        searchParams,
-        setSearchParams,
-        menuQueryStr,
-        modalQueryStr,
-        cateQueryStr,
-        tagQueryStr,
-    } = useHandleQueryStr();
-
+    const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState<boolean>(false);
-    const [isImportant, setIsImportant] = useState<boolean>(false);
 
-    const form = useForm<UpdateFormInterface>();
-    const horizonScroll = useHorizontalScroll();
+    const dispatch = useDispatch<AppDispatch>();
+    const memoState = useSelector((state:RootState) => state.memo);
 
-    const closeModal = () => {
-        searchParams.delete('modal');
+    const form = useForm<CreateMemoInput>({ mode: 'onSubmit' });
+
+    const closeModal = async () => {
+        searchParams.delete('view');
         setSearchParams(searchParams);
+
     }
 
-    // 업데이트 핸들러
-    const handleUpdate = (auto: boolean) => {
-        updateOrAddMemo({
-            getTitle: form.getValues('update.memo.title'),
-            getContent: form.getValues('update.memo.content'),
-            getNewTags: form.getValues('update.newTags'),
-            getCateId: form.getValues('cateId'),
-            typingTimeout: typingTimout,
-            reqType: 'update',
-            memoId: memoId,
-            autoReq: auto,
-            isUpdate,
-            cateQueryStr,
-            tagQueryStr,
-            menuQueryStr,
-            isImportant,
-            closeModal,
-            temporarySaveMemo,
+    // 메모 수정
+    const updateMemo = async () => {
+        clearTimeout(saveDelayTimer.current);
+        saveDelayTimer.current = null;
+
+        const data = form.getValues();
+        isSavingMemo.current = true;
+        // 내용이 있는 경우 저장
+        if (data.title?.length > 0 || data.content?.length > 0) {
+            try {
+                const res = await Api.memo.updateMemo({ ...data, id: savedMemo.current.id });
+                if (res.data.success) savedMemo.current = res.data.savedMemo;
+                else showAlert(res.data.error);
+            } catch (e) {
+                showAlert('메모 수정에 실패하였습니다.');
+                loadMemoList(dispatch, searchParams, true);
+            }
+        }
+        isSavingMemo.current = false;
+    }
+
+    // 메모 수정 시도
+    const tryUpdateMemo = () => {
+        if (saveDelayTimer.current != null) {
+            clearTimeout(saveDelayTimer.current);
+            saveDelayTimer.current = null;
+        }
+        if (saveDelayTimer.current == null) {
+            saveDelayTimer.current = setTimeout(async () => {
+                if (isSavingMemo.current) tryUpdateMemo();  // 저장중이라면 연기
+                else await updateMemo();  // 저장
+            }, 3000);
+        }
+    };
+
+    const handleFormSubmit = (event) => {
+        event.preventDefault();
+        // 제목에서 enter 시 내용으로 이동
+        const input = event.target[2];
+        input.focus();
+    };
+
+    // 폼 입력 감지
+    useEffect(() => {
+        const subscription = form.watch((data, { name, type }) => {
+            // 특정 항목이 입력될 경우
+            if (name) tryUpdateMemo();
         });
-    }
-
-    // 자동저장 핸들러
-    const handleOnChangeUpdate = () => {
-        isUpdate.current = false;
-
-        if (typingTimout.current != null) {
-            clearTimeout(typingTimout.current);
-            typingTimout.current = null;
-        }
-        if (typingTimout.current === null) {
-            typingTimout.current = setTimeout(() => handleUpdate(true), 3000);
-        }
-    }
-
-    // 중요메모 체크 핸들러
-    const handleImportant = () => {
-        handleOnChangeUpdate();
-        setIsImportant(!isImportant);
-    }
-
-    const deleteTag = (tagName) => {
-        const tags = form.getValues('update.newTags');
-        if (tags) form.setValue('update.newTags', tags.filter(tag => tag.name !== tagName));
-    }
+        return () => subscription.unsubscribe();
+    }, [form.watch]);
 
     // 메모수정 모달 벨류세팅
     useEffect(() => {
-        if (modalQueryStr) {
+        const memoId = Number(searchParams.get('view'));
+
+        if (memoId) {
             setIsShow(true);
-            const targetMemo = data.memos.find(find => find.id === memoId);
+            const targetMemo = memoState.memo.list.find(find => find.id === memoId);
             if (targetMemo) {
-                temporarySaveMemo.current = targetMemo; // 메모처리 함수에서 비교할 메모 임시저장
-                const tags = targetMemo.tag.map(tag => ({ name: tag.name }));
-                form.setValue('update.newTags', tags);
-                form.setValue('update.memo.title', targetMemo.title.replace(/<br\/>/g, '\n'));
-                form.setValue('update.memo.content', targetMemo.content.replace(/<br\/>/g, '\n'));
-                form.setValue('cateId', targetMemo.cateId === null ? 0 : targetMemo.cateId);
-                setIsImportant(targetMemo.important);
+                // 데이터 요청해서 받은 데이터를 기반으로 정리
+                (async () => {
+                    const res = await Api.memo.getMemo({ id: memoId });
+                    if (res.data.success) {
+                        const memo = res.data.memo;
+                        savedMemo.current = memo;
+                        form.setValue('title', memo.title);
+                        form.setValue('content', memo.content);
+                        form.setValue('cateId', memo.cateId);
+                        form.setValue('tags', memo.tags);
+                        form.setValue('isImportant', memo.isImportant);
+                    } else {
+                        showAlert('존재하지 않는 메모입니다.');
+                    }
+
+                })();
             }
             else closeModal();
         }
         else setIsShow(false);
-    },[modalQueryStr, data]);
+    },[searchParams]);
 
     return (
         <Transition appear show={ isShow } as={ Fragment }>
             <Dialog
                 as='div'
                 className='relative z-40'
-                onClose={ () => handleUpdate(false) }
+                onClose={ () => {
+                    // handleUpdate(false);
+                    closeModal();
+                } }
             >
                 <Transition.Child
                     as={ Fragment }
@@ -139,95 +149,87 @@ export const MemoEditModal = ({ memoId }: { memoId: number }) => {
                         >
                             <Dialog.Panel className='relative transform overflow-hidden bg-white text-left align-middle shadow-xl transition-all rounded-[5px]'>
                                 <article
-                                    className='relative min-w-0 w-[300px] mobile:w-[400px] flex flex-col justify-between
-                                    border border-zete-light-gray-500 rounded-[8px] px-18px pb-10px pt-12px min-h-[212px] h-fit bg-zete-primary-200 memo-shadow'
+                                    className='relative min-w-0 w-[300px] browser-width-900px:w-[400px] flex flex-col justify-between
+                                    border border-zete-light-gray-500 rounded-[8px] px-[18px] pb-[10px] pt-[12px] min-h-[212px] h-fit bg-zete-primary-200 memo-shadow'
                                 >
                                     <div className='w-full h-full flex flex-col min-h-[212px]'>
-                                        <div className='w-full h-full'>
-                                            <div className='flex justify-between items-center pb-8px border-b border-zete-memo-border h-full'>
-                                                <textarea
-                                                    {...form.register('update.memo.title', {
+                                        <form onSubmit={ handleFormSubmit } className='w-full h-full'>
+                                            <div className='flex justify-between items-center pb-[8px] border-b border-zete-memo-border h-full'>
+                                                <input
+                                                    {...form.register('title', {
                                                         required: false,
-                                                        maxLength: 64,
-                                                        onChange: handleOnChangeUpdate
+                                                        maxLength: 255,
                                                     })}
-                                                    rows={ 1 }
+                                                    tabIndex={ 1 }
                                                     placeholder='제목'
-                                                    className='resize-none w-full pr-6px max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500 font-light placeholder:text-15 memo-custom-scroll'
+                                                    className='resize-none w-full pr-[6px] max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500
+                                                    font-light placeholder:text-[15px] memo-custom-scroll'
                                                 />
-                                                {
-                                                    menuQueryStr ? <FillStarIcon/> :
-                                                        isImportant ? (
-                                                            <FillStarIcon onClick={ handleImportant }/>
-                                                        ) : (
-                                                            <StarIcon onClick={ handleImportant }/>
-                                                        )
-                                                }
+                                                <button
+                                                    type='button'
+                                                    onClick={ () => form.setValue('isImportant', !form.getValues('isImportant')) }
+                                                >
+                                                    { form.watch('isImportant') ? <FillStarIcon/> : <StarIcon/> }
+                                                </button>
                                             </div>
-                                            <div className='h-full w-full pt-9px'>
+                                            <div className='h-full w-full pt-[9px]'>
                                                 <textarea
-                                                    {...form.register('update.memo.content', {
+                                                    {...form.register('content', {
                                                         required: false,
                                                         maxLength: 65535,
-                                                        onChange: handleOnChangeUpdate,
                                                     })}
                                                     rows={ 1 }
                                                     placeholder='메모 작성...'
                                                     className='resize-none h-[280px] w-full bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500
-                                                    font-light placeholder:text-15 memo-custom-scroll'
+                                                    font-light placeholder:text-[15px] memo-custom-scroll'
                                                 />
                                             </div>
-                                        </div>
-                                        <label htmlFor='modifyMemo' className='w-full h-full grow'/>
-                                        <div className='w-full h-full'>
-                                            <div
-                                                ref={ horizonScroll }
-                                                className='flex w-full h-full relative border-b border-zete-memo-border pb-8px overflow-y-hidden
-                                                memo-custom-vertical-scroll'
-                                            >
-                                                {form.watch('update.newTags')?.map((tag, idx) => (
-                                                    <div
-                                                        key={ idx }
-                                                        className='relative flex items-center pl-9px pr-21px py-1px mr-4px rounded-[4px] bg-black
-                                                        bg-opacity-10 cursor-default'
-                                                    >
-                                                        <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
+                                        </form>
+                                        <div className='w-full'>
+                                            <HorizontalScroll>
+                                                <div className='flex w-full h-full relative pb-[8px] overflow-y-hidden'>
+                                                    {form.watch('tags')?.map((tag, idx) => (
+                                                        <div key={ idx } className='relative flex items-center pl-[9px] pr-[21px] py-[1px] mr-[4px] rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                                                        <span className='font-light text-[11px] text-zete-dark-400 whitespace-nowrap'>
                                                             { tag.name }
                                                         </span>
-                                                        <button
-                                                            type='button'
-                                                            onClick={ () => deleteTag(tag.name) }
-                                                            className='absolute right-2px group rounded-full grid place-content-center hover:bg-zete-dark-300
-                                                            hover:bg-opacity-50 w-14px h-14px'
-                                                        >
-                                                            <CloseIcon className='w-10px fill-zete-dark-400 group-hover:fill-white'/>
+                                                            <button
+                                                                type='button'
+                                                                // onClick={ () => deleteTag(tag.name) }
+                                                                className='absolute right-[2px] group rounded-full grid place-content-center hover:bg-zete-dark-300
+                                                            hover:bg-opacity-50 w-[14px] h-[14px]'
+                                                            >
+                                                                <CloseIcon className='w-[10px] fill-zete-dark-400 group-hover:fill-white'/>
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                    <form
+                                                        onSubmit={ (event) => {
+                                                            handleAddMemoTagSubmit(event, form);
+                                                            setDynamicInputWidth(event.target[0]);
+                                                        }}
+                                                        className='relative flex items-center text-zete-dark-400 text-[12px]'
+                                                    >
+                                                        <input
+                                                            onChange={ (event) => setDynamicInputWidth(event.target) }
+                                                            placeholder='태그추가'
+                                                            className='min-w-[50px] w-[50px] px-[2px] placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
+                                                        />
+                                                        <button type='submit' className='relative w-[14px] h-[14px] grid place-content-center'>
+                                                            <PlusIcon svgClassName='w-[9px]' strokeClassName='fill-black'/>
                                                         </button>
-                                                    </div>
-                                                ))}
-                                                <form
-                                                    onSubmit={ (e) => handleAddTagSubmit(e, form.getValues, form.setValue, 'update.newTags') }
-                                                    className='relative flex items-center text-zete-dark-400 text-12'
-                                                >
-                                                    <input
-                                                        ref={ tagsInput }
-                                                        onChange={ () => handleTagInput(tagsInput) }
-                                                        placeholder='태그추가'
-                                                        className='min-w-[50px] w-50px px-2px placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
-                                                    />
-                                                    <button type='submit' className='relative w-14px h-14px grid place-content-center'>
-                                                        <PlusIcon svgClassName='w-9px' strokeClassName='fill-black'/>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                            <div className='flex justify-between items-center pt-10px'>
+                                                    </form>
+                                                </div>
+                                            </HorizontalScroll>
+                                            <div className='flex justify-between items-center pt-[10px] border-t border-zete-memo-border'>
                                                 <div className='flex items-center border border-zete-memo-border rounded-md px-2 py-1'>
-                                                    <CategoryIcon className='w-18px opacity-75 mr-0.5'/>
+                                                    <CategoryIcon className='w-[18px] opacity-75 mr-0.5'/>
                                                     <select
                                                         {...form.register('cateId', { required: true })}
                                                         className='w-[130px] text-[13px] text-gray-500 bg-transparent'
                                                     >
                                                         <option value={0}>전체메모</option>
-                                                        {data.cate.map((cate, idx) => (
+                                                        {memoState.cate.list.map((cate, idx) => (
                                                             <option key={ idx } value={ cate.id }>
                                                                 { cate.name }
                                                             </option>

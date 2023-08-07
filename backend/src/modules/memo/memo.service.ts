@@ -295,7 +295,14 @@ export class MemoService {
         user,
       });
 
-      if (result) return { success: true, savedMemo: result };
+      if (result) {
+        const savedMemo = {
+          ...result,
+          cateId: result.cate.id,
+          updateAt: new Date(),
+        };
+        return { success: true, savedMemo };
+      }
     } catch (e) {
       this.logger.error(e);
     }
