@@ -18,14 +18,11 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        mobile: '900px',
+        'pc': '900px',
       },
       fontSize: {...createRemEntries(50)},
       colors: {
-        primary: '#fec107',
-        scrollBar: '#a0a0a0',
-        placeHolder: '#767676',
-
+        'brand': '#fec107',
         'zete': {
           'scroll-gray': '#a0a0a0',
           'placeHolder': '#767676',
@@ -42,6 +39,10 @@ module.exports = {
           'dark-200': '#4b4b4b',
           'dark-100': '#727272',
           'gray-500': '#707070',
+          'gray-400': '#878787',
+          'gray-300': '#b0b0b0',
+          'gray-200': '#cecece',
+          'gray-100': '#d5d5d5',
           'light-gray-500': '#e1e1e1',
           'light-gray-400': '#e6e6e6',
           'light-gray-300': '#eeeeee',

@@ -6,7 +6,7 @@ api/memo-api.ts
 api/open-ai-api.ts
 api/user-api.ts
 base.ts
-common.lib.ts
+common.ts
 configuration.ts
 git_push.sh
 index.ts

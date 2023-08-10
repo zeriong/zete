@@ -1,28 +1,23 @@
-import { Popover, Transition} from '@headlessui/react';
+import {Popover, Transition} from '@headlessui/react';
 import React, {Fragment, useState} from 'react';
 import {DeleteIcon, EditIcon, ThreeDotMenuIcon} from '../../../../assets/vectors';
 import {ConfirmButton} from '../../../../common/components/ConfirmButton';
-import {RootState} from '../../../../store';
-import {useSelector} from 'react-redux';
-import {useHandleQueryStr} from '../../../../hooks/useHandleQueryStr';
-import {deleteMemo, refreshMemos} from '../../../../store/memo/memo.slice';
+import {AppDispatch} from '../../../../store';
+import {useDispatch} from 'react-redux';
+import {useSearchParams} from 'react-router-dom';
+import {loadMemoList} from '../../../../libs/memo.lib';
+import {deleteMemoAction, getCategories} from '../../../../store/memo/memo.actions';
 
 export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
-    const { menuQueryStr, tagQueryStr, cateQueryStr } = useHandleQueryStr();
-    const { data } = useSelector((state: RootState) => state.memo);
-
     const [isOpen, setIsOpen] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const handleDeleteMemo = () => {
-        deleteMemo(memoId);
-        refreshMemos({
-            offset: 0,
-            limit: data.memos.length,
-            search: '',
-            menuQueryStr,
-            tagQueryStr,
-            cateQueryStr: Number(cateQueryStr) || null,
-        });
+    const dispatch = useDispatch<AppDispatch>();
+
+    const deleteMemo = () => {
+        dispatch(deleteMemoAction({ id: memoId }));
+        dispatch(getCategories());
+        loadMemoList(dispatch, searchParams, true);
     }
 
     const handleConfirmModal = (event) => {
@@ -33,7 +28,7 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
     return (
         <>
             <Popover className='relative h-fit'>
-                {({open, close}) => {
+                {({open}) => {
                     return <>
                         <Popover.Button className={`${open && 'bg-black bg-opacity-10'} hover:bg-black hover:bg-opacity-10 p-1px rounded-full w-26px h-26px`}>
                             <ThreeDotMenuIcon className='fill-zete-dark-200 cursor-pointer'/>
@@ -50,23 +45,15 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                             <Popover.Panel className='absolute z-10 mt-3 right-0 bottom-[130%] px-0 w-[150px]' static>
                                 <ul className='relative bg-white py-6px text-14 font-normal text-start text-zete-dark-300 cursor-default overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 whitespace-nowrap'>
                                     <li className='flex items-center cursor-pointer py-5px px-12px hover:bg-black hover:bg-opacity-5'>
-                                        <>
-                                            <EditIcon className='fill-zete-dark-100 mr-6px w-18px h-18px'/>
-                                        </>
-                                        <p>
-                                            메모수정
-                                        </p>
+                                        <EditIcon className='fill-zete-dark-100 mr-6px w-18px h-18px'/>
+                                        <p>메모수정</p>
                                     </li>
                                     <li
-                                        className='flex items-center cursor-pointer py-5px px-12px hover:bg-black hover:bg-opacity-5'
                                         onClick={handleConfirmModal}
+                                        className='flex items-center cursor-pointer py-5px px-12px hover:bg-black hover:bg-opacity-5'
                                     >
-                                        <>
-                                            <DeleteIcon className='fill-zete-dark-100 mr-6px w-18px h-18px'/>
-                                        </>
-                                        <p>
-                                            메모삭제
-                                        </p>
+                                        <DeleteIcon className='fill-zete-dark-100 mr-6px w-18px h-18px'/>
+                                        <p>메모삭제</p>
                                     </li>
                                 </ul>
                             </Popover.Panel>
@@ -82,12 +69,10 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                     subtitle: '메모를 삭제하시면 다시 되돌릴 수 없습니다.',
                     confirmText: '삭제',
                     isNegative: true,
-                    confirmCallback: handleDeleteMemo,
+                    confirmCallback: deleteMemo,
                 }}
                 className='absolute z-50'
-            >
-                <></>
-            </ConfirmButton>
+            />
         </>
 
     )

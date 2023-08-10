@@ -30,7 +30,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
         e.preventDefault();
         if (createInputValue) {
             // 카테고리 생성
-            dispatch(createCategory({ name: createInputValue }))
+            dispatch(createCategory({ name: createInputValue }));
             // input 초기화
             setCreateInputValue('');
         }
@@ -48,7 +48,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                     input.value = prevVal;
                     showAlert(data.error);
                 }
-            })
+            });
         }
     }
 
@@ -116,7 +116,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                                     <input
                                                         placeholder='새 카테고리 만들기'
                                                         onChange={(event) => setCreateInputValue(event.target.value)}
-                                                        value={createInputValue}
+                                                        value={ createInputValue }
                                                         className='placeholder:text-zete-dark-300 placeholder:font-thin pb-[5px] border-b border-zete-memo-border
                                                         text-zete-dark-300 w-full'
                                                     />
@@ -128,28 +128,28 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                                     </button>
                                                 </form>
                                                 <ul className='text-zete-dark-200 grid gap-[16px] py-[20px]'>
-                                                    {cate.list?.map((val, idx) => (
+                                                    {cate.list?.map((memo, idx) => (
                                                         <li key={ idx }>
                                                             <form
                                                                 onSubmit={(event) => {
                                                                     event.preventDefault()
                                                                     const input = event.target[0];
-                                                                    handleUpdateOnSubmit(val.id, val.name, input);
+                                                                    handleUpdateOnSubmit(memo.id, memo.name, input);
                                                                 }}
                                                                 onBlur={(event) => {
                                                                     const input = event.target;
-                                                                    handleUpdateOnSubmit(val.id, val.name, input);
+                                                                    handleUpdateOnSubmit(memo.id, memo.name, input);
                                                                 }}
                                                                 className='flex items-center'
                                                             >
                                                                 <FillCategoryIcon className='relative -left-[3px] fill-zete-dark-100 mr-[10px]'/>
                                                                 <input
                                                                     placeholder='카테고리 이름을 입력해주세요.'
-                                                                    value={ updateInputValues[val.id] || val.name}
+                                                                    value={ updateInputValues[memo.id] || memo.name }
                                                                     onChange={(event) => {
                                                                         const value = event.target.value
                                                                         setUpdateInputValues((state) => {
-                                                                            state[val.id] = value;
+                                                                            state[memo.id] = value;
                                                                             return { ...state }
                                                                         })
                                                                     }}
@@ -157,11 +157,11 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                                                 />
                                                                 <ConfirmButton
                                                                     options={{
-                                                                        subject: `'${val.name}'를 삭제하시겠습니까?`,
+                                                                        subject: `'${ memo.name }'를 삭제하시겠습니까?`,
                                                                         subtitle: '카테고리가 삭제되면 하위 메모가<br/>모두 삭제됩니다.',
                                                                         confirmText: '삭제',
                                                                         isNegative: true,
-                                                                        confirmCallback: () => dispatch(deleteCategory({id: val.id})),
+                                                                        confirmCallback: () => dispatch(deleteCategory({ id: memo.id })),
                                                                     }}
                                                                     className='relative group p-[6px] rounded-full hover:bg-zete-light-gray-200 -right-[2px]'
                                                                 >

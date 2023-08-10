@@ -82,7 +82,7 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
             // verify required parameter 'id' is not null or undefined
             assertParamExists('deleteAccount', 'id', id)
             const localVarPath = `/user/{id}`
-                .replace(`{${'id'}}`, encodeURIComponent(String(id)));
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -198,10 +198,10 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        profileUpdate: async (updateAccountInput: UpdateAccountInput, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateProfile: async (updateAccountInput: UpdateAccountInput, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'updateAccountInput' is not null or undefined
-            assertParamExists('profileUpdate', 'updateAccountInput', updateAccountInput)
-            const localVarPath = `/user/profileUpdate`;
+            assertParamExists('updateProfile', 'updateAccountInput', updateAccountInput)
+            const localVarPath = `/user/updateProfile`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -290,8 +290,8 @@ export const UserApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async profileUpdate(updateAccountInput: UpdateAccountInput, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.profileUpdate(updateAccountInput, options);
+        async updateProfile(updateAccountInput: UpdateAccountInput, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CoreOutput>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateProfile(updateAccountInput, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -352,8 +352,8 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        profileUpdate(updateAccountInput: UpdateAccountInput, options?: any): AxiosPromise<CoreOutput> {
-            return localVarFp.profileUpdate(updateAccountInput, options).then((request) => request(axios, basePath));
+        updateProfile(updateAccountInput: UpdateAccountInput, options?: any): AxiosPromise<CoreOutput> {
+            return localVarFp.updateProfile(updateAccountInput, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -424,7 +424,7 @@ export class UserApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof UserApi
      */
-    public profileUpdate(updateAccountInput: UpdateAccountInput, options?: AxiosRequestConfig) {
-        return UserApiFp(this.configuration).profileUpdate(updateAccountInput, options).then((request) => request(this.axios, this.basePath));
+    public updateProfile(updateAccountInput: UpdateAccountInput, options?: AxiosRequestConfig) {
+        return UserApiFp(this.configuration).updateProfile(updateAccountInput, options).then((request) => request(this.axios, this.basePath));
     }
 }

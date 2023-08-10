@@ -39,7 +39,7 @@ export class OpenAiService {
       });
 
       // 요청성공시 사용 가능 횟수 차감
-      const res = await this.userService.update(user.id, { gptUsableCount: user.gptUsableCount - 1 });
+      const res = await this.userService.update(user.id, { gptUsableCount: --user.gptUsableCount });
 
       if (res) {
         return {

@@ -1,8 +1,8 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {Api} from '../../openapi/api';
 
-export const getMyProfile = createAsyncThunk(
-    'user/getMyProfile',
+export const getProfile = createAsyncThunk(
+    'user/getProfile',
     async (_, thunkAPI) => {
         try {
             const response = await Api.user.profile();

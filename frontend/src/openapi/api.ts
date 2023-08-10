@@ -1,8 +1,9 @@
 import {store} from '../store';
 import axios, {AxiosRequestConfig} from 'axios';
-import {sendRefreshAccessToken, setLogout} from '../store/auth/auth.slice';
 import {exportApis} from './generated';
 import {API_URL} from '../common/constants';
+import {refreshAccessToken} from '../store/auth/auth.actions';
+import {setLogout} from '../store/auth/auth.slice';
 
 export const REFRESH_TOKEN_PATH = '/auth/refresh';
 
@@ -28,14 +29,14 @@ export const InitApi = () => {
             if (error.config.url === REFRESH_TOKEN_PATH) return Promise.reject(error);
             if (error.response?.status === 401 && !originalConfig.retry) { // 권한 오류가 발생했고 재실행된(무한루프방지) 경우가 아니라면
                 try {
-                    await store.dispatch(sendRefreshAccessToken());
+                    await store.dispatch(refreshAccessToken());
 
                     originalConfig.headers['Authorization'] = `Bearer ${store.getState().auth.accessToken}`;
                     originalConfig.retry = true; // 아래 내용 처리 이후 해당 요청을 재실행
 
                     return instance(originalConfig);
                 } catch (_error) { // 토큰발급 실패, 로그인정보 초기화 및 로그인창 이동
-                    setLogout();
+                    store.dispatch(setLogout());
                     return Promise.reject(_error);
                 }
             }

@@ -1,52 +1,53 @@
 import React, {useEffect, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {sendMyProfile} from '../../../store/user/user.slice';
 import {AppDispatch, RootState} from '../../../store';
-import {Outlet} from 'react-router-dom';
-import {MemoHeader} from './Header';
-import {MemoAside} from './Aside';
+import {Outlet, useSearchParams} from 'react-router-dom';
+import {Header} from './Header';
+import {Aside} from './Aside';
 import {CategoryIcon} from '../../../assets/vectors';
-import {useHandleQueryStr} from '../../../hooks/useHandleQueryStr';
 import {SearchMemo} from '../components/SearchMemo';
-import {loadAsideData} from '../../../store/memo/memo.slice';
 import {setShowSideNav} from '../../../store/layout/layout.slice';
 import CustomScroller from '../../../common/components/customScroller';
+import {useWindowResize} from '../../../hooks/useWindowResize';
 export const MemoLayout = () => {
-    const { loading } = useSelector((state: RootState) => state.user);
-    const { showMenu } = useSelector((state: RootState) => state.changedMenu);
-    const { cate } = useSelector((state: RootState) => state.memo.data);
-    const { cateQueryStr, menuQueryStr, searchParams } = useHandleQueryStr();
+    const [searchParams] = useSearchParams()
 
-    const dispatch = useDispatch<AppDispatch>();
+    const windowResize = useWindowResize()
 
+    const { loading } = useSelector((state: RootState) => state.user)
+    const { isShowSideNav } = useSelector((state: RootState) => state.layout)
+    const memoState = useSelector((state: RootState) => state.memo)
+
+    const dispatch = useDispatch<AppDispatch>()
+
+    // 사이즈 변화에 따른 사이드 네비게이션 활성화
     useEffect(() => {
-        dispatch(sendMyProfile());
-        loadAsideData();
-    }, [dispatch]);
-
-    // 모바일사이즈로 렌더링되는경우 사이드바 숨기기
-    useEffect(() => {
-        if (window.innerWidth <= 767) dispatch(setShowSideNav(false));
-    },[]);
+        if (windowResize.width <= 767) {
+            if (isShowSideNav) dispatch(setShowSideNav(false))
+        } else {
+            if (!isShowSideNav) dispatch(setShowSideNav(true))
+        }
+    },[windowResize]);
 
     const categoryName = useMemo(() => {
-        if (!cateQueryStr && !menuQueryStr) return '전체메모';
-        else if (menuQueryStr) return '중요메모';
+        const cate = searchParams.get('cate');
+        if (!cate) return '전체메모';
+        else if (cate === 'important') return '중요메모';
         else {
-            const matchCate = cate.find((cate) => Number(cate.id) === Number(cateQueryStr))?.name
+            const matchCate = memoState.cate.list.find((cate) => Number(cate.id) === Number(searchParams.get('cate')))?.name
             if (matchCate) return matchCate;
             return '카테고리가 존재하지않습니다.'
         }
-    }, [searchParams, cate]);
+    }, [searchParams, memoState.cate]);
 
     return loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
         <>
-            <MemoHeader/>
-            <MemoAside/>
+            <Header/>
+            <Aside/>
             <main
-                className={`${ showMenu ? 'pl-[256px] max-md:pl-0' : 'pl-0' }
+                className={`${ isShowSideNav ? 'pl-[256px] max-md:pl-0' : 'pl-0' }
                 flex relative flex-col justify-center h-full text-center items-center pt-[46px]
-                overflow-auto duration-300 ease-in-out`}
+                duration-300 ease-in-out`}
             >
                 <div className='w-full h-full flex relative pt-[46px]'>
                     <header className='flex fixed top-[46px] h-[46px] items-center justify-between w-full ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 pl-16px md:pl-20px'>
@@ -58,7 +59,7 @@ export const MemoLayout = () => {
                             <SearchMemo/>
                         </div>
                     </header>
-                    <div className='w-full h-full bg-zete-light-gray-100 overflow-auto'>
+                    <div className='w-full h-full bg-zete-light-gray-100'>
                         <CustomScroller autoHide={ false }>
                             <Outlet/>
                         </CustomScroller>

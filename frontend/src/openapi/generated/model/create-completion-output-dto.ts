@@ -55,6 +55,6 @@ export interface CreateCompletionOutputDto {
      * @type {number}
      * @memberof CreateCompletionOutputDto
      */
-    'gptDailyLimit'?: number;
+    'usableCount'?: number;
 }
 

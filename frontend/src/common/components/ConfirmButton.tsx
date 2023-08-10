@@ -2,7 +2,6 @@ import React, {Fragment, ReactNode, useEffect, useState} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 import {FuncButton} from './FuncButton';
 import * as DOMPurify from 'dompurify';
-import {stopBubbling} from '../../libs/memo.lib';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     options: {
@@ -16,7 +15,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
         isMatchText?: boolean;
         matchText?: string;
     }
-    children: ReactNode;
+    children?: ReactNode;
 }
 
 export const ConfirmButton = (props: ButtonProps) => {
@@ -50,9 +49,7 @@ export const ConfirmButton = (props: ButtonProps) => {
 
     const handleInput = (e) => setInput(e.target.value);
 
-    useEffect(() => {
-        setInput('');
-    }, [isOpen]);
+    useEffect(() => setInput(''), [isOpen]);
 
     return (
         <>
@@ -79,7 +76,7 @@ export const ConfirmButton = (props: ButtonProps) => {
                     <div
                         className='fixed inset-0 overflow-y-auto'
                         // 부모요소에 걸린 이벤트 상속방지
-                        onClick={ stopBubbling }
+                        onClick={ (e) => e.stopPropagation() }
                     >
                         <div className='flex min-h-full items-center justify-center p-4 text-center'>
                             <Transition.Child
@@ -92,14 +89,14 @@ export const ConfirmButton = (props: ButtonProps) => {
                                 leaveTo='opacity-0 scale-95'
                             >
                                 <Dialog.Panel className='w-full max-w-[320px] transform overflow-hidden rounded-[8px] bg-white align-middle shadow-xl transition-all'>
-                                    <div className='px-[16px] py-[16px]'>
+                                    <div className='px-[16px] py-[20px]'>
                                         <p
                                             className='font-bold text-[18px]'
                                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(props.options.subject) }}
                                         />
                                         {props.options.subtitle && (
                                             <p
-                                                className='font-light text-[15px] text-gray-600 mt-[32px]'
+                                                className='font-light text-[15px] text-gray-600 mt-[20px]'
                                                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(props.options.subtitle) }}
                                             />
                                         )}

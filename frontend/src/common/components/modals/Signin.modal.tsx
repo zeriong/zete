@@ -2,26 +2,25 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
 import {Dialog, Transition } from '@headlessui/react';
-import {setLogin, setLogout } from '../../../store/auth/auth.slice';
-import {setUser} from '../../../store/user/user.slice';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../store';
 import {FuncButton} from '../FuncButton';
 import {Api} from '../../../openapi/api';
 import {LoginInput} from '../../../openapi/generated';
 import {PATTERNS} from '../../constants';
+import {setLogin, setLogout} from '../../../store/auth/auth.slice';
 
 export const SigninModal = () => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL } = PATTERNS;
+    const { loading } = useSelector((state: RootState) => state.auth);
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const { loading } = useSelector((state: RootState) => state.auth);
+    const dispatch = useDispatch<AppDispatch>();
 
     const form = useForm<LoginInput>({ mode: 'onChange' });
 
@@ -36,7 +35,7 @@ export const SigninModal = () => {
         form.reset();
     }
 
-    const handleOnSubmit = form.handleSubmit(async () => {
+    const loginSubmit = form.handleSubmit(async () => {
         await Api.auth.login(form.getValues())
             .then((res) => {
                 if (!res.data.success) {
@@ -44,12 +43,14 @@ export const SigninModal = () => {
                     dispatch(setLogout());
                     return;
                 }
-                dispatch(setLogin(res.data.accessToken));
-                dispatch(setUser(res.data.user));
                 closeModal();
+                dispatch(setLogin(res.data.accessToken));
                 navigate('/memo');
             })
-            .catch((e) => console.log(e));
+            .catch((e) => {
+                setErrorMessage('서버와 통신할 수 없습니다.');
+                console.log(e);
+            });
     });
 
     useEffect(() => {
@@ -92,7 +93,7 @@ export const SigninModal = () => {
                                     </p>
                                     <form
                                         className='flex flex-col mx-auto mt-[32px] gap-y-[16px]'
-                                        onSubmit={ handleOnSubmit }
+                                        onSubmit={ loginSubmit }
                                     >
                                         <div>
                                             <input

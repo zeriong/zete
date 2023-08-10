@@ -1,7 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../store';
 import {Dialog, Transition } from '@headlessui/react';
 import {FuncButton} from '../FuncButton';
@@ -11,15 +11,14 @@ import {PATTERNS} from '../../constants';
 
 
 export const SignupModal = (props: { successControl: React.Dispatch<React.SetStateAction<boolean>> }) => {
-    const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL } = PATTERNS;
+    const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL, INPUT_PHONE } = PATTERNS;
+    const { loading } = useSelector((state: RootState) => state.auth);
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-
-    const { loading } = useSelector((state: RootState) => state.auth);
 
     const form = useForm<CreateAccountInput & { passwordConfirm?: string }>({ mode: 'onChange' });
 
@@ -31,21 +30,21 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
         setSearchParams(searchParams);
     };
 
+    useEffect(() => {
+        if (searchParams.get('modal') === 'sign-up') return setIsShow(true);
+        setIsShow(false);
+    },[searchParams]);
+
     const handleOnSubmit = form.handleSubmit(async () => {
-        await Api.user.createAccount(form.getValues())
+        const { passwordConfirm, ...input } = form.getValues();
+        await Api.user.createAccount(input)
             .then((res) => {
                 if (!res.data.success) return setErrorMessage(res.data.error || '잘못된 접근으로 에러가 발생했습니다.');
-
                 closeModal();
                 props.successControl(true);
             })
             .catch(e => console.log(e));
     });
-
-    useEffect(() => {
-        if (searchParams.get('modal') === 'sign-up') return setIsShow(true);
-        setIsShow(false);
-    },[searchParams]);
 
     return (
         <>
@@ -132,14 +131,14 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                 <div className='mt-[4px] text-red-500 text-[11px] font-normal h-[12px]'>
                                                     {form.formState.errors.password &&
                                                         <div className='relative'>
-                                                            <p>비밀번호는 최소 8자입니다.</p>
-                                                            <h2 className='absolute top-[80%] text-[9px] whitespace-nowrap'>
+                                                            비밀번호는 최소 8자입니다.
+                                                            <div className='absolute top-[80%] text-[9px] whitespace-nowrap'>
                                                                 숫자, 영문, 특수문자
                                                                 <span className='px-[2px] mr-[2px] overflow-hidden font-bold'>
                                                                     @$!%*#?&
                                                                 </span>
                                                                 를 포함해야 합니다.
-                                                            </h2>
+                                                            </div>
                                                         </div>
                                                     }
                                                 </div>
@@ -184,10 +183,10 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                             <input
                                                 {...form.register('mobile', {
                                                     required: true,
-                                                    minLength: 13,
+                                                    minLength: 13, maxLength: 13,
                                                     onChange: (event) => {
                                                         const value = event.target.value.substring(0, 13).replace(/[^0-9]/g, '')
-                                                            .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, '$1-$2-$3').replace(/(-{1,2})$/g, '');
+                                                            .replace(INPUT_PHONE, '$1-$2-$3').replace(/(-{1,2})$/g, '');
                                                         event.target.value = value;
                                                     },
                                                 })}

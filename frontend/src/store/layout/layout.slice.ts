@@ -1,22 +1,22 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 interface IState {
-    showMenu: boolean;
+    isShowSideNav: boolean;
 }
 
 const initState: IState = {
-    showMenu: true,
+    isShowSideNav: true,
 }
 
 export const layoutSlice = createSlice({
     name: 'layout',
     initialState: initState,
     reducers: {
-        toggleSideNav: (state: IState) => {
-            state.showMenu = !state.showMenu;
+        toggleSideNav: (state) => {
+            state.isShowSideNav = !state.isShowSideNav;
         },
-        setShowSideNav: (state: IState, { payload }: PayloadAction<boolean>) => {
-            state.showMenu = payload;
+        setShowSideNav: (state, { payload }: PayloadAction<boolean>) => {
+            state.isShowSideNav = payload;
         },
     },
 });

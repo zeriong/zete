@@ -1,6 +1,12 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {Api} from '../../openapi/api';
-import {ChangeImportantInput, CreateCategoryInput, DeleteCategoryInput, DeleteMemoInput, GetMemoInput, SearchMemosInput, UpdateCategoryInput}from '../../openapi/generated';
+import {
+    ChangeImportantInput,
+    CreateCategoryInput, CreateMemoInput,
+    DeleteCategoryInput,
+    DeleteMemoInput, GetMemoInput,
+    SearchMemosInput, UpdateCategoryInput, UpdateMemoInput
+} from '../../openapi/generated';
 
 /* ========================= 카테고리 ======================== */
 
@@ -97,7 +103,7 @@ export const changeImportant = createAsyncThunk(
     }
 );
 
-export const deleteMemo = createAsyncThunk(
+export const deleteMemoAction = createAsyncThunk(
     'memo/deleteMemo',
     async (input: DeleteMemoInput, thunkAPI) => {
         try {

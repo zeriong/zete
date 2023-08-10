@@ -224,7 +224,9 @@ export class MemoService {
         })
         .getOne();
 
-      return { success: true, memo };
+      if (memo) return { success: true, memo };
+
+      return { success: false };
     } catch (e) {
       this.logger.error(e);
       return { success: false, error: `${e}` };
@@ -271,14 +273,12 @@ export class MemoService {
   async updateMemo(input: UpdateMemoInput, user: User): Promise<UpdateMemoOutput> {
     try {
       if (!input.content && !input.title) return { success: false, error: '메모를 입력해주세요.' };
-
       // 태그 데이터 보정
       const tags: Tag[] = input.tags.map((tag) => ({
         ...tag,
         cate: { id: input.cateId || null },
         user,
       }));
-
       // 기존 데이터와 업데이트 데이터를 비교해 업데이트 데이터에 없는 목록은 삭제
       const prevTags = await this.tagsRepository.find({ where: { memo: { id: input.id }, user: { id: user.id } } });
       const removeTags = prevTags.filter((prevTag) => !tags.some((tag) => tag.id === prevTag.id));
@@ -341,14 +341,14 @@ export class MemoService {
     try {
       const result = await this.memoRepository
         .createQueryBuilder()
-        .update({ isImportant: () => 'NOT important' })
+        .update({ isImportant: () => 'NOT isImportant' })
         .where('id = :id AND userId = :userId', { id: input.id, userId: user.id })
         .execute();
 
       if (result.affected > 0) {
         const totalImportantCount = await this.memoRepository
           .createQueryBuilder()
-          .where('important = :important', { important: true })
+          .where('isImportant = :isImportant', { isImportant: true })
           .getCount();
 
         return { success: true, totalImportantCount };

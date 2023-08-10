@@ -323,12 +323,12 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
         const { onScroll, onScrollFrame } = this.props;
         if (onScroll) onScroll(event);
         this.update((values: any) => {
-            //const { scrollLeft, scrollTop } = values;
-            //this.viewScrollLeft = scrollLeft;
-            //this.viewScrollTop = scrollTop;
+            const { scrollLeft, scrollTop } = values;
+            this.viewScrollLeft = scrollLeft;
+            this.viewScrollTop = scrollTop;
             if (onScrollFrame) onScrollFrame(values);
         });
-        //this.detectScrolling();
+        this.detectScrolling();
     }
 
     handleScrollStart() {
@@ -623,7 +623,7 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
             // Override min/max height for initial universal rendering
             ...((autoHeight && universal && !didMountUniversal) && {
                 minHeight: autoHeightMin,
-                //maxHeight: autoHeightMax
+                maxHeight: autoHeightMax
             }),
             // Override
             ...((universal && !didMountUniversal) && viewStyleUniversalInitial)
@@ -652,9 +652,13 @@ export default class CustomScroller extends Component<Partial<Props>, any> {
             })
         };
 
+        // 터치환경인 경우 customScroller를 해제하고 기본 터치 스크롤을 사용
+        const isTouchScreen = typeof window !== 'undefined' && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        const renderViewClassName = isTouchScreen ? '' : 'customScrollerInner';
+
         return createElement(tagName, { ...props, style: containerStyle, ref: (ref) => { this.container = ref; } }, [
             cloneElement(
-                renderView({ style: viewStyle, className: 'customScrollerInner' }),
+                renderView({ style: viewStyle, className: renderViewClassName }),
                 { key: 'view', ref: (ref: any) => { this.view = ref; } },
                 children
             ),

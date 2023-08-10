@@ -1,33 +1,27 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../../store';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../../store';
 import {AddMemo} from '../components/AddMemo';
 import Masonry from 'react-masonry-css';
-import {useHandleQueryStr} from '../../../hooks/useHandleQueryStr';
 import * as DOMPurify from 'dompurify';
 import {FillStarIcon, StarIcon} from '../../../assets/vectors';
-import {useHorizontalScroll} from '../../../hooks/useHorizontalScroll';
 import {MemoEditModal} from '../components/modals/MemoEdit.modal';
 import {SavedMemoMenuPopover} from '../components/popovers/SavedMemoMenu.popover';
-import {usePaginationObservers} from '../../../hooks/useObservers';
-import {importantConverter, refreshMemos, refreshTargetMemo} from '../../../store/memo/memo.slice';
+import {useSearchParams} from 'react-router-dom';
+import {changeImportant} from '../../../store/memo/memo.actions';
+import {resetMemosReducer} from '../../../store/memo/memo.slice';
+import {HorizontalScroll} from '../../../common/components/HorizontalScroll';
+import {loadMemoList} from '../../../libs/memo.lib';
 
-export const Memo = () => {
-    const intervalRef = useRef<NodeJS.Timeout>(null);
+export const MemoPage = () => {
+    const observer = useRef<IntersectionObserver>(null);
+    const loader = useRef(null);
 
-    const { loading } = useSelector((state: RootState) => (state.user));
-    const { data } = useSelector((state: RootState) => state.memo);
-    const { paginationDivObsRef } = usePaginationObservers();
-    const {
-        modalQueryStr,
-        menuQueryStr,
-        searchParams,
-        cateQueryStr,
-        tagQueryStr,
-        setSearchParams,
-    } = useHandleQueryStr();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const [currentMemoId,setCurrentMemoId] = useState<number>(0);
+    const memoState = useSelector((state: RootState) => state.memo);
+    const dispatch = useDispatch<AppDispatch>();
+
     const [masonryCols] = useState({
         default: 7,
         2544: 6,
@@ -40,115 +34,124 @@ export const Memo = () => {
         610: 1,
     });
 
-    const horizonScroll = useHorizontalScroll();
-
-    // 20분마다 렌더링된 모든 메모상태 최신화
-    const handleInterval = () => {
-        intervalRef.current = setInterval(() => {
-            refreshMemos({
-                offset: 0,
-                limit: data.memos.length,
-                search: '',
-                menuQueryStr,
-                tagQueryStr,
-                cateQueryStr: Number(cateQueryStr) || null,
-            })
-            // 1200000ms = 20min
-        },1200000);
-    }
-
-    const memoModifier = (memoId) => {
-        setCurrentMemoId(memoId);
-        searchParams.set('modal', 'memoModify');
+    const selectMemo = (id) => {
+        searchParams.set('view', id);
         setSearchParams(searchParams);
-        refreshTargetMemo(memoId);
     }
 
-    // 20분마다 데이터 최신화
+    const changeMemoImportant = (memo) => {
+        dispatch(changeImportant({id: memo.id}));
+    }
+
+    const handleObserver = async (entities, observer) => {
+        const target = entities[0];
+        if (target.isIntersecting) await loadMemoList(dispatch, searchParams, false);
+    };
+
+    // deps에 url변경을 카테고리, 태그, 검색에 대해서만 (메모수정인 view 제외)
     useEffect(() => {
-        if (modalQueryStr) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-        } else {
-            clearInterval(intervalRef.current);
-            handleInterval();
+        if (observer.current) {
+            (async () => {
+                observer.current.disconnect();
+                // 옵저버 & 메모리스트 초기화 후 로드
+                await dispatch(resetMemosReducer());
+                await loadMemoList(dispatch, searchParams, false);
+            })();
         }
-    },[searchParams, data]);
+    },[searchParams.get('cate'), searchParams.get('tag'), searchParams.get('search')]);
+
+    useEffect(() => {
+        const options = {
+            root: null, // viewport를 root로 설정
+            rootMargin: '20px', // 타겟의 교차상태를 판단할 때, 타겟의 마진을 추가로 고려
+            threshold: 0.2, // 타겟이 viewport에 20% 이상 보이면 교차상태로 판단 (사용자경험 + 중요메모에는 메모 폼이 없어 위치변경 문제발생을 해결하기 위함.)
+        };
+
+        observer.current = new IntersectionObserver(handleObserver, options);
+
+        if (loader.current) observer.current.observe(loader.current);
+
+        return () => observer && observer.current.disconnect();
+        // deps에 limit와 응답 데이터 개수가 같은 경우 감지하여 실행
+    }, [memoState.memo.pagingEffect]);
 
     return (
-        loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
-            <>
-                <section className='relative top-0 gap-28px w-full p-16px mobile:p-30px'>
-                    {!menuQueryStr && (
-                        <div className='relative flex justify-center mt-6px mb-22px mobile:mb-30px mobile:mt-0'>
-                            <AddMemo/>
-                        </div>
-                    )}
-                    <Masonry
-                        breakpointCols={ masonryCols }
-                        className='my-masonry-grid flex justify-center gap-x-16px mobile:gap-x-30px w-full mobile:w-auto'
-                        columnClassName='my-masonry-grid_column'
-                    >
-                        {data.memos?.map((memo) => (
+        <>
+            <section className='relative top-0 gap-28px w-full p-16px pc:p-30px'>
+                {searchParams.get('cate') !== 'important' && (
+                    <div className='relative flex justify-center mt-6px mb-22px pc:mb-30px pc:mt-0'>
+                        <AddMemo/>
+                    </div>
+                )}
+                <Masonry
+                    breakpointCols={ masonryCols }
+                    className='my-masonry-grid flex justify-center gap-x-16px pc:gap-x-30px w-full pc:w-auto'
+                    columnClassName='my-masonry-grid_column'
+                >
+                    {memoState.memo.list?.map((memo) => (
+                        <div
+                            key={ memo.id }
+                            className='relative w-full'
+                        >
                             <div
-                                key={ memo.id }
-                                className='relative w-full'
+                                className='mb-16px w-full pc:w-[300px] pc:mb-30px flex rounded-[8px] memo-shadow'
+                                onClick={ () => selectMemo(memo.id) }
                             >
-                                <div
-                                    className='mb-16px w-full mobile:w-[300px] mobile:mb-30px flex rounded-[8px] memo-shadow'
-                                    onClick={ () => memoModifier(memo.id) }
+                                <article
+                                    className='relative flex flex-col justify-between border w-full
+                                    border-zete-light-gray-500 rounded-[8px] px-18px pb-[12px] pt-[14px] min-h-[212px] bg-zete-primary-200 break-words'
                                 >
-                                    <article
-                                        className='relative flex flex-col justify-between border w-full
-                                        border-zete-light-gray-500 rounded-[8px] px-18px py-14px min-h-[212px] bg-zete-primary-200'
-                                    >
-                                        {memo.title ? (
-                                            <p
-                                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(memo.title) }}
-                                                className='text-zete-gray-500 font-light text-20 text-start w-full mb-10px pr-30px'
-                                            />
-                                        ) : (
-                                            <p className='min-h-[30px] w-full mb-10px pr-30px'/>
-                                        )}
-                                        <div className='items-end h-full w-full line-clamp-[14]'>
-                                            <p
-                                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(memo.content) }}
-                                                className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
-                                            />
-                                        </div>
-                                        <div className='flex w-full items-center pt-16px pr-26px'>
-                                            <div ref={ horizonScroll } className='flex w-full h-full relative py-4px overflow-y-hidden memo-custom-vertical-scroll'>
-                                                {memo.tag?.map((tag, idx) => (
-                                                    <div key={ idx } className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                                    <div className='flex relative w-full'>
+                                        <p
+                                            dangerouslySetInnerHTML={{ __html: memo.title && DOMPurify.sanitize(memo.title.replace(/\n/g, '<br/>')) }}
+                                            className={`text-zete-gray-500 font-light text-20 text-start w-full mb-10px pr-24px ${!memo.title && 'h-[20px] w-full mb-10px pr-30px'}`}
+                                        />
+                                        {/* 중요메모 버튼 */}
+                                        <button
+                                            type='button'
+                                            className={memo.title ? 'relative flex items-start' : 'absolute right-0'}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                changeMemoImportant(memo);
+                                            }}
+                                        >
+                                            { memo.isImportant ? <FillStarIcon/> : <StarIcon/> }
+                                        </button>
+                                    </div>
+                                    <div className='items-end h-full w-full line-clamp-[14]'>
+                                        <p
+                                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(memo.content).replace(/\n/g, '<br/>') }}
+                                            className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
+                                        />
+                                    </div>
+                                    <div className='w-full flex'>
+                                        <div className='flex w-full items-center pr-[6px] overflow-hidden'>
+                                            <HorizontalScroll>
+                                                <div className='flex w-full h-full relative pt-[8px] pb-[9px] overflow-y-hidden'>
+                                                    {memo.tags?.map((tag, idx) => (
+                                                        <div key={ idx } className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                                         <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
                                                             { tag.name }
                                                         </span>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </HorizontalScroll>
                                         </div>
-                                    </article>
-                                    <div className='absolute bottom-10px right-18px'>
-                                        <SavedMemoMenuPopover memoId={ memo.id }/>
+                                        <div className='relative -bottom-[4px]'>
+                                            <SavedMemoMenuPopover memoId={ memo.id }/>
+                                        </div>
                                     </div>
-                                </div>
-                                <button
-                                    type='button'
-                                    className='absolute top-13px right-14px'
-                                    onClick={ () => importantConverter(memo.id) }
-                                >
-                                    { memo.important ? <FillStarIcon/> : <StarIcon/> }
-                                </button>
+                                </article>
                             </div>
-                        ))}
-                    </Masonry>
-                    <>
-                        <MemoEditModal memoId={ currentMemoId }/>
-                    </>
-                </section>
-                <div className='relative w-full h-1px'>
-                    <div ref={ paginationDivObsRef } className='absolute left-0 bottom-0 w-1px h-[500px]'/>
-                </div>
-            </>
+                        </div>
+                    ))}
+                </Masonry>
+                <MemoEditModal/>
+            </section>
+            <div className='relative'>
+                <div ref={loader} className='absolute left-0 -top-[100px] bottom-0 w-[1px] h-[300px]'/>
+            </div>
+        </>
     )
 }

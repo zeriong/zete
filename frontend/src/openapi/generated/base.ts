@@ -19,17 +19,17 @@ import type { Configuration } from './configuration';
 import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 
-export const BASE_PATH = 'http://localhost'.replace(/\/+$/, '');
+export const BASE_PATH = "http://localhost".replace(/\/+$/, "");
 
 /**
  *
  * @export
  */
 export const COLLECTION_FORMATS = {
-    csv: ',',
-    ssv: ' ',
-    tsv: '\t',
-    pipes: '|',
+    csv: ",",
+    ssv: " ",
+    tsv: "\t",
+    pipes: "|",
 };
 
 /**
@@ -67,6 +67,6 @@ export class BaseAPI {
 export class RequiredError extends Error {
     constructor(public field: string, msg?: string) {
         super(msg);
-        this.name = 'RequiredError'
+        this.name = "RequiredError"
     }
 }

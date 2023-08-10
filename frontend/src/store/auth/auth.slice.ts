@@ -7,7 +7,7 @@ interface IState {
     loading: boolean | undefined;
 }
 
-const initIState: IState = {
+const initState: IState = {
     isLoggedIn: false,
     accessToken: '',
     loading: true,
@@ -15,7 +15,7 @@ const initIState: IState = {
 
 export const authSlice = createSlice({
     name: 'auth',
-    initialState: initIState,
+    initialState: initState,
     reducers: {
         setLogin: (state: IState, { payload }: PayloadAction<string>) => {
             state.accessToken = payload;

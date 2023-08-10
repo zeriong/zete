@@ -1,8 +1,14 @@
 import React, {Fragment} from 'react';
 import {Dialog, Transition } from '@headlessui/react';
+import {useSearchParams} from 'react-router-dom';
 
 export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Dispatch<React.SetStateAction<boolean>> }) => {
-    const closeModal = () => props.setIsShow(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const closeModal = () => {
+        props.setIsShow(false);
+        searchParams.set('modal', 'sign-in');
+        setSearchParams(searchParams);
+    }
 
     return (
         <Transition appear show={ props.isShow } as={ Fragment }>
@@ -18,7 +24,7 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                 >
                     <div className='fixed inset-0 bg-black bg-opacity-40' />
                 </Transition.Child>
-                <section className='fixed inset-0 overflow-y-auto'>
+                <article className='fixed inset-0 overflow-y-auto'>
                     <div className='flex min-h-full items-center justify-center p-4 text-center'>
                         <Transition.Child
                             as={ Fragment }
@@ -29,7 +35,7 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                             leaveFrom='opacity-100 scale-100'
                             leaveTo='opacity-0 scale-95'
                         >
-                            <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-24px md:p-32px text-left align-middle shadow-xl transition-all'>
+                            <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-[24px] md:p-[32px] text-left align-middle shadow-xl transition-all'>
                                 <h1 className='text-[24px] mb-[20px]'>
                                     회원가입 성공!
                                 </h1>
@@ -46,7 +52,7 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                             </Dialog.Panel>
                         </Transition.Child>
                     </div>
-                </section>
+                </article>
             </Dialog>
         </Transition>
     );

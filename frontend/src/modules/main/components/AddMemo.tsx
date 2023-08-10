@@ -7,7 +7,7 @@ import {showAlert} from '../../../store/alert/alert.slice';
 import {CreateMemoInput, Memo} from '../../../openapi/generated';
 import {setDynamicInputWidth, setDynamicTextareaHeight} from '../../../libs/common.lib';
 import {useSearchParams} from 'react-router-dom';
-import {deleteMemoTag, getCategoryId, handleAddMemoTagSubmit} from '../../../libs/memo.lib';
+import {deleteMemoTag, getCategoryId, handleAddMemoTagSubmit, handleFormSubmit} from '../../../libs/memo.lib';
 import {useOutsideClick} from '../../../hooks/useOutsideClick';
 import {AskAI} from './AskAI';
 import {HorizontalScroll} from '../../../common/components/HorizontalScroll';
@@ -89,25 +89,15 @@ export const AddMemo = () => {
         }
         // 내용이 있는경우 idle일때 저장하기 때문에 3초로 통신주기를 줄임
         if (saveDelayTimer.current == null) {
-            saveDelayTimer.current = setTimeout(async () => {
+            saveDelayTimer.current = setTimeout( async () => {
                 if (isSavingMemo.current) tryMemoSave();  // 저장중이라면 연기
                 else await saveMemo();  // 저장
             }, 3000);
         }
     };
 
-    const handleFormSubmit = (event) => {
-        event.preventDefault();
-        // 제목에서 enter 시 내용으로 이동
-        const input = event.target[2];
-        input.focus();
-    };
-
     // 입력폼 이외 영역 클릭 감지
-    useOutsideClick(panelRef, () => {
-        setFormMode('idle');
-        console.log('폼영역 외 클릭 감지!!');
-    });
+    useOutsideClick(panelRef, () => setFormMode('idle'));
 
     // 폼 입력 감지
     useEffect(() => {
@@ -130,8 +120,8 @@ export const AddMemo = () => {
                 // 메모 내용이 존재하는경우 메모 즉시저장
                 if (data.title?.length > 0 || data.content?.length > 0) {
                     await saveMemo();
-                    // 생성한 메모 카테고리가 현재 카테고리와 같은 경우만 보여줌
-                    if (Number(searchParams.get('cate')) === data.cateId) {
+                    // 생성한 메모 카테고리가 현재 카테고리와 같거나 전체메모인 경우만 메모 렌더링
+                    if (Number(searchParams.get('cate')) === data.cateId || !searchParams.get('cate')) {
                         dispatch(saveMemoReducer(savedMemo.current));
                     }
                     // 카테고리 최신화
@@ -157,7 +147,7 @@ export const AddMemo = () => {
                 className={`flex flex-col transition-all duration-300 px-[18px] pb-[10px] pt-[12px] memo-shadow
                     ${formMode === 'askAI' ? 'rounded-t-[8px] bg-white border-t-[10px] border-x-[10px] border-zete-gpt-100'
                     : 'border border-zete-light-gray-500 rounded-[8px] bg-zete-primary-200'}`}
-            ><div onClick={() => console.log(memoState.cate)} >text</div>
+            >
                 <form onSubmit={ handleFormSubmit } className='w-full'>
                     {formMode !== 'idle' && (
                         <div className='flex justify-between items-center overflow-hidden pb-[16px]'>
@@ -169,7 +159,7 @@ export const AddMemo = () => {
                                 tabIndex={ 1 }
                                 placeholder='제목'
                                 className='resize-none w-full pr-[6px] max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500
-                                    font-light placeholder:text-[15px] memo-custom-scroll'
+                                font-light placeholder:text-[15px] memo-custom-scroll'
                             />
                             <button
                                 type='button'
@@ -210,11 +200,11 @@ export const AddMemo = () => {
                     </div>
                 </form>
                 {formMode !== 'idle' && (
-                    <div className={ `w-full` }>
+                    <div className='w-full'>
                         <HorizontalScroll>
-                            <div className='flex w-full h-full relative pb-[8px] overflow-y-hidden'>
+                            <div className='flex w-full h-full relative pt-[8px] pb-[9px] overflow-y-hidden'>
                                 {form.watch('tags')?.map((tag, idx) => (
-                                    <div key={ idx } className='relative flex items-center pl-[9px] pr-[21px] py-[1px] mr-[4px] rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                                    <div key={ idx } className='relative flex items-center pl-[9px] pr-[21px] py-[1px] mr-[4px] rounded-[4px] bg-black/10 cursor-default'>
                                         <span className='font-light text-[11px] text-zete-dark-400 whitespace-nowrap'>
                                             { tag.name }
                                         </span>
@@ -255,13 +245,11 @@ export const AddMemo = () => {
                                         <option value={ 0 }>
                                             전체메모
                                         </option>
-                                        {
-                                            memoState.cate.list.map((cate, idx) => (
-                                                <option key={ idx } value={ cate.id }>
-                                                    { cate.name }
-                                                </option>
-                                            ))
-                                        }
+                                        {memoState.cate.list.map((cate, idx) => (
+                                            <option key={ idx } value={ cate.id }>
+                                                { cate.name }
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                                 <button
