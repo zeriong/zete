@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, useEffect} from 'react';
 import {Dialog, Transition } from '@headlessui/react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -9,6 +9,10 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
         searchParams.set('modal', 'sign-in');
         setSearchParams(searchParams);
     }
+
+    useEffect(() => {
+        props.setIsShow(true);
+    },[])
 
     return (
         <Transition appear show={ props.isShow } as={ Fragment }>
@@ -24,8 +28,8 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                 >
                     <div className='fixed inset-0 bg-black bg-opacity-40' />
                 </Transition.Child>
-                <article className='fixed inset-0 overflow-y-auto'>
-                    <div className='flex min-h-full items-center justify-center p-4 text-center'>
+                <article className='fixed inset-0'>
+                    <div className='flex h-full items-center justify-center p-[16px]'>
                         <Transition.Child
                             as={ Fragment }
                             enter='ease-out duration-300'
@@ -35,12 +39,12 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                             leaveFrom='opacity-100 scale-100'
                             leaveTo='opacity-0 scale-95'
                         >
-                            <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-[24px] md:p-[32px] text-left align-middle shadow-xl transition-all'>
+                            <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-[8px] bg-white p-[24px] md:p-[32px] text-left shadow-xl'>
                                 <h1 className='text-[24px] mb-[20px]'>
                                     회원가입 성공!
                                 </h1>
                                 <h2 className='mb-[24px]'>
-                                    Zeriong Kepp 서비스를 무료로 이용해보세요.
+                                    Zete의 메모서비스를 무료로 이용해보세요.
                                 </h2>
                                 <button
                                     type='button'

@@ -6,8 +6,8 @@ import {CategoryEditModal} from '../components/modals/CategoryEdit.modal';
 import {Link, To, useSearchParams} from 'react-router-dom';
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from '../../../assets/vectors';
 import {Tag} from '../../../openapi/generated';
-import {toggleSideNav} from '../../../store/layout/layout.slice';
-import {getCategories} from '../../../store/memo/memo.actions';
+import {toggleSideNavReducer} from '../../../store/layout/layout.slice';
+import {getCategoriesAction} from '../../../store/memo/memo.actions';
 
 export const Aside = () => {
     const { isShowSideNav } = useSelector((state: RootState) => (state.layout));
@@ -17,13 +17,13 @@ export const Aside = () => {
 
     useEffect(() => {
         // 카테고리 목록 로드
-        dispatch(getCategories())
+        dispatch(getCategoriesAction())
     }, [])
 
     return (
         <>
             <section
-                onClick={() => dispatch(toggleSideNav())}
+                onClick={() => dispatch(toggleSideNavReducer())}
                 className={`z-50 w-full h-full left-0 top-0 fixed bg-black opacity-0 hidden max-md:block ease-in-out duration-300
                 ${ isShowSideNav ? 'opacity-50 visible' : 'opacity-0 invisible' }`}
             />

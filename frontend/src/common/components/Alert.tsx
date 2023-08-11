@@ -1,13 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState, store} from '../../store';
-import {DELETE_ALERT, IAlertObject} from '../../store/alert/alert.slice';
+import {deleteAlertReducer, IAlertObject} from '../../store/alert/alert.slice';
 import {AlarmIcon} from '../../assets/vectors';
 
 export const Alert = () => {
     const alarm = useRef<HTMLDivElement>(null);
-
-    const { alerts } = useSelector((state:RootState) => state.alert);
 
     const [alert, setAlert] = useState<IAlertObject>({ message: '' });
     const [isShow, setIsShow] = useState(false);
@@ -15,6 +13,7 @@ export const Alert = () => {
     const [isRender, setIsRender] = useState(false);
 
     const dispatch = useDispatch();
+    const { alerts } = useSelector((state:RootState) => state.alert);
 
     const showAlert = () => {
         setIsRender(true);
@@ -29,7 +28,7 @@ export const Alert = () => {
                 setIsShow(false);
 
                 setTimeout(() => {
-                    dispatch(DELETE_ALERT());
+                    dispatch(deleteAlertReducer());
                     setIsRunning(false);
                     showAlert();
                     alarm.current.style.display = 'none';
@@ -52,11 +51,11 @@ export const Alert = () => {
             {!isRender ? <div ref={ alarm }/> :
                 <div
                     ref={ alarm }
-                    className={`bg-black/90 flex items-center justify-center fixed h-40px pl-20px pr-26px py-30px z-[200] left-26px
-                    rounded-[4px] transition-all duration-300 ease-in-out ${ isShow ? 'bottom-26px opacity-100' : 'opacity-0 bottom-0' }`}
+                    className={`bg-black/90 flex items-center justify-center fixed h-[40px] pl-[20px] pr-[26px] py-[30px] z-[200] left-[26px]
+                    rounded-[4px] transition-all duration-300 ease-in-out ${ isShow ? 'bottom-[26px] opacity-100' : 'opacity-0 bottom-0' }`}
                 >
-                    <div className='mr-6px'>
-                        <AlarmIcon className='fill-white h-22px'/>
+                    <div className='mr-[6px]'>
+                        <AlarmIcon className='fill-white h-[22px]'/>
                     </div>
                     <span className='w-full font-normal text-white'>
                         { alert.message }

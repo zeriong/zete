@@ -62,3 +62,4 @@ export const setDynamicInputWidth = (target) => {
         target.style.width = target.scrollWidth + 'px';
     }
 }
+

@@ -3,16 +3,15 @@ import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../store';
 import {GiHamburgerMenu} from '@react-icons/all-files/gi/GiHamburgerMenu';
-import { logout } from '../../../store/auth/auth.actions';
+import { logoutAction } from '../../../store/auth/auth.actions';
 
 export const HomeNav = ()=> {
-    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
-    const userState = useSelector((state: RootState) => state.user.data);
-
     const [searchParams, setSearchParams] = useSearchParams();
     const [openMenu, setOpenMenu]= useState(false);
 
     const dispatch = useDispatch<AppDispatch>();
+    const userState = useSelector((state: RootState) => state.user.data);
+    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
 
     const menuNames: { name: string, to: string }[] = [
         { name: '서비스', to: '/service' },
@@ -36,22 +35,19 @@ export const HomeNav = ()=> {
         setSearchParams(searchParams);
     }
 
-    const handleLogout = () => {
-        dispatch(logout());
+    const logout = () => {
+        dispatch(logoutAction());
         setOpenMenu(false);
     }
 
     return (
-        <nav
-            className='flex justify-between max-lg:h-[48px] max-lg:px-[20px] items-center px-[40px] py-[12px] border-b border-gray-300
-            whitespace-nowrap fixed bg-white w-full z-30'
-        >
+        <nav className='flex justify-between max-lg:h-[48px] px-[20px] items-center pc:px-[40px] py-[12px] border-b border-gray-300 whitespace-nowrap fixed bg-white w-full z-30'>
             <section
                 onClick={ () => setOpenMenu(false) }
                 className={`transition-all ease-in-out fixed w-full h-full bg-black opacity-0 left-0 top-0 duration-300 z-30
                 ${openMenu ? 'opacity-50 visible' : 'opacity-0 invisible'}`}
             />
-            <Link to='/' className='font-bold max-lg:text-lg text-[20px] mr-48px'>
+            <Link to='/' className='font-bold max-lg:text-[18px] text-[20px] mr-[48px]'>
                 Zete!
             </Link>
             <section
@@ -60,7 +56,7 @@ export const HomeNav = ()=> {
                 ${openMenu ? 'right-0' : '-right-[260px]'}`}
             >
                 <div className='max-lg:block hidden font-bold border-b border-b-orange-200 pb-[20px] pl-[8px]'>
-                    <div className='text-xl mb-[8px] text-gray-700'>{ isLoggedIn ? `${userState.name}님` : '로그인해주세요.' }</div>
+                    <div className='text-xl mb-[8px] text-gray-700'>{ isLoggedIn ? `${ userState.name }님` : '로그인해주세요.' }</div>
                     {isLoggedIn ? (
                         <>
                             <Link to='memo' className='flex ml-[12px] w-full text-orange-700 hover:scale-110 ease-in-out duration-150 py-[4px] px-[8px] hover:text-orange-900'>
@@ -69,7 +65,7 @@ export const HomeNav = ()=> {
                             <button
                                 type='button'
                                 className={ mobileSideBarButtonStyle }
-                                onClick={ handleLogout }
+                                onClick={ logout }
                             >
                                 로그아웃
                             </button>
@@ -128,7 +124,7 @@ export const HomeNav = ()=> {
                     </Link>
                     <button
                         type='button'
-                        onClick={ handleLogout }
+                        onClick={ logout }
                         className={ mobileHeaderButtonStyle + 'border border-gray-500' }
                     >
                         로그아웃

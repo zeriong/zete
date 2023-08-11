@@ -10,8 +10,8 @@ import {
 
 /* ========================= 카테고리 ======================== */
 
-export const getCategories = createAsyncThunk(
-    'memo/getCategories',
+export const getCategoriesAction = createAsyncThunk(
+    'memo/getCategoriesAction',
     async (_, thunkAPI) => {
         try {
             const response = await Api.memo.getCategories();
@@ -25,8 +25,8 @@ export const getCategories = createAsyncThunk(
     }
 );
 
-export const createCategory = createAsyncThunk(
-    'memo/createCategory',
+export const createCategoryAction = createAsyncThunk(
+    'memo/createCategoryAction',
     async (input: CreateCategoryInput, thunkAPI) => {
         try {
             const response = await Api.memo.createCategory(input);
@@ -40,8 +40,8 @@ export const createCategory = createAsyncThunk(
     }
 );
 
-export const updateCategory = createAsyncThunk(
-    'memo/updateCategory',
+export const updateCategoryAction = createAsyncThunk(
+    'memo/updateCategoryAction',
     async (input: UpdateCategoryInput, thunkAPI) => {
         try {
             const response = await Api.memo.updateCategory(input);
@@ -55,8 +55,8 @@ export const updateCategory = createAsyncThunk(
     }
 );
 
-export const deleteCategory = createAsyncThunk(
-    'memo/deleteCategory',
+export const deleteCategoryAction = createAsyncThunk(
+    'memo/deleteCategoryAction',
     async (input: DeleteCategoryInput, thunkAPI) => {
         try {
             const response = await Api.memo.deleteCategory(input);
@@ -72,8 +72,8 @@ export const deleteCategory = createAsyncThunk(
 
 /* ========================= 메모 ======================== */
 
-export const searchMemos = createAsyncThunk(
-    'memo/searchMemos',
+export const searchMemosAction = createAsyncThunk(
+    'memo/searchMemosAction',
     async (input: { data: SearchMemosInput,  refresh?: boolean }, thunkAPI) => {
         try {
             /** 변경사항 = refresh타입 추가하여 리프레쉬인 경우와 아닌 경우 상태관리 다르게 함 */
@@ -88,8 +88,8 @@ export const searchMemos = createAsyncThunk(
     }
 );
 
-export const changeImportant = createAsyncThunk(
-    'memo/changeImportant',
+export const changeImportantAction = createAsyncThunk(
+    'memo/changeImportantAction',
     async (input: ChangeImportantInput, thunkAPI) => {
         try {
             const response = await Api.memo.changeImportant(input);
@@ -104,7 +104,7 @@ export const changeImportant = createAsyncThunk(
 );
 
 export const deleteMemoAction = createAsyncThunk(
-    'memo/deleteMemo',
+    'memo/deleteMemoAction',
     async (input: DeleteMemoInput, thunkAPI) => {
         try {
             const response = await Api.memo.deleteMemo(input);
@@ -118,8 +118,8 @@ export const deleteMemoAction = createAsyncThunk(
     }
 );
 
-export const getMemo = createAsyncThunk(
-    'memo/getMemo',
+export const getMemoAction = createAsyncThunk(
+    'memo/getMemoAction',
     async (input: GetMemoInput, thunkAPI) => {
         try {
             const response = await Api.memo.getMemo(input);

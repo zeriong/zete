@@ -111,7 +111,7 @@ export const ProfileEditPage = () => {
                     <input
                         {...form.register('mobile', {
                             required: true,
-                            minLength: 13, maxLength: 13,
+                            minLength: 13, maxLength: 14,
                             onChange: (event) => {
                                 const value = event.target.value.substring(0, 13).replace(/[^0-9]/g, '')
                                     .replace(INPUT_PHONE, '$1-$2-$3').replace(/(-{1,2})$/g, '');

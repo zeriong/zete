@@ -30,10 +30,8 @@ export const ConfirmButton = (props: ButtonProps) => {
 
     const buttonPropsOptions = Object.fromEntries(Object.entries(props).filter(([key]) => key !== 'options'));
 
-    const handleFuncButtonOnClick = () => {
-        if (props.options.confirmCallback) {
-            props.options.confirmCallback();
-        }
+    const funcButtonOnClick = () => {
+        if (props.options.confirmCallback) props.options.confirmCallback();
         closeModal();
     }
 
@@ -46,8 +44,6 @@ export const ConfirmButton = (props: ButtonProps) => {
         if (!props.options.setForeignSetOpen) return setIsOpen(true);
         props.options.setForeignSetOpen(true);
     }
-
-    const handleInput = (e) => setInput(e.target.value);
 
     useEffect(() => setInput(''), [isOpen]);
 
@@ -74,11 +70,11 @@ export const ConfirmButton = (props: ButtonProps) => {
                         <div className='fixed inset-0 bg-black/40'/>
                     </Transition.Child>
                     <div
-                        className='fixed inset-0 overflow-y-auto'
+                        className='fixed inset-0'
                         // 부모요소에 걸린 이벤트 상속방지
                         onClick={ (e) => e.stopPropagation() }
                     >
-                        <div className='flex min-h-full items-center justify-center p-4 text-center'>
+                        <div className='flex min-h-full items-center justify-center p-[16px] text-center'>
                             <Transition.Child
                                 as={Fragment}
                                 enter='ease-out duration-300'
@@ -88,7 +84,7 @@ export const ConfirmButton = (props: ButtonProps) => {
                                 leaveFrom='opacity-100 scale-100'
                                 leaveTo='opacity-0 scale-95'
                             >
-                                <Dialog.Panel className='w-full max-w-[320px] transform overflow-hidden rounded-[8px] bg-white align-middle shadow-xl transition-all'>
+                                <Dialog.Panel className='max-w-[320px] overflow-hidden rounded-[8px] bg-white shadow-xl'>
                                     <div className='px-[16px] py-[20px]'>
                                         <p
                                             className='font-bold text-[18px]'
@@ -101,22 +97,22 @@ export const ConfirmButton = (props: ButtonProps) => {
                                             />
                                         )}
                                         {Boolean(props.options.isMatchText) && (
-                                            <div className='mt-[12px]'>
-                                                <p className='text-[11px] text-gray-500 text-opacity-90 pl-[2px] mb-[2px]'>
+                                            <fieldset className='mt-[12px]'>
+                                                <legend className='text-[11px] text-gray-500 text-opacity-90 pl-[2px] mb-[2px]'>
                                                     {`아래 입력창에 '${ props.options.matchText }'를 입력해주세요`}
-                                                </p>
+                                                </legend>
                                                 <input
                                                     value={ input }
-                                                    onChange={ handleInput }
+                                                    onChange={ (e) => setInput(e.target.value) }
                                                     placeholder={ props.options.matchText }
                                                     className='w-full text-center border border-gray-300 rounded-[6px] px-[8px] py-[4px] placeholder:text-gray-400/80 placeholder:font-light'
                                                 />
-                                            </div>
+                                            </fieldset>
                                         )}
                                     </div>
                                     <div className='grid grid-cols-2 text-[14px] font-medium'>
                                         <FuncButton
-                                            onClick={ handleFuncButtonOnClick }
+                                            onClick={ funcButtonOnClick }
                                             options={ funcButtonOptions }
                                             type='button'
                                             className={`py-[12px] ${ props.options.isNegative ? 'bg-red-500/80 text-white' : 'bg-blue-500/90 text-white' }`}

@@ -1,7 +1,7 @@
 import {showAlert} from '../store/alert/alert.slice';
 import {isIntegerString} from './common.lib';
 import {store} from '../store';
-import {searchMemos} from '../store/memo/memo.actions';
+import {searchMemosAction} from '../store/memo/memo.actions';
 import {MEMO_LIST_REQUEST_LIMIT} from '../common/constants';
 
 
@@ -17,7 +17,7 @@ export const deleteMemoTag = (form, name) => {
 }
 
 // 태그 추가
-export const handleAddMemoTagSubmit = (event, form) => {
+export const addMemoTagSubmit = (event, form) => {
     event.preventDefault();
 
     const input = event.target[0];
@@ -34,7 +34,7 @@ export const handleAddMemoTagSubmit = (event, form) => {
 }
 
 // 제목 인풋에서 enter시 내용으로 이동
-export const handleFormSubmit = (event) => {
+export const focusToContent = (event) => {
     event.preventDefault();
     // 제목 -> 내용 포커싱
     const input = event.target[2];
@@ -42,7 +42,7 @@ export const handleFormSubmit = (event) => {
 };
 
 // 메모리스트 로드
-export const loadMemoList = (dispatch, searchParams, refresh) => {
+export const loadMemos = (dispatch, searchParams, refresh) => {
     const memoState = store.getState().memo.memo;
     const cateState = store.getState().memo.cate;
 
@@ -64,7 +64,7 @@ export const loadMemoList = (dispatch, searchParams, refresh) => {
     }
 
     if (!memoState.isLoading && (memoState.totalCount === -1 || memoState.offset < memoCount)) {
-        dispatch(searchMemos({
+        dispatch(searchMemosAction({
             data: {
                 // 검색어가 있다면 카테고리, 태그 미적용
                 cate: searchParam ? undefined : cateParam,

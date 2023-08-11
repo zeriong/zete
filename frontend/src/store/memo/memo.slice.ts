@@ -3,14 +3,14 @@ import {CategoryDto,
     Memo,
 } from '../../openapi/generated';
 import {
-    changeImportant,
-    createCategory,
-    updateCategory,
-    deleteCategory,
+    changeImportantAction,
+    createCategoryAction,
+    updateCategoryAction,
+    deleteCategoryAction,
     deleteMemoAction,
-    getCategories,
-    getMemo,
-    searchMemos,
+    getCategoriesAction,
+    getMemoAction,
+    searchMemosAction,
 } from './memo.actions';
 import {MEMO_LIST_REQUEST_LIMIT} from '../../common/constants';
 
@@ -74,7 +74,7 @@ export const memoSlice = createSlice({
         /* ======================= 카테고리 ====================== */
 
         // 카테고리 목록
-        builder.addCase(getCategories.fulfilled, (state, { payload: data }) => {
+        builder.addCase(getCategoriesAction.fulfilled, (state, { payload: data }) => {
             if (data.success) {
                 state.cate.list = data.list.sort((a, b) => a.name > b.name ? 1 : -1);
                 state.cate.totalMemoCount = data.totalMemoCount;
@@ -83,7 +83,7 @@ export const memoSlice = createSlice({
         });
 
         // 카테고리 생성
-        builder.addCase(createCategory.fulfilled, (state, { payload: data }) => {
+        builder.addCase(createCategoryAction.fulfilled, (state, { payload: data }) => {
             if (data.success) {
                 state.cate.list = [...state.cate.list, data.savedCate]
                     .sort((a, b) => a.name > b.name ? 1 : -1);
@@ -91,7 +91,7 @@ export const memoSlice = createSlice({
         });
 
         // 카테고리 업데이트
-        builder.addCase(updateCategory.fulfilled, (state, { payload: data, meta }) => {
+        builder.addCase(updateCategoryAction.fulfilled, (state, { payload: data, meta }) => {
             const input = meta.arg;
             if (data.success) {
                 state.cate.list = state.cate.list.map((cate) => {
@@ -105,7 +105,7 @@ export const memoSlice = createSlice({
         });
 
         // 카테고리 삭제
-        builder.addCase(deleteCategory.fulfilled, (state, { payload: data, meta }) => {
+        builder.addCase(deleteCategoryAction.fulfilled, (state, { payload: data, meta }) => {
             const input = meta.arg;
             if (data.success) {
                 state.cate.list = data.list.sort((a, b) => a.name > b.name ? 1 : -1);
@@ -119,10 +119,10 @@ export const memoSlice = createSlice({
         /* ======================= 메모 ====================== */
 
         // 메모 목록 검색
-        builder.addCase(searchMemos.pending, (state) => {
+        builder.addCase(searchMemosAction.pending, (state) => {
             state.memo.isLoading = true;
         });
-        builder.addCase(searchMemos.fulfilled, (state, { payload: data, meta }) => {
+        builder.addCase(searchMemosAction.fulfilled, (state, { payload: data, meta }) => {
             const refresh = meta.arg.refresh;
             if (!data.success) return;
             if (refresh) {
@@ -150,12 +150,12 @@ export const memoSlice = createSlice({
                 state.memo.isLoading = false;
             }
         });
-        builder.addCase(searchMemos.rejected, (state) => {
+        builder.addCase(searchMemosAction.rejected, (state) => {
             state.memo.isLoading = false;
         });
 
         // 중요메모 설정
-        builder.addCase(changeImportant.fulfilled, (state, { payload: data, meta }) => {
+        builder.addCase(changeImportantAction.fulfilled, (state, { payload: data, meta }) => {
             const input = meta.arg;
             if (data.success) {
                 state.memo.list = state.memo.list.map((memo) => {

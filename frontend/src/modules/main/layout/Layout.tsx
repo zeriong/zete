@@ -6,7 +6,7 @@ import {Header} from './Header';
 import {Aside} from './Aside';
 import {CategoryIcon} from '../../../assets/vectors';
 import {SearchMemo} from '../components/SearchMemo';
-import {setShowSideNav} from '../../../store/layout/layout.slice';
+import {setShowSideNavReducer} from '../../../store/layout/layout.slice';
 import CustomScroller from '../../../common/components/customScroller';
 import {useWindowResize} from '../../../hooks/useWindowResize';
 export const MemoLayout = () => {
@@ -23,9 +23,9 @@ export const MemoLayout = () => {
     // 사이즈 변화에 따른 사이드 네비게이션 활성화
     useEffect(() => {
         if (windowResize.width <= 767) {
-            if (isShowSideNav) dispatch(setShowSideNav(false))
+            if (isShowSideNav) dispatch(setShowSideNavReducer(false))
         } else {
-            if (!isShowSideNav) dispatch(setShowSideNav(true))
+            if (!isShowSideNav) dispatch(setShowSideNavReducer(true))
         }
     },[windowResize]);
 

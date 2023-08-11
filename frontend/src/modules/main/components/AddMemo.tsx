@@ -7,13 +7,13 @@ import {showAlert} from '../../../store/alert/alert.slice';
 import {CreateMemoInput, Memo} from '../../../openapi/generated';
 import {setDynamicInputWidth, setDynamicTextareaHeight} from '../../../libs/common.lib';
 import {useSearchParams} from 'react-router-dom';
-import {deleteMemoTag, getCategoryId, handleAddMemoTagSubmit, handleFormSubmit} from '../../../libs/memo.lib';
+import {deleteMemoTag, getCategoryId, addMemoTagSubmit, focusToContent} from '../../../libs/memo.lib';
 import {useOutsideClick} from '../../../hooks/useOutsideClick';
 import {AskAI} from './AskAI';
 import {HorizontalScroll} from '../../../common/components/HorizontalScroll';
 import {Api} from '../../../openapi/api';
 import {saveMemoReducer} from '../../../store/memo/memo.slice';
-import {getCategories} from '../../../store/memo/memo.actions';
+import {getCategoriesAction} from '../../../store/memo/memo.actions';
 
 export const AddMemo = () => {
     const panelRef = useRef<HTMLDivElement>(null);
@@ -125,7 +125,7 @@ export const AddMemo = () => {
                         dispatch(saveMemoReducer(savedMemo.current));
                     }
                     // 카테고리 최신화
-                    dispatch(getCategories());
+                    dispatch(getCategoriesAction());
                 }
                 resetForm();
             })();
@@ -148,7 +148,7 @@ export const AddMemo = () => {
                     ${formMode === 'askAI' ? 'rounded-t-[8px] bg-white border-t-[10px] border-x-[10px] border-zete-gpt-100'
                     : 'border border-zete-light-gray-500 rounded-[8px] bg-zete-primary-200'}`}
             >
-                <form onSubmit={ handleFormSubmit } className='w-full'>
+                <form onSubmit={ focusToContent } className='w-full'>
                     {formMode !== 'idle' && (
                         <div className='flex justify-between items-center overflow-hidden pb-[16px]'>
                             <input
@@ -218,7 +218,7 @@ export const AddMemo = () => {
                                 ))}
                                 <form
                                     onSubmit={ (event) => {
-                                        handleAddMemoTagSubmit(event, form);
+                                        addMemoTagSubmit(event, form);
                                         setDynamicInputWidth(event.target[0]);
                                     }}
                                     className='relative flex items-center text-zete-dark-400 text-[12px]'

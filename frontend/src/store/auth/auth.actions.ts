@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {Api} from '../../openapi/api';
 
-export const logout = createAsyncThunk(
+export const logoutAction = createAsyncThunk(
     'user/logout',
     async (_, thunkAPI) => {
         try {
@@ -17,7 +17,7 @@ export const logout = createAsyncThunk(
     }
 );
 
-export const refreshAccessToken = createAsyncThunk(
+export const refreshAccessTokenAction = createAsyncThunk(
     'user/refreshToken',
     async (_, thunkAPI) => {
         try {

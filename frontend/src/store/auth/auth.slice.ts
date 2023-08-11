@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {logout, refreshAccessToken} from './auth.actions';
+import {logoutAction, refreshAccessTokenAction} from './auth.actions';
 
 interface IState {
     isLoggedIn: boolean;
@@ -17,18 +17,18 @@ export const authSlice = createSlice({
     name: 'auth',
     initialState: initState,
     reducers: {
-        setLogin: (state: IState, { payload }: PayloadAction<string>) => {
+        setLoginReducer: (state: IState, { payload }: PayloadAction<string>) => {
             state.accessToken = payload;
             state.isLoggedIn = true;
         },
-        setLogout: (state: IState) => {
+        setLogoutReducer: (state: IState) => {
             state.accessToken = '';
             state.isLoggedIn = false;
         },
     },
     extraReducers: (builder) => {
         // refreshToken
-        builder.addCase(refreshAccessToken.fulfilled, (state: IState, { payload }) => {
+        builder.addCase(refreshAccessTokenAction.fulfilled, (state: IState, { payload }) => {
             if (payload.success) {
                 state.isLoggedIn = true;
                 state.accessToken = payload.accessToken;
@@ -38,11 +38,11 @@ export const authSlice = createSlice({
             }
             state.loading = false;
         });
-        builder.addCase(refreshAccessToken.rejected, (state: IState) => {
+        builder.addCase(refreshAccessTokenAction.rejected, (state: IState) => {
             state.loading = false;
         });
         // logout
-        builder.addCase(logout.fulfilled, (state: IState, { payload }) => {
+        builder.addCase(logoutAction.fulfilled, (state: IState, { payload }) => {
             if (payload.success) {
                 state.isLoggedIn = false;
                 state.accessToken = '';
@@ -51,4 +51,4 @@ export const authSlice = createSlice({
     }
 });
 
-export const { setLogin, setLogout } = authSlice.actions;
+export const { setLoginReducer, setLogoutReducer } = authSlice.actions;

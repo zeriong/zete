@@ -8,11 +8,11 @@ import {FuncButton} from '../FuncButton';
 import {Api} from '../../../openapi/api';
 import {LoginInput} from '../../../openapi/generated';
 import {PATTERNS} from '../../constants';
-import {setLogin, setLogout} from '../../../store/auth/auth.slice';
+import {setLoginReducer, setLogoutReducer} from '../../../store/auth/auth.slice';
+import {VisibilityOff, VisibilityOn} from '../../../assets/vectors';
 
 export const SigninModal = () => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL } = PATTERNS;
-    const { loading } = useSelector((state: RootState) => state.auth);
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState(false);
@@ -21,6 +21,7 @@ export const SigninModal = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
+    const { loading } = useSelector((state: RootState) => state.auth);
 
     const form = useForm<LoginInput>({ mode: 'onChange' });
 
@@ -40,11 +41,11 @@ export const SigninModal = () => {
             .then((res) => {
                 if (!res.data.success) {
                     setErrorMessage(res.data.error);
-                    dispatch(setLogout());
+                    dispatch(setLogoutReducer());
                     return;
                 }
                 closeModal();
-                dispatch(setLogin(res.data.accessToken));
+                dispatch(setLoginReducer(res.data.accessToken));
                 navigate('/memo');
             })
             .catch((e) => {
@@ -74,7 +75,7 @@ export const SigninModal = () => {
                         <div className='fixed inset-0 bg-black bg-opacity-40' />
                     </Transition.Child>
                     <div className='fixed inset-0 overflow-y-auto'>
-                        <div className='flex min-h-full items-center justify-center p-4 text-center'>
+                        <div className='flex min-h-full items-center justify-center p-[16px]'>
                             <Transition.Child
                                 as={ Fragment }
                                 enter='ease-out duration-300'
@@ -84,15 +85,15 @@ export const SigninModal = () => {
                                 leaveFrom='opacity-100 scale-100'
                                 leaveTo='opacity-0 scale-95'
                             >
-                                <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-[24px] md:p-[32px] text-left align-middle shadow-xl transition-all'>
-                                    <h1 className='text-[28px] font-bold'>
+                                <Dialog.Panel className='w-full max-w-sm overflow-hidden rounded-[8px] bg-white p-[24px] pc:p-[32px] text-left shadow-xl'>
+                                    <h1 className='text-[26px] pc:text-[28px] font-bold'>
                                         로그인
                                     </h1>
-                                    <p className='h-[20px] relative top-[16px] text-red-500'>
+                                    <p className='text-red-500 mt-[6px] h-[24px]'>
                                         { errorMessage }
                                     </p>
                                     <form
-                                        className='flex flex-col mx-auto mt-[32px] gap-y-[16px]'
+                                        className='flex flex-col gap-[16px] mt-[6px]'
                                         onSubmit={ loginSubmit }
                                     >
                                         <div>
@@ -105,36 +106,39 @@ export const SigninModal = () => {
                                                 placeholder='이메일을 입력해주세요.'
                                                 className='border border-gray-400 rounded px-[8px] py-[4px] w-full'
                                             />
-                                            <p className='mt-1 text-red-500 text-[12px] font-normal h-[12px]'>
+                                            <p className='mt-[4px] text-red-500 text-[12px] font-normal h-[12px]'>
                                                 { form.formState.errors.email && '이메일을 입력해주시기 바랍니다.' }
                                             </p>
                                         </div>
-                                        <div>
-                                            <input
-                                                {...form.register('password', {
-                                                    required: true,
-                                                    minLength: 8, maxLength: 64,
-                                                    pattern: VALID_PASSWORD,
-                                                    onChange: (event) => {
-                                                        // value filter
-                                                        const value = event.target.value;
-                                                        event.target.value = value.replace(INPUT_PASSWORD, '');
-                                                    },
-                                                })}
-                                                type={ showPassword ? 'text' : 'password' }
-                                                placeholder='비밀번호를 입력해주세요.'
-                                                className='border border-gray-400 rounded px-[8px] py-[4px] w-full'
-                                            />
+                                        <div className='flex flex-col justify-center relative w-full'>
+                                            <div className='relative'>
+                                                <input
+                                                    {...form.register('password', {
+                                                        required: true,
+                                                        minLength: 8, maxLength: 64,
+                                                        pattern: VALID_PASSWORD,
+                                                        onChange: (event) => {
+                                                            // mask
+                                                            const value = event.target.value;
+                                                            event.target.value = value.replace(INPUT_PASSWORD, '');
+                                                        },
+                                                    })}
+                                                    type={ showPassword ? 'text' : 'password' }
+                                                    placeholder='비밀번호를 입력해주세요.'
+                                                    className='border border-gray-400 rounded-[4px] pl-[8px] pr-[30px] py-[4px] w-full'
+                                                />
+                                                <button
+                                                    type='button'
+                                                    onClick={ () => setShowPassword(!showPassword) }
+                                                    className='absolute right-0 text-[12px] h-fit text-gray-100 px-[8px] top-1/2 -translate-y-1/2'
+                                                >
+                                                    { showPassword ? <VisibilityOn/> : <VisibilityOff/> }
+                                                </button>
+                                            </div>
                                             <div className='flex justify-between'>
-                                                <p className='mt-1 text-red-500 text-[12px] font-normal h-[12px]'>
+                                                <p className='mt-[4px] text-red-500 text-[12px] font-normal h-[12px]'>
                                                     { form.formState.errors.password && '비밀번호는 최소 8자 이상입니다.' }
                                                 </p>
-                                                <span
-                                                    onClick={ () => setShowPassword(!showPassword) }
-                                                    className='cursor-pointer text-[12px] bg-gray-600 h-fit text-gray-100 px-[8px] mr-[4px]'
-                                                >
-                                                    { showPassword ? '비밀번호 숨김' : '비밀번호 확인' }
-                                                </span>
                                             </div>
                                         </div>
                                         <FuncButton
@@ -144,13 +148,12 @@ export const SigninModal = () => {
                                                 loading: loading,
                                             }}
                                             type='submit'
-                                            className='w-full py-[6px] bg-orange-500 text-white mx-auto mt-[12px] text-center cursor-pointer text-[22px] items-center rounded-[16px]'
+                                            className='w-full py-[6px] bg-orange-500 text-white mt-[12px] text-center cursor-pointer text-[20px] rounded-[16px]'
                                         />
                                         <button
                                             type='button'
                                             onClick={ openSignupModal }
-                                            className='w-full py-[6px] bg-orange-500 text-white mx-auto mb-[12px] text-center
-                                            cursor-pointer text-[22px] items-center rounded-[16px]'
+                                            className='w-full py-[6px] bg-orange-500 text-white mb-[12px] text-center cursor-pointer text-[20px] rounded-[16px]'
                                         >
                                             회원가입
                                         </button>

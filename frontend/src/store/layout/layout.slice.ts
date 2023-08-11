@@ -12,13 +12,13 @@ export const layoutSlice = createSlice({
     name: 'layout',
     initialState: initState,
     reducers: {
-        toggleSideNav: (state) => {
+        toggleSideNavReducer: (state) => {
             state.isShowSideNav = !state.isShowSideNav;
         },
-        setShowSideNav: (state, { payload }: PayloadAction<boolean>) => {
+        setShowSideNavReducer: (state, { payload }: PayloadAction<boolean>) => {
             state.isShowSideNav = payload;
         },
     },
 });
 
-export const { toggleSideNav, setShowSideNav } = layoutSlice.actions;
+export const { toggleSideNavReducer, setShowSideNavReducer } = layoutSlice.actions;

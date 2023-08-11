@@ -6,7 +6,7 @@ import {AppDispatch, RootState} from '../../../../store';
 import CustomScroller from '../../../../common/components/customScroller';
 import {showAlert} from '../../../../store/alert/alert.slice';
 import {ConfirmButton} from '../../../../common/components/ConfirmButton';
-import {createCategory, deleteCategory, getCategories, updateCategory} from '../../../../store/memo/memo.actions';
+import {createCategoryAction, deleteCategoryAction, getCategoriesAction, updateCategoryAction} from '../../../../store/memo/memo.actions';
 import {CoreOutput} from '../../../../openapi/generated';
 
 export const CategoryEditModal = (props: { buttonText: string }) => {
@@ -30,7 +30,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
         e.preventDefault();
         if (createInputValue) {
             // 카테고리 생성
-            dispatch(createCategory({ name: createInputValue }));
+            dispatch(createCategoryAction({ name: createInputValue }));
             // input 초기화
             setCreateInputValue('');
         }
@@ -41,7 +41,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
         const val = input.value;
         // 입력 값이 있고 기존 값과 다르다면
         if (val && val.length > 1 && val !== prevVal) {
-            dispatch(updateCategory({ id: id, name: val })).then((value) => {
+            dispatch(updateCategoryAction({ id: id, name: val })).then((value) => {
                 const data = value.payload as CoreOutput;
                 // 업데이트 실패시 원래 값으로 되돌림
                 if (!data.success) {
@@ -54,7 +54,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
 
     // 모달 오픈시 카테고리 목록 갱신
     useEffect(() => {
-        if (isShow) dispatch(getCategories());
+        if (isShow) dispatch(getCategoriesAction());
         // 업데이트 관리용 input values 초기화
         setUpdateInputValues({});
     },[isShow]);
@@ -161,7 +161,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                                                         subtitle: '카테고리가 삭제되면 하위 메모가<br/>모두 삭제됩니다.',
                                                                         confirmText: '삭제',
                                                                         isNegative: true,
-                                                                        confirmCallback: () => dispatch(deleteCategory({ id: memo.id })),
+                                                                        confirmCallback: () => dispatch(deleteCategoryAction({ id: memo.id })),
                                                                     }}
                                                                     className='relative group p-[6px] rounded-full hover:bg-zete-light-gray-200 -right-[2px]'
                                                                 >

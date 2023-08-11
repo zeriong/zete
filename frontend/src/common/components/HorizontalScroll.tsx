@@ -5,7 +5,6 @@ import {useWindowResize} from '../../hooks/useWindowResize';
 export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: string, className?: string, children: ReactNode }) => { // { type, text, disabled, loading, className, onClick }: IButtonProps
     const scrollOuter = useRef<HTMLDivElement>(null)
     const scrollInner = useRef<HTMLDivElement>(null)
-
     const scrollRef = useRef<CustomScroller>(null)
 
     const [ scrollLeft, setScrollLeft ] = useState(0)
@@ -31,7 +30,7 @@ export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: stri
     }, [windowResize.width, scrollLeft]);
 
 
-    const handleWheel = (event: WheelEvent) => {
+    const wheelEvent = (event: WheelEvent) => {
         // 마우스 세로휠 가로 적용
         let left = scrollRef.current?.getScrollLeft() + event.deltaY;
         if (left < 0) left = 0;
@@ -42,10 +41,8 @@ export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: stri
 
     useEffect(() => {
         const container = scrollOuter.current;
-        container?.addEventListener('wheel', handleWheel, { passive: false });
-        return () => {
-            container?.removeEventListener('wheel', handleWheel);
-        }
+        container?.addEventListener('wheel', wheelEvent, { passive: false });
+        return () => container?.removeEventListener('wheel', wheelEvent);
     }, []);
 
     return (
@@ -71,7 +68,7 @@ export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: stri
                                 scrollRef.current?.scrollLeft(left);
                             }}
                         >
-                            <div className="w-[12px] h-[12px] border-t border-l border-black border-opacity-50 -rotate-45 ml-0.5"/>
+                            <div className="w-[12px] h-[12px] border-t border-l border-black border-opacity-50 -rotate-45 ml-[2px]"/>
                         </div>
                     )}
                     {isShowRightButton && (
@@ -83,7 +80,7 @@ export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: stri
                                 scrollRef.current?.scrollLeft(left);
                             }}
                         >
-                            <div className="w-[12px] h-[12px] border-t border-l border-black border-opacity-50 rotate-[135deg] mr-0.5"/>
+                            <div className="w-[12px] h-[12px] border-t border-l border-black border-opacity-50 rotate-[135deg] mr-[2px]"/>
                         </div>
                     )}
                 </>

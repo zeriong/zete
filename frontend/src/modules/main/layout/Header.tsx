@@ -4,7 +4,7 @@ import {useDispatch} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {BarsMenuIcon} from '../../../assets/vectors';
 import {SearchMemo} from '../components/SearchMemo';
-import {toggleSideNav} from '../../../store/layout/layout.slice';
+import {toggleSideNavReducer} from '../../../store/layout/layout.slice';
 
 export const Header = () => {
     const dispatch = useDispatch();
@@ -15,7 +15,7 @@ export const Header = () => {
                 <div className='flex items-center'>
                     <button
                         type='button'
-                        onClick={ () => dispatch(toggleSideNav()) }
+                        onClick={ () => dispatch(toggleSideNavReducer()) }
                         className='ease-in-out duration-300 mr-7px md:hidden p-10px h-full'
                     >
                         <BarsMenuIcon/>

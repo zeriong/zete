@@ -5,8 +5,8 @@ import {ConfirmButton} from '../../../../common/components/ConfirmButton';
 import {AppDispatch} from '../../../../store';
 import {useDispatch} from 'react-redux';
 import {useSearchParams} from 'react-router-dom';
-import {loadMemoList} from '../../../../libs/memo.lib';
-import {deleteMemoAction, getCategories} from '../../../../store/memo/memo.actions';
+import {loadMemos} from '../../../../libs/memo.lib';
+import {deleteMemoAction, getCategoriesAction} from '../../../../store/memo/memo.actions';
 
 export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -16,8 +16,8 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
 
     const deleteMemo = () => {
         dispatch(deleteMemoAction({ id: memoId }));
-        dispatch(getCategories());
-        loadMemoList(dispatch, searchParams, true);
+        dispatch(getCategoriesAction());
+        loadMemos(dispatch, searchParams, true);
     }
 
     const handleConfirmModal = (event) => {

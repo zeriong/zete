@@ -9,10 +9,10 @@ import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from '../../.
 import {setDynamicInputWidth} from '../../../../libs/common.lib';
 import {showAlert} from '../../../../store/alert/alert.slice';
 import {Api} from '../../../../openapi/api';
-import {deleteMemoTag, handleAddMemoTagSubmit, handleFormSubmit, loadMemoList} from '../../../../libs/memo.lib';
+import {deleteMemoTag, addMemoTagSubmit, focusToContent, loadMemos} from '../../../../libs/memo.lib';
 import {HorizontalScroll} from '../../../../common/components/HorizontalScroll';
 import {updateMemoReducer} from '../../../../store/memo/memo.slice';
-import {getCategories} from '../../../../store/memo/memo.actions';
+import {getCategoriesAction} from '../../../../store/memo/memo.actions';
 
 export const MemoEditModal = () => {
     const savedMemo = useRef<Memo | null>(null);
@@ -59,11 +59,11 @@ export const MemoEditModal = () => {
             const res = await Api.memo.updateMemo({ ...data, id: savedMemo.current.id });
             if (res.data.success) savedMemo.current = res.data.savedMemo;
             else showAlert(res.data.error);
-            dispatch(getCategories());
+            dispatch(getCategoriesAction());
         } catch (e) {
             showAlert('메모 수정에 실패하였습니다.');
-            loadMemoList(dispatch, searchParams, true);
-            dispatch(getCategories());
+            loadMemos(dispatch, searchParams, true);
+            dispatch(getCategoriesAction());
         }
         isSavingMemo.current = false;
     }
@@ -105,8 +105,8 @@ export const MemoEditModal = () => {
                 showAlert('존재하지 않는 메모입니다.');
                 searchParams.delete('view');
                 setSearchParams(searchParams);
-                loadMemoList(dispatch, searchParams, true);
-                dispatch(getCategories());
+                loadMemos(dispatch, searchParams, true);
+                dispatch(getCategoriesAction());
             }
             isLoadingMemo.current = false;
         })()
@@ -191,7 +191,7 @@ export const MemoEditModal = () => {
                                     border border-zete-light-gray-500 rounded-[8px] px-[18px] pb-[10px] pt-[12px] min-h-[212px] h-fit bg-zete-primary-200 memo-shadow'
                                 >
                                     <div className='w-full h-full flex flex-col min-h-[212px]'>
-                                        <form onSubmit={ handleFormSubmit } className='w-full h-full'>
+                                        <form onSubmit={ focusToContent } className='w-full h-full'>
                                             <div className='flex justify-between items-center pb-[8px] border-b border-zete-memo-border h-full'>
                                                 <input
                                                     {...form.register('title', {
@@ -250,7 +250,7 @@ export const MemoEditModal = () => {
                                                     ))}
                                                     <form
                                                         onSubmit={ (event) => {
-                                                            handleAddMemoTagSubmit(event, form);
+                                                            addMemoTagSubmit(event, form);
                                                             setDynamicInputWidth(event.target[0]);
                                                         }}
                                                         className='relative flex items-center text-zete-dark-400 text-[12px]'
