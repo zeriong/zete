@@ -29,8 +29,8 @@ export const MemoPage = () => {
         1888: 4,
         1566: 3,
         1234: 2,
-        900: 1,
-        767: 2,
+        900: 2,
+        767: 1,
         610: 1,
     });
 
@@ -91,59 +91,55 @@ export const MemoPage = () => {
                     {memoState.memo.list?.map((memo) => (
                         <div
                             key={ memo.id }
-                            className='relative w-full'
+                            className='relative w-full mb-16px pc:w-[300px] pc:mb-30px flex rounded-[8px] memo-shadow'
+                            onClick={ () => selectMemo(memo.id) }
                         >
-                            <div
-                                className='mb-16px w-full pc:w-[300px] pc:mb-30px flex rounded-[8px] memo-shadow'
-                                onClick={ () => selectMemo(memo.id) }
-                            >
-                                <article
-                                    className='relative flex flex-col justify-between border w-full
+                            <article
+                                className='relative flex flex-col justify-between border w-full
                                     border-zete-light-gray-500 rounded-[8px] px-18px pb-[12px] pt-[14px] min-h-[212px] bg-zete-primary-200 break-words'
-                                >
-                                    <div className='flex relative w-full'>
-                                        <p
-                                            dangerouslySetInnerHTML={{ __html: memo.title && DOMPurify.sanitize(memo.title.replace(/\n/g, '<br/>')) }}
-                                            className={`text-zete-gray-500 font-light text-20 text-start w-full mb-10px ${!memo.title && 'h-[20px] w-full mb-10px pr-30px'}`}
-                                        />
-                                        {/* 중요메모 버튼 */}
-                                        <button
-                                            type='button'
-                                            className={memo.title ? 'relative flex items-start' : 'absolute right-0'}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                changeMemoImportant(memo);
-                                            }}
-                                        >
-                                            { memo.isImportant ? <FillStarIcon/> : <StarIcon/> }
-                                        </button>
-                                    </div>
-                                    <div className='items-end h-full w-full line-clamp-[14]'>
-                                        <p
-                                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(memo.content).replace(/\n/g, '<br/>') }}
-                                            className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
-                                        />
-                                    </div>
-                                    <div className='w-full flex'>
-                                        <div className='flex w-full items-center pr-[6px] overflow-hidden'>
-                                            <HorizontalScroll>
-                                                <div className='flex w-full h-full relative pt-[8px] pb-[9px] overflow-y-hidden'>
-                                                    {memo.tags?.map((tag, idx) => (
-                                                        <div key={ idx } className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
+                            >
+                                <div className='flex relative w-full'>
+                                    <p
+                                        dangerouslySetInnerHTML={{ __html: memo.title && DOMPurify.sanitize(memo.title.replace(/\n/g, '<br/>')) }}
+                                        className={`text-zete-gray-500 font-light text-20 text-start w-full mb-10px ${!memo.title && 'h-[20px] w-full mb-10px pr-30px'}`}
+                                    />
+                                    {/* 중요메모 버튼 */}
+                                    <button
+                                        type='button'
+                                        className={memo.title ? 'relative flex items-start' : 'absolute right-0'}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            changeMemoImportant(memo);
+                                        }}
+                                    >
+                                        { memo.isImportant ? <FillStarIcon/> : <StarIcon/> }
+                                    </button>
+                                </div>
+                                <div className='items-end h-full w-full line-clamp-[14]'>
+                                    <p
+                                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(memo.content).replace(/\n/g, '<br/>') }}
+                                        className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
+                                    />
+                                </div>
+                                <div className='w-full flex'>
+                                    <div className='flex w-full items-center pr-[6px] overflow-hidden'>
+                                        <HorizontalScroll>
+                                            <div className='flex w-full h-full relative pt-[8px] pb-[9px] overflow-y-hidden'>
+                                                {memo.tags?.map((tag, idx) => (
+                                                    <div key={ idx } className='flex items-center px-9px py-1px mr-4px rounded-[4px] bg-black bg-opacity-10 cursor-default'>
                                                         <span className='font-light text-11 text-zete-dark-400 whitespace-nowrap'>
                                                             { tag.name }
                                                         </span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </HorizontalScroll>
-                                        </div>
-                                        <div className='relative -bottom-[4px]'>
-                                            <SavedMemoMenuPopover memoId={ memo.id }/>
-                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </HorizontalScroll>
                                     </div>
-                                </article>
-                            </div>
+                                    <div className='relative -bottom-[4px]'>
+                                        <SavedMemoMenuPopover memoId={ memo.id }/>
+                                    </div>
+                                </div>
+                            </article>
                         </div>
                     ))}
                 </Masonry>

@@ -1,28 +1,43 @@
-import React from 'react'
+import React from 'react';
 import { Popover, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
-import {GrLogout} from '@react-icons/all-files/gr/GrLogout';
-import {FaRegIdCard} from '@react-icons/all-files/fa/FaRegIdCard';
 import {Link} from 'react-router-dom';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../../../store';
-import {UserIcon} from '../../../../assets/vectors';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../../../store';
+import {LogoutIcon, ProfileIcon, UserIcon} from '../../../../assets/vectors';
+import {logoutAction} from '../../../../store/auth/auth.actions';
 
-const solutions = [
-    {
-        name: '나의 회원정보',
-        icon: FaRegIdCard,
-    },
-    {
-        name: '로그아웃',
-        icon: GrLogout,
-    },
-]
+interface IMenuList {
+    name: string;
+    icon: JSX.Element;
+    path: string;
+    function?: any;
+}
 
 export const UserProfileMenuPopover = () => {
-    const { data: { name } } = useSelector((state: RootState) => (state.user));
+    const dispatch = useDispatch<AppDispatch>();
+    const { loading, data } = useSelector((state: RootState) => state.user);
 
-    return (
+    const menuList: IMenuList[] = [
+        {
+            name: '나의 회원정보',
+            icon: <ProfileIcon/>,
+            path: 'profile',
+        },
+        {
+            name: '로그아웃',
+            icon: <LogoutIcon/>,
+            path: '/',
+            function: () => dispatch(logoutAction()),
+        },
+    ];
+
+    const listOnClick = (item, close) => {
+        if (item.function) item.function();
+        close();
+    }
+
+    return (loading && !data.name) ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
         <div className='w-auto max-w-sm'>
             <Popover className='relative h-28px z-50'>
                 {({ open, close }) => (
@@ -43,30 +58,28 @@ export const UserProfileMenuPopover = () => {
                             leaveFrom='opacity-100 translate-y-0'
                             leaveTo='opacity-0 translate-y-1'
                         >
-                            <Popover.Panel className='absolute mt-3 w-[180px] right-0 px-0 lg:max-w-lg max-md:w-[160px]'>
-                                <div className='overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5'>
-                                    <div className='relative bg-white p-3'>
-                                        <div className='text-lg font-medium text-gray-900 p-1 mb-1 cursor-default'>
-                                            {`${name}님 😊`}
-                                        </div>
-                                        {solutions.map((item) => (
-                                            <Link
-                                                to={`${item.name === '나의 회원정보' ? 'profile' : '/'}`}
-                                                onClick={close}
-                                                key={item.name}
-                                                className=' flex items-center rounded-lg h-12 transition duration-150 ease-in-out hover:bg-orange-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50 whitespace-nowrap'
-                                            >
-                                                <div className='flex h-8 w-10 shrink-0 items-center justify-center text-white sm:h-12 sm:w-12'>
-                                                    <item.icon aria-hidden='true' size='20' color='#2f2f2f' />
-                                                </div>
-                                                <div className='ml-2'>
-                                                    <p className='text-sm font-medium text-gray-900'>
-                                                        {item.name}
-                                                    </p>
-                                                </div>
-                                            </Link>
-                                        ))}
-                                    </div>
+                            <Popover.Panel className='absolute mt-[12px] w-[160px] pc:w-[180px] right-0 px-0 shadow-lg rounded-[8px] overflow-hidden border border-black/10'>
+                                <div className='relative bg-white p-[12px] '>
+                                    <p className='text-lg font-medium text-zete-dark p-[4px] mb-[4px] cursor-default'>
+                                        {data.name}
+                                    </p>
+                                    {menuList.map((item) => (
+                                        <Link
+                                            key={item.name}
+                                            to={item.path}
+                                            onClick={ () => listOnClick(item, close) }
+                                            className='flex items-center rounded-[8px] h-[48px] transition duration-150 ease-in-out whitespace-nowrap hover:bg-orange-100'
+                                        >
+                                            <div className='flex items-center justify-center h-[32px] pc:h-[48px] w-[36px] text-white'>
+                                                {item.icon}
+                                            </div>
+                                            <div className='ml-[8px]'>
+                                                <p className='text-[14px] font-medium text-gray-900'>
+                                                    {item.name}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    ))}
                                 </div>
                             </Popover.Panel>
                         </Transition>
@@ -74,5 +87,4 @@ export const UserProfileMenuPopover = () => {
                 )}
             </Popover>
         </div>
-    )
 }

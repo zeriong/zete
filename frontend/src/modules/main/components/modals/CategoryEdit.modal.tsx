@@ -4,7 +4,7 @@ import {CatePlusIcon, DeleteIcon, FillCategoryIcon, ModifyIcon} from '../../../.
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../../store';
 import CustomScroller from '../../../../common/components/customScroller';
-import {showAlert} from '../../../../store/alert/alert.slice';
+import {showAlert} from '../../../../store/alert/alert.actions';
 import {ConfirmButton} from '../../../../common/components/ConfirmButton';
 import {createCategoryAction, deleteCategoryAction, getCategoriesAction, updateCategoryAction} from '../../../../store/memo/memo.actions';
 import {CoreOutput} from '../../../../openapi/generated';
@@ -26,7 +26,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
     }
 
     // 카테고리 생성 submit
-    const handleCreateCategorySubmit = (e) => {
+    const createCategorySubmit = (e) => {
         e.preventDefault();
         if (createInputValue) {
             // 카테고리 생성
@@ -37,7 +37,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
     }
 
     // 카테고리 업데이트 submit
-    const handleUpdateOnSubmit = (id: number, prevVal: string, input: any) => {
+    const updateCategorySubmit = (id: number, prevVal: string, input: any) => {
         const val = input.value;
         // 입력 값이 있고 기존 값과 다르다면
         if (val && val.length > 1 && val !== prevVal) {
@@ -90,7 +90,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                     >
                         <div className='fixed inset-0 bg-black bg-opacity-40'/>
                     </Transition.Child>
-                    <div className='fixed inset-0 overflow-y-auto'>
+                    <div className='fixed inset-0'>
                         <div className='close-modal-background flex min-h-full items-center justify-center p-[16px] text-center'>
                             <Transition.Child
                                 as={Fragment}
@@ -101,7 +101,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                 leaveFrom='opacity-100 scale-100'
                                 leaveTo='opacity-0 scale-95'
                             >
-                                <Dialog.Panel className='w-[300px] relative transform overflow-hidden bg-white text-left align-middle shadow-xl transition-all'>
+                                <Dialog.Panel className='w-[300px] relative transform overflow-hidden bg-white text-left shadow-xl'>
                                     <div className='relative h-[430px] w-full p-[16px]'>
                                         <CustomScroller>
                                             <p className='text-zete-dark-400'>
@@ -109,13 +109,13 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                             </p>
                                             <div className='py-[16px] px-[8px] text-[15px]'>
                                                 <form
-                                                    onSubmit={ handleCreateCategorySubmit }
+                                                    onSubmit={ createCategorySubmit }
                                                     className='flex items-center'
                                                 >
                                                     <ModifyIcon className='min-w-[22px] mr-[16px]'/>
                                                     <input
                                                         placeholder='새 카테고리 만들기'
-                                                        onChange={(event) => setCreateInputValue(event.target.value)}
+                                                        onChange={ (event) => setCreateInputValue(event.target.value) }
                                                         value={ createInputValue }
                                                         className='placeholder:text-zete-dark-300 placeholder:font-thin pb-[5px] border-b border-zete-memo-border
                                                         text-zete-dark-300 w-full'
@@ -134,11 +134,11 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                                                 onSubmit={(event) => {
                                                                     event.preventDefault()
                                                                     const input = event.target[0];
-                                                                    handleUpdateOnSubmit(memo.id, memo.name, input);
+                                                                    updateCategorySubmit(memo.id, memo.name, input);
                                                                 }}
                                                                 onBlur={(event) => {
                                                                     const input = event.target;
-                                                                    handleUpdateOnSubmit(memo.id, memo.name, input);
+                                                                    updateCategorySubmit(memo.id, memo.name, input);
                                                                 }}
                                                                 className='flex items-center'
                                                             >

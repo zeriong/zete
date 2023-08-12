@@ -1,18 +1,14 @@
-import React, {useState} from 'react';
-import {SuccessSignupModal} from '../../../common/components/modals/SuccessSignup.modal';
-import {SignupModal} from '../../../common/components/modals/Signup.modal';
-import {SigninModal} from '../../../common/components/modals/Signin.modal';
+import React from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../../store';
 import memoImg from '../../../assets/scroll-g6570d2351_1920.png';
 
-export const Home = ()=> {
+export const Home = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const [modalControl, setModalControl] = useState(false);
 
     const { isLoggedIn } = useSelector((state: RootState) => state.auth);
-    const { data } = useSelector((state: RootState) => state.user);
+    const { loading, data } = useSelector((state: RootState) => state.user);
 
     const openSignInModal = () => {
         searchParams.set('modal','sign-in');
@@ -24,7 +20,7 @@ export const Home = ()=> {
         setSearchParams(searchParams);
     }
 
-    return (
+    return (loading && !data.name) ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
         <>
             <div className='flex h-full w-full py-[100px] max-md:py-0'>
                 <div
@@ -90,9 +86,6 @@ export const Home = ()=> {
                     />
                 </figure>
             </div>
-            <SuccessSignupModal isShow={ modalControl } setIsShow={ setModalControl }/>
-            <SignupModal successControl={ setModalControl }/>
-            <SigninModal/>
         </>
-    )
+
 };

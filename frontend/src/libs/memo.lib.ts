@@ -1,4 +1,4 @@
-import {showAlert} from '../store/alert/alert.slice';
+import {showAlert} from '../store/alert/alert.actions';
 import {isIntegerString} from './common.lib';
 import {store} from '../store';
 import {searchMemosAction} from '../store/memo/memo.actions';

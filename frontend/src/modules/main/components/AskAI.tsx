@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {UseFormReturn} from 'react-hook-form';
-import {showAlert} from '../../../store/alert/alert.slice';
+import {showAlert} from '../../../store/alert/alert.actions';
 import {Api} from '../../../openapi/api';
 import CustomScroller from '../../../common/components/customScroller';
 import {setDynamicTextareaHeight} from '../../../libs/common.lib';

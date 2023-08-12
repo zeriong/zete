@@ -12,7 +12,6 @@ export const BarsMenuIcon = (props: SVGProps<SVGSVGElement>) => (
         </defs>
     </svg>
 )
-
 export const ModifyIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg width='22' height='22' viewBox='0 0 22 21' fill='none' xmlns='http://www.w3.org/2000/svg' {...props}>
         <g clipPath='url(#clip0_11_234)'>
@@ -27,25 +26,21 @@ export const ModifyIcon = (props: SVGProps<SVGSVGElement>) => (
         </defs>
     </svg>
 )
-
 export const SearchIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg width='18' height='18' viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg' {...props}>
         <path d='M7.53752 15.0676C9.23469 15.0688 10.8819 14.4936 12.2097 13.4362L16.7719 17.9999L18.0001 16.7714L13.4379 12.2076C14.4956 10.8699 15.0685 9.21244 15.0624 7.50695C15.0564 5.80122 14.4718 4.14813 13.4044 2.81788C12.337 1.48763 10.85 0.559187 9.18665 0.184187C7.52303 -0.190571 5.78169 0.010089 4.24721 0.753811C2.71273 1.49777 1.47612 2.74037 0.739178 4.27852C0.00247421 5.81691 -0.190633 7.55959 0.191719 9.22186C0.57383 10.8841 1.50847 12.3677 2.84308 13.4294C4.17745 14.4912 5.83262 15.0688 7.53776 15.0673H7.53752V15.0676ZM7.53752 1.73852C9.07393 1.73852 10.5476 2.34919 11.634 3.4358C12.7205 4.52264 13.3307 5.99657 13.3307 7.53375C13.3307 9.07094 12.7205 10.5449 11.634 11.6317C10.5476 12.7186 9.07417 13.329 7.53752 13.329C6.00087 13.329 4.52746 12.7186 3.44099 11.6317C2.35452 10.5449 1.7443 9.07094 1.7443 7.53375C1.7443 5.99657 2.35476 4.52264 3.44099 3.4358C4.52746 2.34895 6.00087 1.73852 7.53752 1.73852Z' fill='#767676'/>
     </svg>
 )
-
 export const StarIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg xmlns='http://www.w3.org/2000/svg' height='26' viewBox='0 96 960 960' width='26' {...props} fill={'#4B4B4B'}>
         <path d='M331.462 839.845 480 750.461l148.538 90.384-39.308-169.153 130.692-113.461L547.538 543 480 383.847 412.462 542l-172.384 15.231L370.77 671.077l-39.308 168.768Zm-68.46 94.613 57.307-246.766L128.85 521.77l252.613-21.922L480 267.158l98.537 232.69L831.15 521.77 639.691 687.692l57.307 246.766L480 803.537 263.002 934.458ZM480 622.154Z'/>
     </svg>
 )
-
 export const FillStarIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg xmlns='http://www.w3.org/2000/svg' height='26' viewBox='0 96 960 960' width='26' {...props} fill={'#4B4B4B'}>
         <path d='m263.002 934.458 57.307-246.766L128.85 521.77l252.613-21.922L480 267.158l98.537 232.69L831.15 521.77 639.691 687.692l57.307 246.766L480 803.537 263.002 934.458Z'/>
     </svg>
 )
-
 export const AllIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg width='15' height='15' viewBox='0 0 15 15' fill='none' xmlns='http://www.w3.org/2000/svg' {...props}>
         <g clipPath='url(#clip0_10_158)'>
@@ -58,7 +53,6 @@ export const AllIcon = (props: SVGProps<SVGSVGElement>) => (
         </defs>
     </svg>
 )
-
 export const CategoryIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg width='21' height='16' viewBox='0 0 21 16' fill='none' xmlns='http://www.w3.org/2000/svg' {...props}>
         <g clipPath='url(#clip0_10_190)'>
@@ -88,7 +82,6 @@ export const TagIcon = ({svgClassName, strokeClassName}: {svgClassName?:string, 
         </defs>
     </svg>
 )
-
 export const UserIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg' {...props}>
         <g clipPath='url(#clip0_7_108)'>
@@ -103,13 +96,11 @@ export const UserIcon = (props: SVGProps<SVGSVGElement>) => (
         </defs>
     </svg>
 )
-
 export const ThreeDotMenuIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 96 960 960' width='24' {...props}>
         <path d='M213.072 649.999q-30.59 0-52.215-21.784-21.624-21.784-21.624-52.374 0-30.59 21.784-52.215 21.784-21.625 52.374-21.625 30.59 0 52.214 21.784 21.625 21.784 21.625 52.374 0 30.59-21.784 52.215-21.784 21.625-52.374 21.625Zm266.769 0q-30.59 0-52.215-21.784-21.625-21.784-21.625-52.374 0-30.59 21.784-52.215 21.784-21.625 52.374-21.625 30.59 0 52.215 21.784 21.625 21.784 21.625 52.374 0 30.59-21.784 52.215-21.784 21.625-52.374 21.625Zm266.768 0q-30.59 0-52.214-21.784-21.625-21.784-21.625-52.374 0-30.59 21.784-52.215 21.784-21.625 52.374-21.625 30.59 0 52.215 21.784 21.624 21.784 21.624 52.374 0 30.59-21.784 52.215-21.784 21.625-52.374 21.625Z'/>
     </svg>
 )
-
 export const PlusIcon = ({svgClassName, strokeClassName}: {svgClassName?:string, strokeClassName?:string}) => (
     <svg width='21' height='21' viewBox='0 0 21 21' fill='none' xmlns='http://www.w3.org/2000/svg' className={svgClassName}>
         <path d='M9.16296 20V10.837H0V9.15556H9.16296V0H10.8444V9.16296H20.0074V10.8444H10.8444V20.0074H9.16296V20Z' fill='#4B4B4B' className={strokeClassName}/>
@@ -140,13 +131,28 @@ export const AlarmIcon = (props: SVGProps<SVGSVGElement>) => (
         <path d='M170.001 850.615v-59.999h80v-290q0-81.462 50.384-144.038 50.385-62.577 129.616-80.269v-28q0-21.154 14.423-35.577 14.422-14.423 35.576-14.423t35.576 14.423q14.423 14.423 14.423 35.577v28q79.231 17.692 129.616 80.269 50.384 62.576 50.384 144.038v290h80v59.999H170.001ZM480 968.307q-29.538 0-50.923-21-21.384-21-21.384-51.307h144.614q0 30.307-21 51.307-21 21-51.307 21Z'/>
     </svg>
 )
-export const VisibilityOff = (props: SVGProps<SVGSVGElement>) => (
+export const VisibilityOffIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" {...props}>
         <path d="m629-419-44-44q26-71-27-118t-115-24l-44-44q17-11 38-16t43-5q71 0 120.5 49.5T650-500q0 22-5.5 43.5T629-419Zm129 129-40-40q49-36 85.5-80.5T857-500q-50-111-150-175.5T490-740q-42 0-86 8t-69 19l-46-47q35-16 89.5-28T485-800q143 0 261.5 81.5T920-500q-26 64-67 117t-95 93Zm58 226L648-229q-35 14-79 21.5t-89 7.5q-146 0-265-81.5T40-500q20-52 55.5-101.5T182-696L56-822l42-43 757 757-39 44ZM223-654q-37 27-71.5 71T102-500q51 111 153.5 175.5T488-260q33 0 65-4t48-12l-64-64q-11 5-27 7.5t-30 2.5q-70 0-120-49t-50-121q0-15 2.5-30t7.5-27l-97-97Zm305 142Zm-116 58Z"/>
     </svg>
 )
-export const VisibilityOn = (props: SVGProps<SVGSVGElement>) => (
+export const VisibilityOnIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 -960 960 960" width="16" {...props}>
         <path d="M480.118-330Q551-330 600.5-379.618q49.5-49.617 49.5-120.5Q650-571 600.382-620.5q-49.617-49.5-120.5-49.5Q409-670 359.5-620.382q-49.5 49.617-49.5 120.5Q310-429 359.618-379.5q49.617 49.5 120.5 49.5Zm-.353-58Q433-388 400.5-420.735q-32.5-32.736-32.5-79.5Q368-547 400.735-579.5q32.736-32.5 79.5-32.5Q527-612 559.5-579.265q32.5 32.736 32.5 79.5Q592-453 559.265-420.5q-32.736 32.5-79.5 32.5ZM480-200q-146 0-264-83T40-500q58-134 176-217t264-83q146 0 264 83t176 217q-58 134-176 217t-264 83Zm0-300Zm-.169 240Q601-260 702.5-325.5 804-391 857-500q-53-109-154.331-174.5-101.332-65.5-222.5-65.5Q359-740 257.5-674.5 156-609 102-500q54 109 155.331 174.5 101.332 65.5 222.5 65.5Z"/>
+    </svg>
+)
+export const HamburgerMenuIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 448 512" {...props}>
+        <path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/>
+    </svg>
+)
+export const ProfileIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 576 512" aria-hidden="true" color="#2f2f2f" height="20" width="20" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <path d="M528 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h480c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zm0 400H303.2c.9-4.5.8 3.6.8-22.4 0-31.8-30.1-57.6-67.2-57.6-10.8 0-18.7 8-44.8 8-26.9 0-33.4-8-44.8-8-37.1 0-67.2 25.8-67.2 57.6 0 26-.2 17.9.8 22.4H48V144h480v288zm-168-80h112c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H360c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8zm0-64h112c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H360c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8zm0-64h112c4.4 0 8-3.6 8-8v-16c0-4.4-3.6-8-8-8H360c-4.4 0-8 3.6-8 8v16c0 4.4 3.6 8 8 8zm-168 96c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64z"/>
+    </svg>
+)
+export const LogoutIcon = (props: SVGProps<SVGSVGElement>) => (
+    <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 24 24" aria-hidden="true" color="#2f2f2f" height="20" width="20" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <path fill="none" stroke="#231F20" strokeWidth="2" d="M13,9 L13,2 L1,2 L1,22 L13,22 L13,15 M22,12 L5,12 M17,7 L22,12 L17,17"/>
     </svg>
 )

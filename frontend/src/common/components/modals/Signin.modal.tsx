@@ -9,7 +9,7 @@ import {Api} from '../../../openapi/api';
 import {LoginInput} from '../../../openapi/generated';
 import {PATTERNS} from '../../constants';
 import {setLoginReducer, setLogoutReducer} from '../../../store/auth/auth.slice';
-import {VisibilityOff, VisibilityOn} from '../../../assets/vectors';
+import {VisibilityOffIcon, VisibilityOnIcon} from '../../../assets/vectors';
 
 export const SigninModal = () => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL } = PATTERNS;
@@ -62,7 +62,7 @@ export const SigninModal = () => {
     return (
         <>
             <Transition appear show={ isShow } as={ Fragment }>
-                <Dialog as='div' className='relative z-30' onClose={ closeModal }>
+                <Dialog as='div' className='relative z-50' onClose={ closeModal }>
                     <Transition.Child
                         as={ Fragment }
                         enter='ease-out duration-300'
@@ -74,7 +74,7 @@ export const SigninModal = () => {
                     >
                         <div className='fixed inset-0 bg-black bg-opacity-40' />
                     </Transition.Child>
-                    <div className='fixed inset-0 overflow-y-auto'>
+                    <div className='fixed inset-0'>
                         <div className='flex min-h-full items-center justify-center p-[16px]'>
                             <Transition.Child
                                 as={ Fragment }
@@ -132,7 +132,7 @@ export const SigninModal = () => {
                                                     onClick={ () => setShowPassword(!showPassword) }
                                                     className='absolute right-0 text-[12px] h-fit text-gray-100 px-[8px] top-1/2 -translate-y-1/2'
                                                 >
-                                                    { showPassword ? <VisibilityOn/> : <VisibilityOff/> }
+                                                    { showPassword ? <VisibilityOnIcon/> : <VisibilityOffIcon/> }
                                                 </button>
                                             </div>
                                             <div className='flex justify-between'>

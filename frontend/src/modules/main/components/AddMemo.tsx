@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../store';
 import {useForm} from 'react-hook-form';
-import {showAlert} from '../../../store/alert/alert.slice';
+import {showAlert} from '../../../store/alert/alert.actions';
 import {CreateMemoInput, Memo} from '../../../openapi/generated';
 import {setDynamicInputWidth, setDynamicTextareaHeight} from '../../../libs/common.lib';
 import {useSearchParams} from 'react-router-dom';

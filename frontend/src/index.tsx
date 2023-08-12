@@ -4,11 +4,11 @@ import App from './App';
 import './common/style/global.css';
 import {Provider} from 'react-redux';
 import {store} from './store';
-import {InitApi} from './openapi/api';
+import {getAccessToken} from './libs/api.lib';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-InitApi();
+getAccessToken();
 
 root.render(
       <Provider store={ store }>

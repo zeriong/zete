@@ -7,7 +7,7 @@ import {useSearchParams} from 'react-router-dom';
 import {Dialog, Transition} from '@headlessui/react';
 import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from '../../../../assets/vectors';
 import {setDynamicInputWidth} from '../../../../libs/common.lib';
-import {showAlert} from '../../../../store/alert/alert.slice';
+import {showAlert} from '../../../../store/alert/alert.actions';
 import {Api} from '../../../../openapi/api';
 import {deleteMemoTag, addMemoTagSubmit, focusToContent, loadMemos} from '../../../../libs/memo.lib';
 import {HorizontalScroll} from '../../../../common/components/HorizontalScroll';

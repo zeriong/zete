@@ -2,7 +2,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {Api} from '../../openapi/api';
 import {
     ChangeImportantInput,
-    CreateCategoryInput, CreateMemoInput,
+    CreateCategoryInput,
     DeleteCategoryInput,
     DeleteMemoInput, GetMemoInput,
     SearchMemosInput, UpdateCategoryInput, UpdateMemoInput

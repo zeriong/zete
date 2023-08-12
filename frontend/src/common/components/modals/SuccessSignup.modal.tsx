@@ -10,13 +10,9 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
         setSearchParams(searchParams);
     }
 
-    useEffect(() => {
-        props.setIsShow(true);
-    },[])
-
     return (
         <Transition appear show={ props.isShow } as={ Fragment }>
-            <Dialog as='div' className='relative z-20' onClose={ closeModal }>
+            <Dialog as='div' className='relative z-50' onClose={ closeModal }>
                 <Transition.Child
                     as={ Fragment }
                     enter='ease-out duration-300'
@@ -26,7 +22,7 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                     leaveFrom='opacity-100'
                     leaveTo='opacity-0'
                 >
-                    <div className='fixed inset-0 bg-black bg-opacity-40' />
+                    <div className='fixed inset-0 bg-black bg-opacity-40'/>
                 </Transition.Child>
                 <article className='fixed inset-0'>
                     <div className='flex h-full items-center justify-center p-[16px]'>
@@ -39,11 +35,11 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                             leaveFrom='opacity-100 scale-100'
                             leaveTo='opacity-0 scale-95'
                         >
-                            <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-[8px] bg-white p-[24px] md:p-[32px] text-left shadow-xl'>
-                                <h1 className='text-[24px] mb-[20px]'>
+                            <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-[8px] bg-white p-[24px] pc:p-[32px] text-left shadow-xl'>
+                                <h1 className='text-[22px] pc:text-[24px] mb-[20px]'>
                                     회원가입 성공!
                                 </h1>
-                                <h2 className='mb-[24px]'>
+                                <h2 className='mb-[24px] text-[15px] pc:text-[16px]'>
                                     Zete의 메모서비스를 무료로 이용해보세요.
                                 </h2>
                                 <button

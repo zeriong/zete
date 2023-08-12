@@ -12,20 +12,19 @@ import {useWindowResize} from '../../../hooks/useWindowResize';
 export const MemoLayout = () => {
     const [searchParams] = useSearchParams()
 
-    const windowResize = useWindowResize()
+    const dispatch = useDispatch<AppDispatch>();
+    const memoState = useSelector((state: RootState) => state.memo);
+    const { loading, data } = useSelector((state: RootState) => state.user);
+    const { isShowSideNav } = useSelector((state: RootState) => state.layout);
 
-    const { loading } = useSelector((state: RootState) => state.user)
-    const { isShowSideNav } = useSelector((state: RootState) => state.layout)
-    const memoState = useSelector((state: RootState) => state.memo)
-
-    const dispatch = useDispatch<AppDispatch>()
+    const windowResize = useWindowResize();
 
     // 사이즈 변화에 따른 사이드 네비게이션 활성화
     useEffect(() => {
-        if (windowResize.width <= 767) {
-            if (isShowSideNav) dispatch(setShowSideNavReducer(false))
+        if (windowResize.width <= 900) {
+            if (isShowSideNav) dispatch(setShowSideNavReducer(false));
         } else {
-            if (!isShowSideNav) dispatch(setShowSideNavReducer(true))
+            if (!isShowSideNav) dispatch(setShowSideNavReducer(true));
         }
     },[windowResize]);
 
@@ -34,13 +33,13 @@ export const MemoLayout = () => {
         if (!cate) return '전체메모';
         else if (cate === 'important') return '중요메모';
         else {
-            const matchCate = memoState.cate.list.find((cate) => Number(cate.id) === Number(searchParams.get('cate')))?.name
+            const matchCate = memoState.cate.list.find((cate) => Number(cate.id) === Number(searchParams.get('cate')))?.name;
             if (matchCate) return matchCate;
             return '카테고리가 존재하지않습니다.'
         }
     }, [searchParams, memoState.cate]);
 
-    return loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
+    return (loading && !data.name) ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
         <>
             <Header/>
             <Aside/>

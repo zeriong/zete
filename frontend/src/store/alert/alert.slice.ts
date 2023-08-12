@@ -1,5 +1,4 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {store} from '../index';
 
 export interface IAlertObject {
     message?: string;
@@ -11,10 +10,6 @@ interface INotificationState {
 
 const initState: INotificationState = {
     alerts: [],
-}
-
-export const showAlert = (message: string) => {
-    store.dispatch(alertSlice.actions.setAlertReducer({ message }));
 }
 
 export const alertSlice = createSlice({

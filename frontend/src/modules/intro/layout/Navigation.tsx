@@ -3,7 +3,8 @@ import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../store';
 import {GiHamburgerMenu} from '@react-icons/all-files/gi/GiHamburgerMenu';
-import { logoutAction } from '../../../store/auth/auth.actions';
+import {logoutAction} from '../../../store/auth/auth.actions';
+import {HamburgerMenuIcon} from '../../../assets/vectors';
 
 export const HomeNav = ()=> {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -12,6 +13,7 @@ export const HomeNav = ()=> {
     const dispatch = useDispatch<AppDispatch>();
     const userState = useSelector((state: RootState) => state.user.data);
     const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+    const { loading, data } = useSelector((state: RootState) => state.user);
 
     const menuNames: { name: string, to: string }[] = [
         { name: '서비스', to: '/service' },
@@ -40,22 +42,21 @@ export const HomeNav = ()=> {
         setOpenMenu(false);
     }
 
-    return (
-        <nav className='flex justify-between max-lg:h-[48px] px-[20px] items-center pc:px-[40px] py-[12px] border-b border-gray-300 whitespace-nowrap fixed bg-white w-full z-30'>
+    return (loading && !data.name) ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
+        <nav className='flex justify-between h-[48px] pc:h-auto pl-[12px] pr-[12px] items-center pc:px-[40px] py-[12px] border-b border-gray-300 whitespace-nowrap fixed bg-white w-full z-30'>
             <section
                 onClick={ () => setOpenMenu(false) }
                 className={`transition-all ease-in-out fixed w-full h-full bg-black opacity-0 left-0 top-0 duration-300 z-30
                 ${openMenu ? 'opacity-50 visible' : 'opacity-0 invisible'}`}
             />
-            <Link to='/' className='font-bold max-lg:text-[18px] text-[20px] mr-[48px]'>
+            <Link to='/' className='font-bold text-[18px] pc:text-[20px] mr-[48px]'>
                 Zete!
             </Link>
             <section
-                className={`max-lg:fixed max-lg:h-full max-lg:bg-orange-50 max-lg:w-[260px] max-lg:bottom-0
-                max-lg:p-[28px] max-lg:flex-col max-lg:ease-in-out max-lg:duration-300 flex gap-[32px] justify-start w-full z-30
+                className={`fixed pc:static h-full pc:h-auto w-[260px] pc:w-full p-[28px] pc:p-0 flex gap-[32px] justify-start bg-white bottom-0 flex-col ease-in-out duration-300 z-30
                 ${openMenu ? 'right-0' : '-right-[260px]'}`}
             >
-                <div className='max-lg:block hidden font-bold border-b border-b-orange-200 pb-[20px] pl-[8px]'>
+                <div className='block pc:hidden font-bold border-b border-b-orange-200 pb-[20px] pl-[8px]'>
                     <div className='text-xl mb-[8px] text-gray-700'>{ isLoggedIn ? `${ userState.name }님` : '로그인해주세요.' }</div>
                     {isLoggedIn ? (
                         <>
@@ -90,7 +91,7 @@ export const HomeNav = ()=> {
                     )
                     }
                 </div>
-                <div className='flex max-lg:flex-col gap-[32px] max-lg:gap-[20px] text-[18px] font-bold justify-start w-full text-gray-700 '>
+                <div className='flex flex-col pc:flex-row gap-[20px] pc:gap-[32px] text-[18px] font-bold justify-start w-full text-gray-700 '>
                     {menuNames.map((menu, idx) => (
                         <Link
                             key={ idx }
@@ -112,7 +113,7 @@ export const HomeNav = ()=> {
                 </button>
             </section>
             {isLoggedIn ? (
-                <section className='max-lg:hidden flex flex-row items-center'>
+                <section className='hidden pc:flex flex-row items-center'>
                     <div className='text-[20px] font-bold text-gray-600 mr-[16px]'>
                         { `${ userState.name }님` }
                     </div>
@@ -149,10 +150,9 @@ export const HomeNav = ()=> {
             <button
                 type='button'
                 onClick={ () => setOpenMenu(!openMenu) }
-                className='bg-white p-[6px] rounded-lg border border-gray-200 left-[12px] hidden max-lg:block'
+                className='bg-white p-[6px] rounded-lg border border-gray-200 left-[12px] block pc:hidden'
             >
-                <GiHamburgerMenu size='20' color='#f97316'/>
+                <HamburgerMenuIcon className='fill-orange-500/80'/>
             </button>
         </nav>
-    )
 }

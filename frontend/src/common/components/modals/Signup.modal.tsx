@@ -8,7 +8,7 @@ import {FuncButton} from '../FuncButton';
 import {CreateAccountInput} from '../../../openapi/generated';
 import {Api} from '../../../openapi/api';
 import {PATTERNS} from '../../constants';
-import {VisibilityOff, VisibilityOn} from '../../../assets/vectors';
+import {VisibilityOffIcon, VisibilityOnIcon} from '../../../assets/vectors';
 
 
 export const SignupModal = (props: { successControl: React.Dispatch<React.SetStateAction<boolean>> }) => {
@@ -49,7 +49,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
     return (
         <>
             <Transition appear show={ isShow } as={ Fragment }>
-                <Dialog as='div' className='relative z-30' onClose={ closeModal }>
+                <Dialog as='div' className='relative z-50' onClose={ closeModal }>
                     <Transition.Child
                         as={ Fragment }
                         enter='ease-out duration-300'
@@ -135,7 +135,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                     onClick={ () => setShowPassword(!showPassword) }
                                                     className='absolute right-0 text-[12px] h-fit text-gray-100 px-[8px] top-1/2 -translate-y-1/2'
                                                 >
-                                                    { showPassword ? <VisibilityOn/> : <VisibilityOff/>}
+                                                    { showPassword ? <VisibilityOnIcon/> : <VisibilityOffIcon/>}
                                                 </button>
                                             </div>
                                             <div className='flex justify-between'>
@@ -178,7 +178,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                     onClick={ () => setShowConfirmPassword(!showConfirmPassword) }
                                                     className='absolute right-0 text-[12px] h-fit text-gray-100 px-[8px] top-1/2 -translate-y-1/2'
                                                 >
-                                                    { showConfirmPassword ? <VisibilityOn/> : <VisibilityOff/> }
+                                                    { showConfirmPassword ? <VisibilityOnIcon/> : <VisibilityOffIcon/> }
                                                 </button>
                                             </div>
                                             <p className='mt-[4px] text-red-500 text-[12px] font-normal h-[12px]'>
