@@ -1,9 +1,10 @@
-import React, {Fragment, useEffect} from 'react';
+import React, {Fragment} from 'react';
 import {Dialog, Transition } from '@headlessui/react';
 import {useSearchParams} from 'react-router-dom';
 
 export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const [searchParams, setSearchParams] = useSearchParams();
+
     const closeModal = () => {
         props.setIsShow(false);
         searchParams.set('modal', 'sign-in');
@@ -35,11 +36,11 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                             leaveFrom='opacity-100 scale-100'
                             leaveTo='opacity-0 scale-95'
                         >
-                            <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-[8px] bg-white p-[24px] pc:p-[32px] text-left shadow-xl'>
-                                <h1 className='text-[22px] pc:text-[24px] mb-[20px]'>
+                            <Dialog.Panel className='w-full max-w-sm transform overflow-hidden rounded-[8px] bg-white p-[24px] md:p-[32px] text-left shadow-xl'>
+                                <h1 className='text-[22px] md:text-[24px] mb-[20px]'>
                                     회원가입 성공!
                                 </h1>
-                                <h2 className='mb-[24px] text-[15px] pc:text-[16px]'>
+                                <h2 className='mb-[24px] text-[15px] md:text-[16px]'>
                                     Zete의 메모서비스를 무료로 이용해보세요.
                                 </h2>
                                 <button

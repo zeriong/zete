@@ -5,7 +5,7 @@ import {deleteAlertReducer, IAlertObject} from '../../store/alert/alert.slice';
 import {AlarmIcon} from '../../assets/vectors';
 
 export const Alert = () => {
-    const alarm = useRef<HTMLDivElement>(null);
+    const alarmRef = useRef<HTMLDivElement>(null);
 
     const [alert, setAlert] = useState<IAlertObject>({ message: '' });
     const [isShow, setIsShow] = useState(false);
@@ -17,7 +17,7 @@ export const Alert = () => {
 
     const showAlert = () => {
         setIsRender(true);
-        alarm.current.style.display = 'flex';
+        alarmRef.current.style.display = 'flex';
 
         if (!isRunning && store.getState().alert.alerts.length > 0) {
             setIsRunning(true);
@@ -31,7 +31,7 @@ export const Alert = () => {
                     dispatch(deleteAlertReducer());
                     setIsRunning(false);
                     showAlert();
-                    alarm.current.style.display = 'none';
+                    alarmRef.current.style.display = 'none';
                 }, 300);
 
             }, 3000);
@@ -48,9 +48,9 @@ export const Alert = () => {
 
     return (
         <>
-            {!isRender ? <div ref={ alarm }/> :
+            {!isRender ? <div ref={ alarmRef }/> :
                 <div
-                    ref={ alarm }
+                    ref={ alarmRef }
                     className={`bg-black/90 flex items-center justify-center fixed h-[40px] pl-[20px] pr-[26px] py-[30px] z-[200] left-[26px]
                     rounded-[4px] transition-all duration-300 ease-in-out ${ isShow ? 'bottom-[26px] opacity-100' : 'opacity-0 bottom-0' }`}
                 >

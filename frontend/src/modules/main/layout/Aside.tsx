@@ -10,21 +10,20 @@ import {toggleSideNavReducer} from '../../../store/layout/layout.slice';
 import {getCategoriesAction} from '../../../store/memo/memo.actions';
 
 export const Aside = () => {
+    const dispatch = useDispatch<AppDispatch>();
     const { isShowSideNav } = useSelector((state: RootState) => (state.layout));
     const { cate } = useSelector((state: RootState) => state.memo);
 
-    const dispatch = useDispatch<AppDispatch>();
-
     useEffect(() => {
         // 카테고리 목록 로드
-        dispatch(getCategoriesAction())
-    }, [])
+        (async () => dispatch(await getCategoriesAction()))()
+    }, []);
 
     return (
         <>
             <section
                 onClick={() => dispatch(toggleSideNavReducer())}
-                className={`z-50 w-full h-full left-0 top-0 fixed bg-black opacity-0 hidden max-md:block ease-in-out duration-300
+                className={`z-50 w-full h-full left-0 top-0 fixed bg-black block md:hidden ease-in-out duration-300
                 ${ isShowSideNav ? 'opacity-50 visible' : 'opacity-0 invisible' }`}
             />
             <aside
@@ -33,15 +32,15 @@ export const Aside = () => {
                 ${ isShowSideNav ? 'left-0' : '-left-[256px]' }`}
             >
                 <CustomScroller customTrackVerticalStyle={{ width: 5 }}>
-                    <section className='h-full w-full p-14px text-zete-dark-500 font-light text-14'>
+                    <section className='h-full w-full p-[14px] text-zete-dark-500 font-light text-[14px]'>
                         <div className='h-fit pb-[12px]'>
-                            <ul className='flex flex-col justify-center gap-4px'>
+                            <ul className='flex flex-col justify-center gap-[4px]'>
                                 <CateItemList
                                     to={{ pathname: '/memo' }}
                                     cateId={ null }
                                     cateName='전체메모'
                                     iconComponent={ AllIcon }
-                                    iconClassName='mr-14px w-20px'
+                                    iconClassName='mr-[14px] w-[20px]'
                                     count={ cate.totalMemoCount }
                                 />
                                 <CateItemList
@@ -49,14 +48,14 @@ export const Aside = () => {
                                     cateId={ null }
                                     cateName='중요메모'
                                     iconComponent={ StarIcon }
-                                    iconClassName='mr-14px w-20px'
+                                    iconClassName='mr-[14px] w-[20px]'
                                     count={ cate.importantMemoCount }
                                 />
                             </ul>
-                            <p className='text-zete-dark-300 text-11 font-light pb-14px pt-17px pl-12px'>
+                            <p className='text-zete-dark-300 text-[11px] font-light pb-[14px] pt-[17px] pl-[12px]'>
                                 카테고리
                             </p>
-                            <ul className='grid gap-4px'>
+                            <ul className='grid gap-[4px]'>
                                 {cate.list.map((cate, idx) => (
                                     <CateItemList
                                         key={idx}
@@ -64,7 +63,7 @@ export const Aside = () => {
                                         cateId={ String(cate.id) }
                                         cateName={ cate.name }
                                         iconComponent={ CategoryIcon }
-                                        iconClassName='mr-10px mt-4px min-w-[21px]'
+                                        iconClassName='mr-[10px] mt-[4px] min-w-[21px]'
                                         tags={ cate.tags }
                                         count={ cate.memoCount }
                                     />
@@ -96,46 +95,44 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
         >
             <Link
                 to={ props.to }
-                className='flex w-full justify-between items-center p-10px hover:bg-zete-light-gray-200 rounded-[5px]'
+                className='flex w-full justify-between items-center p-[10px] hover:bg-zete-light-gray-200 rounded-[5px]'
             >
                 <div
                     className={`flex justify-start w-full font-light transition-all duration-150
                     ${ props.cateId ? 'items-start' : 'items-center' }`}
                 >
                     <props.iconComponent className={ props.iconClassName }/>
-                    <span>
-                        { props.cateName }
-                    </span>
+                    <p>{ props.cateName }</p>
                 </div>
                 <div
-                    className={`rounded-full text-zete-dark-100 py-2px px-8px text-12 font-medium
+                    className={`rounded-full text-zete-dark-100 py-[2px] px-[8px] text-[12px] font-medium
                     ${ isActiveCate ? 'bg-white' : 'group-hover:bg-white bg-zete-light-gray-300' }`}
                 >
-                    <span className='relative bottom-1px'>
+                    <p className='relative bottom-[1px]'>
                         { props.count || 0 }
-                    </span>
+                    </p>
                 </div>
             </Link>
-            <div className={ (isActiveCate && props.tags?.length > 0) ? 'px-12px pb-12px' : 'h-0 overflow-hidden' }>
+            <ul className={ (isActiveCate && props.tags?.length > 0) ? 'px-[12px] pb-[12px]' : 'h-0 overflow-hidden' }>
                 {props.tags?.map((tag, idx) => (
-                    <div
+                    <li
                         key={ idx }
-                        className={`overflow-hidden font-light text-13 transition-all duration-300 
-                        ${ isActiveCate ? 'max-h-[200px] mt-6px' : 'h-[0vh] p-0 m-0' }`}
+                        className={`overflow-hidden font-light text-[13px] transition-all duration-300 
+                        ${ isActiveCate ? 'max-h-[200px] mt-[6px]' : 'h-[0vh] p-0 m-0' }`}
                     >
                         <Link
                             to={{ pathname: '/memo', search: `${ props.to.search }&tag=${ tag.name }` }}
-                            className={`flex w-full h-fit py-8px pl-16px rounded-[5px] mb-1px hover:bg-zete-light-gray-500
+                            className={`flex w-full h-fit py-[8px] pl-[16px] rounded-[5px] mb-[1px] hover:bg-zete-light-gray-500
                             ${ searchParams.get('tag') === tag.name && 'bg-zete-light-gray-500' }`}
                         >
-                            <TagIcon svgClassName='w-14px mr-8px' strokeClassName='fill-zete-dark-200'/>
+                            <TagIcon svgClassName='w-[14px] mr-[8px]' strokeClassName='fill-zete-dark-200'/>
                             <p>
                                 { tag.name }
                             </p>
                         </Link>
-                    </div>
+                    </li>
                 ))}
-            </div>
+            </ul>
         </li>
     )
 }

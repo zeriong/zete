@@ -29,10 +29,8 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
     const createCategorySubmit = (e) => {
         e.preventDefault();
         if (createInputValue) {
-            // 카테고리 생성
-            dispatch(createCategoryAction({ name: createInputValue }));
-            // input 초기화
-            setCreateInputValue('');
+            dispatch(createCategoryAction({ name: createInputValue })); // 카테고리 생성
+            setCreateInputValue('');  // input 초기화
         }
     }
 
@@ -64,19 +62,15 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
             <button
                 type='button'
                 onClick={ openModal }
-                className='flex w-full justify-between items-center px-[10px] py-[8px] rounded-[5px] mt-[4px] h-[42px]'
+                className='flex justify-start items-center w-full px-[10px] py-[8px] rounded-[5px] mt-[4px] h-[42px] font-light'
             >
-                <div className='flex justify-start items-center w-full font-light transition-all duration-150'>
-                    <ModifyIcon className='mr-[10px]'/>
-                    <span>
-                        { props.buttonText }
-                    </span>
-                </div>
+                <ModifyIcon className='mr-[10px]'/>
+                <p>{ props.buttonText }</p>
             </button>
             <Transition appear show={ isShow } as={ Fragment }>
                 <Dialog
                     as='div'
-                    className='relative z-30'
+                    className='relative z-50'
                     onClose={ closeModal }
                 >
                     <Transition.Child
@@ -88,10 +82,10 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                         leaveFrom='opacity-100'
                         leaveTo='opacity-0'
                     >
-                        <div className='fixed inset-0 bg-black bg-opacity-40'/>
+                        <div className='fixed inset-0 bg-black/40'/>
                     </Transition.Child>
                     <div className='fixed inset-0'>
-                        <div className='close-modal-background flex min-h-full items-center justify-center p-[16px] text-center'>
+                        <div className='flex min-h-full items-center justify-center p-[16px] text-center'>
                             <Transition.Child
                                 as={Fragment}
                                 enter='ease-out duration-300'
@@ -101,12 +95,12 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                 leaveFrom='opacity-100 scale-100'
                                 leaveTo='opacity-0 scale-95'
                             >
-                                <Dialog.Panel className='w-[300px] relative transform overflow-hidden bg-white text-left shadow-xl'>
+                                <Dialog.Panel className='relative transform w-[300px] overflow-hidden bg-white text-left shadow-xl'>
                                     <div className='relative h-[430px] w-full p-[16px]'>
                                         <CustomScroller>
-                                            <p className='text-zete-dark-400'>
+                                            <h1 className='text-zete-dark-400'>
                                                 카테고리 추가/수정
-                                            </p>
+                                            </h1>
                                             <div className='py-[16px] px-[8px] text-[15px]'>
                                                 <form
                                                     onSubmit={ createCategorySubmit }
@@ -117,8 +111,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                                         placeholder='새 카테고리 만들기'
                                                         onChange={ (event) => setCreateInputValue(event.target.value) }
                                                         value={ createInputValue }
-                                                        className='placeholder:text-zete-dark-300 placeholder:font-thin pb-[5px] border-b border-zete-memo-border
-                                                        text-zete-dark-300 w-full'
+                                                        className='placeholder:text-zete-dark-300 placeholder:font-thin pb-[5px] border-b border-zete-memo-border text-zete-dark-300 w-full'
                                                     />
                                                     <button
                                                         type='submit'

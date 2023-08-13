@@ -20,7 +20,7 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
         loadMemos(dispatch, searchParams, true);
     }
 
-    const handleConfirmModal = (event) => {
+    const openConfirmModal = (event) => {
         event.stopPropagation();
         setIsOpen(true);
     }
@@ -30,11 +30,11 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
             <Popover className='relative h-fit'>
                 {({open}) => {
                     return <>
-                        <Popover.Button className={`${open && 'bg-black bg-opacity-10'} hover:bg-black hover:bg-opacity-10 p-1px rounded-full w-26px h-26px`}>
+                        <Popover.Button className={`${ open && 'bg-black/10' } hover:bg-black/10 p-[1px] rounded-full w-[26px] h-[26px]`}>
                             <ThreeDotMenuIcon className='fill-zete-dark-200 cursor-pointer'/>
                         </Popover.Button>
                         <Transition
-                            as={Fragment}
+                            as={ Fragment }
                             enter='transition ease-out duration-200'
                             enterFrom='opacity-0 translate-y-1'
                             enterTo='opacity-100 translate-y-0'
@@ -42,20 +42,22 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                             leaveFrom='opacity-100 translate-y-0'
                             leaveTo='opacity-0 translate-y-1'
                         >
-                            <Popover.Panel className='absolute z-10 mt-3 right-0 bottom-[130%] px-0 w-[150px]' static>
-                                <ul className='relative bg-white py-6px text-14 font-normal text-start text-zete-dark-300 cursor-default overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 whitespace-nowrap'>
-                                    <li className='flex items-center cursor-pointer py-5px px-12px hover:bg-black hover:bg-opacity-5'>
-                                        <EditIcon className='fill-zete-dark-100 mr-6px w-18px h-18px'/>
-                                        <p>메모수정</p>
-                                    </li>
-                                    <li
-                                        onClick={handleConfirmModal}
-                                        className='flex items-center cursor-pointer py-5px px-12px hover:bg-black hover:bg-opacity-5'
-                                    >
-                                        <DeleteIcon className='fill-zete-dark-100 mr-6px w-18px h-18px'/>
-                                        <p>메모삭제</p>
-                                    </li>
-                                </ul>
+                            <Popover.Panel static className='absolute z-10 mt-[12px] right-0 bottom-[130%] px-0 w-[150px] py-[6px] bg-white font-normal text-[14px] text-zete-dark-300 shadow-lg border border-gray-500/10 rounded-[8px]'>
+                                <button
+                                    type='button'
+                                    className='flex items-center py-[5px] px-[12px] hover:bg-black/5 w-full'
+                                >
+                                    <EditIcon className='fill-zete-dark-100 mr-[6px] w-[18px] h-[18px]'/>
+                                    <p>메모수정</p>
+                                </button>
+                                <button
+                                    type='button'
+                                    onClick={ openConfirmModal }
+                                    className='flex items-center py-[5px] px-[12px] hover:bg-black/5 w-full'
+                                >
+                                    <DeleteIcon className='fill-zete-dark-100 mr-[6px] w-[18px] h-[18px]'/>
+                                    <p>메모삭제</p>
+                                </button>
                             </Popover.Panel>
                         </Transition>
                     </>

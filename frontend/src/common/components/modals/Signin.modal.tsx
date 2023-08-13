@@ -36,7 +36,7 @@ export const SigninModal = () => {
         form.reset();
     }
 
-    const loginSubmit = form.handleSubmit(async () => {
+    const signinSubmit = form.handleSubmit(async () => {
         await Api.auth.login(form.getValues())
             .then((res) => {
                 if (!res.data.success) {
@@ -85,8 +85,8 @@ export const SigninModal = () => {
                                 leaveFrom='opacity-100 scale-100'
                                 leaveTo='opacity-0 scale-95'
                             >
-                                <Dialog.Panel className='w-full max-w-sm overflow-hidden rounded-[8px] bg-white p-[24px] pc:p-[32px] text-left shadow-xl'>
-                                    <h1 className='text-[26px] pc:text-[28px] font-bold'>
+                                <Dialog.Panel className='w-full max-w-sm overflow-hidden rounded-[8px] bg-white p-[24px] md:p-[32px] text-left shadow-xl'>
+                                    <h1 className='text-[26px] md:text-[28px] font-bold'>
                                         로그인
                                     </h1>
                                     <p className='text-red-500 mt-[6px] h-[24px]'>
@@ -94,7 +94,7 @@ export const SigninModal = () => {
                                     </p>
                                     <form
                                         className='flex flex-col gap-[16px] mt-[6px]'
-                                        onSubmit={ loginSubmit }
+                                        onSubmit={ signinSubmit }
                                     >
                                         <div>
                                             <input

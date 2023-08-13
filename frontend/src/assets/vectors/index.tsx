@@ -1,17 +1,4 @@
 import React, {SVGProps} from 'react';
-
-export const BarsMenuIcon = (props: SVGProps<SVGSVGElement>) => (
-    <svg width='20' height='14' viewBox='0 0 20 14' fill='none' xmlns='http://www.w3.org/2000/svg' {...props}>
-        <g clipPath='url(#clip0_20_548)'>
-            <path d='M0 14V12.054H21V14H0ZM0 7.973V6.027H21V7.973H0ZM0 1.946V0H21V1.946H0Z' fill='black'/>
-        </g>
-        <defs>
-            <clipPath id='clip0_20_548'>
-                <rect width='20' height='13.3333' fill='white'/>
-            </clipPath>
-        </defs>
-    </svg>
-)
 export const ModifyIcon = (props: SVGProps<SVGSVGElement>) => (
     <svg width='22' height='22' viewBox='0 0 22 21' fill='none' xmlns='http://www.w3.org/2000/svg' {...props}>
         <g clipPath='url(#clip0_11_234)'>

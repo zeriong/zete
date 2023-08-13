@@ -15,12 +15,12 @@ import {updateMemoReducer} from '../../../../store/memo/memo.slice';
 import {getCategoriesAction} from '../../../../store/memo/memo.actions';
 
 export const MemoEditModal = () => {
-    const savedMemo = useRef<Memo | null>(null);
-    const saveDelayTimer = useRef<NodeJS.Timeout | null>(null);
-    const getDelayTimer = useRef<NodeJS.Timeout | null>(null);
-    const isSavingMemo = useRef(false);
-    const isLoadingMemo = useRef(false);
-    const requestMemoId = useRef(0);
+    const savedMemoRef = useRef<Memo | null>(null);
+    const saveDelayTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const getDelayTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isSavingMemoRef = useRef(false);
+    const isLoadingMemoRef = useRef(false);
+    const requestMemoIdRef = useRef(0);
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [isShow, setIsShow] = useState(false);
@@ -33,22 +33,22 @@ export const MemoEditModal = () => {
     const closeModal = async () => {
         searchParams.delete('view');
         setSearchParams(searchParams);
-        if (savedMemo.current) {
+        if (savedMemoRef.current) {
             await updateMemo();
-            dispatch(updateMemoReducer(savedMemo.current));
+            dispatch(updateMemoReducer(savedMemoRef.current));
         }
         form.reset();
-        savedMemo.current = null;
+        savedMemoRef.current = null;
     }
 
     // 메모 수정
     const updateMemo = async () => {
-        clearTimeout(saveDelayTimer.current);
-        saveDelayTimer.current = null;
-        isSavingMemo.current = true;
+        clearTimeout(saveDelayTimerRef.current);
+        saveDelayTimerRef.current = null;
+        isSavingMemoRef.current = true;
 
         const data = form.getValues();
-        const targetMemo = memoState.memo.list.find(memo => memo.id === requestMemoId.current);
+        const targetMemo = memoState.memo.list.find(memo => memo.id === requestMemoIdRef.current);
         const diffTagLength = data.tags.length === 0 ? 0 : targetMemo.tags.filter(tag => data.tags.some(formTag => formTag.name === tag.name)).length;
         // 내용이 있고 변경사항이 있는 경우에만 요청
         if (data.title?.length === 0 && data.content?.length === 0) showAlert('입력내용이 존재하지 않아 마지막 내용을 저장합니다.');
@@ -56,8 +56,8 @@ export const MemoEditModal = () => {
             targetMemo.tags.length === diffTagLength && targetMemo.isImportant === data.isImportant) return;
 
         try {
-            const res = await Api.memo.updateMemo({ ...data, id: savedMemo.current.id });
-            if (res.data.success) savedMemo.current = res.data.savedMemo;
+            const res = await Api.memo.updateMemo({ ...data, id: savedMemoRef.current.id });
+            if (res.data.success) savedMemoRef.current = res.data.savedMemo;
             else showAlert(res.data.error);
             dispatch(getCategoriesAction());
         } catch (e) {
@@ -65,18 +65,18 @@ export const MemoEditModal = () => {
             loadMemos(dispatch, searchParams, true);
             dispatch(getCategoriesAction());
         }
-        isSavingMemo.current = false;
+        isSavingMemoRef.current = false;
     }
 
     // 메모 수정 시도
     const tryUpdateMemo = () => {
-        if (saveDelayTimer.current != null) {
-            clearTimeout(saveDelayTimer.current);
-            saveDelayTimer.current = null;
+        if (saveDelayTimerRef.current != null) {
+            clearTimeout(saveDelayTimerRef.current);
+            saveDelayTimerRef.current = null;
         }
-        if (saveDelayTimer.current == null) {
-            saveDelayTimer.current = setTimeout(async () => {
-                if (isSavingMemo.current) tryUpdateMemo();  // 저장중이라면 연기
+        if (saveDelayTimerRef.current == null) {
+            saveDelayTimerRef.current = setTimeout(async () => {
+                if (isSavingMemoRef.current) tryUpdateMemo();  // 저장중이라면 연기
                 else await updateMemo();  // 저장
             }, 3000);
         }
@@ -85,18 +85,15 @@ export const MemoEditModal = () => {
     // 수정할 메모를 요청해서 받은 데이터를 기반으로 세팅
     const setModal = () => {
         (async () =>{
-            console.log('셋메모 start')
-            isLoadingMemo.current = true;
-            const res = await Api.memo.getMemo({ id: requestMemoId.current });
-            console.log(res.data)
+            isLoadingMemoRef.current = true;
+            const res = await Api.memo.getMemo({ id: requestMemoIdRef.current });
             if (res.data.success) {
                 const memo = res.data.memo;
-                console.log('데이터',res.data)
                 // 요청한 메모일 경우만 세팅 (지연로드 되는경우 대비)
-                if (requestMemoId.current === Number(res.data.memo.id)) {
-                    savedMemo.current = memo;
-                    form.setValue('title', memo.title);
-                    form.setValue('content', memo.content);
+                if (requestMemoIdRef.current === Number(res.data.memo.id)) {
+                    savedMemoRef.current = memo;
+                    form.setValue('title', memo.title || '');
+                    form.setValue('content', memo.content || '');
                     form.setValue('cateId', Number(memo.cateId));
                     form.setValue('tags', memo.tags);
                     form.setValue('isImportant', memo.isImportant);
@@ -108,21 +105,21 @@ export const MemoEditModal = () => {
                 loadMemos(dispatch, searchParams, true);
                 dispatch(getCategoriesAction());
             }
-            isLoadingMemo.current = false;
+            isLoadingMemoRef.current = false;
         })()
     }
 
     // 모달 세팅 시도
     const trySetModal = () => {
         (async () => {
-            if (getDelayTimer.current != null) {
-                clearTimeout(getDelayTimer.current);
-                getDelayTimer.current = null;
+            if (getDelayTimerRef.current != null) {
+                clearTimeout(getDelayTimerRef.current);
+                getDelayTimerRef.current = null;
             }
-            if (getDelayTimer.current == null) {
+            if (getDelayTimerRef.current == null) {
                 // 데이터로드중이라면 연기 (메모수정이 완료 되지 않아도 세팅 연기)
-                if (isLoadingMemo.current) {
-                    getDelayTimer.current = setTimeout(() => {
+                if (isLoadingMemoRef.current) {
+                    getDelayTimerRef.current = setTimeout(() => {
                         trySetModal();
                     }, 500);
                 } else { // 모달 세팅
@@ -132,10 +129,10 @@ export const MemoEditModal = () => {
         })()
     }
 
-    // 메모수정 모달
+    // searchParams를 통한 메모수정 모달 컨트롤
     useEffect(() => {
-        requestMemoId.current = Number(searchParams.get('view'));
-        if (requestMemoId.current) {
+        requestMemoIdRef.current = Number(searchParams.get('view'));
+        if (requestMemoIdRef.current) {
             form.reset();
             setIsShow(true);
             trySetModal();
@@ -172,10 +169,7 @@ export const MemoEditModal = () => {
                     <div className='fixed inset-0 bg-black bg-opacity-40' />
                 </Transition.Child>
                 <div className='fixed inset-0 overflow-y-auto'>
-                    <div
-                        className='close-modal-background
-                        flex min-h-full items-center justify-center p-4 text-center'
-                    >
+                    <div className='flex min-h-full items-center justify-center p-[16px]'>
                         <Transition.Child
                             as={ Fragment }
                             enter='ease-out duration-300'
@@ -185,12 +179,16 @@ export const MemoEditModal = () => {
                             leaveFrom='opacity-100 scale-100'
                             leaveTo='opacity-0 scale-95'
                         >
-                            <Dialog.Panel className='relative transform overflow-hidden bg-white text-left align-middle shadow-xl transition-all rounded-[5px]'>
+                            <Dialog.Panel className='relative transform overflow-hidden bg-white text-left shadow-xl rounded-[5px]'>
                                 <article
-                                    className='relative min-w-0 w-[300px] pc:w-[400px] flex flex-col justify-between
-                                    border border-zete-light-gray-500 rounded-[8px] px-[18px] pb-[10px] pt-[12px] min-h-[212px] h-fit bg-zete-primary-200 memo-shadow'
+                                    className='relative min-w-0 w-[300px] md:w-[400px] flex flex-col justify-between
+                                    border border-zete-light-gray-500 rounded-[8px] px-[18px] pb-[10px] pt-[12px] min-h-[212px] h-fit bg-memo memo-shadow'
                                 >
+                                    {(isLoadingMemoRef.current || !savedMemoRef.current) &&  // 응답을 받는중이거나 모달이 닫히는경우 form을 숨겨줌
+                                        <div className='absolute left-0 top-0 w-full h-full bg-memo z-10 rounded-[5px]'/>
+                                    }
                                     <div className='w-full h-full flex flex-col min-h-[212px]'>
+
                                         <form onSubmit={ focusToContent } className='w-full h-full'>
                                             <div className='flex justify-between items-center pb-[8px] border-b border-zete-memo-border h-full'>
                                                 <input
@@ -198,9 +196,8 @@ export const MemoEditModal = () => {
                                                         required: false,
                                                         maxLength: 255,
                                                     })}
-                                                    disabled={ isLoadingMemo.current || !isShow }
                                                     tabIndex={ 1 }
-                                                    placeholder={ isLoadingMemo.current || !isShow ? '' : '제목' }
+                                                    placeholder='제목'
                                                     className='resize-none w-full pr-[6px] max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500
                                                     font-light placeholder:text-[15px] memo-custom-scroll'
                                                 />
@@ -212,8 +209,8 @@ export const MemoEditModal = () => {
                                                 </button>
                                             </div>
                                             <div className='relative h-full w-full pt-[9px]'>
-                                                {isLoadingMemo.current &&
-                                                    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20px] whitespace-nowrap font-bold text-zete-gray-500/80'>
+                                                {isLoadingMemoRef.current &&
+                                                    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20px] whitespace-nowrap font-bold text-zete-gray-500/80 z-20'>
                                                         메모를 불러오는 중입니다.
                                                     </div>
                                                 }
@@ -222,9 +219,8 @@ export const MemoEditModal = () => {
                                                         required: false,
                                                         maxLength: 65535,
                                                     })}
-                                                    disabled={ isLoadingMemo.current || !isShow }
                                                     rows={ 1 }
-                                                    placeholder={ isLoadingMemo.current || !isShow ? '' : '메모 작성...' }
+                                                    placeholder='메모 작성...'
                                                     className='resize-none h-[280px] w-full bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500
                                                     font-light placeholder:text-[15px] memo-custom-scroll'
                                                 />
@@ -241,15 +237,14 @@ export const MemoEditModal = () => {
                                                             <button
                                                                 type='button'
                                                                 onClick={ () => deleteMemoTag(form, tag.name) }
-                                                                className='absolute right-[2px] group rounded-full grid place-content-center hover:bg-zete-dark-300
-                                                                hover:bg-opacity-50 w-[14px] h-[14px]'
+                                                                className='absolute right-[2px] group rounded-full grid place-content-center hover:bg-zete-dark-300/50 w-[14px] h-[14px]'
                                                             >
                                                                 <CloseIcon className='w-[10px] fill-zete-dark-400 group-hover:fill-white'/>
                                                             </button>
                                                         </div>
                                                     ))}
                                                     <form
-                                                        onSubmit={ (event) => {
+                                                        onSubmit={(event) => {
                                                             addMemoTagSubmit(event, form);
                                                             setDynamicInputWidth(event.target[0]);
                                                         }}
@@ -257,15 +252,12 @@ export const MemoEditModal = () => {
                                                     >
                                                         <input
                                                             onChange={ (event) => setDynamicInputWidth(event.target) }
-                                                            disabled={ isLoadingMemo.current || !isShow }
-                                                            placeholder={(isLoadingMemo.current || !isShow) ? '' : '태그추가'}
+                                                            placeholder='태그추가'
                                                             className='min-w-[50px] w-[50px] px-[2px] placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
                                                         />
-                                                        {(isLoadingMemo.current || !isShow) &&
-                                                            <button type='submit' className='relative w-[14px] h-[14px] grid place-content-center'>
-                                                                <PlusIcon svgClassName='w-[9px]' strokeClassName='fill-black'/>
-                                                            </button>
-                                                        }
+                                                        <button type='submit' className='relative w-[14px] h-[14px] grid place-content-center'>
+                                                            <PlusIcon svgClassName='w-[9px]' strokeClassName='fill-black'/>
+                                                        </button>
                                                     </form>
                                                 </div>
                                             </HorizontalScroll>
@@ -274,7 +266,6 @@ export const MemoEditModal = () => {
                                                     <CategoryIcon className='w-[18px] opacity-75 mr-[2px]'/>
                                                     <select
                                                         {...form.register('cateId', { required: true })}
-                                                        disabled={ isLoadingMemo.current || !isShow }
                                                         className='w-[130px] text-[13px] text-gray-500 bg-transparent'
                                                     >
                                                         <option value={0}>

@@ -1,18 +1,18 @@
 import {useEffect, useRef, useState} from 'react';
 
 export const useWindowResize = () => {
-    const timer = useRef<NodeJS.Timeout | null>(null);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
     useEffect(() => {
         const updateSize = () => {
-            if (timer.current != null) {
-                clearTimeout(timer.current);
-                timer.current = null;
+            if (timerRef.current != null) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
             }
-            if (timer.current == null) {
-                timer.current = setTimeout(() => {
+            if (timerRef.current == null) {
+                timerRef.current = setTimeout(() => {
                     setSize({ width: window.innerWidth, height: window.innerHeight });
                 }, 300);
             }

@@ -54,19 +54,19 @@ export const ProfileEditPage = () => {
     useEffect(() => setIsRender(true),[]);
 
     return  loading ? <div>로딩중...</div> :
-        <div className='w-full min-h-[640px] pc:min-h-[700px] h-full relative flex justify-center items-center'>
+        <div className='w-full min-h-[640px] md:min-h-[700px] h-full relative flex justify-center items-center'>
             <form
                 onSubmit={ onSubmit }
                 className={`flex flex-col justify-center relative bg-white text-start items-center shadow-2xl transition-all ease-in-out duration-500
-                pc:gap-[16px] pc:p-[20px] pc:rounded-[16px] pc:border pc:border-gray-300 pc:w-auto pc:h-auto
+                md:gap-[16px] md:p-[20px] md:rounded-[16px] md:border md:border-gray-300 md:w-auto md:h-auto
                 h-full w-full gap-[14px] px-[16px]
                 ${isRender ? 'bottom-0' : '-bottom-full'}`}
             >
-                <h1 className='font-extrabold text-[24px] pc:text-[30px] text-center'>
+                <h1 className='font-extrabold text-[24px] md:text-[30px] text-center'>
                     프로필 변경
                 </h1>
-                <div className='pc:w-auto w-full pc:px-0'>
-                    <h2 className='font-bold pc:text-[18px] text-[14px] text-[#5f5f5f]'>
+                <div className='md:w-auto w-full md:px-0'>
+                    <h2 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
                         이름
                     </h2>
                     <input
@@ -75,24 +75,24 @@ export const ProfileEditPage = () => {
                             minLength: 2, maxLength: 30,
                         })}
                         placeholder='수정할 이름을 입력해주세요.'
-                        className='border border-gray-400 rounded px-2 py-1 pc:w-96 w-full'
+                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
                     />
                     <p className='mt-1 text-red-500 text-xs font-normal h-3'>
                         { form.formState.errors.name && '성함을 입력해 주시기 바랍니다.' }
                     </p>
                 </div>
-                <div className='pc:w-auto w-full pc:px-0'>
+                <div className='md:w-auto w-full md:px-0'>
                     <p className='absolute -top-5 text-red-500 font-bold'>
                         { occurError }
                     </p>
-                    <h2 className='font-bold pc:text-[18px] text-[14px] text-[#5f5f5f]'>
+                    <h2 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
                         이메일
-                        <span className='pc:text-[14px] text-[12px] text-orange-400/80'>
+                        <span className='md:text-[14px] text-[12px] text-orange-400/80'>
                                 &nbsp;(현계정에 등록된 이메일 외 중복이메일은 등록불가)
                         </span>
                     </h2>
                     <input
-                        className='border border-gray-400 rounded px-2 py-1 pc:w-96 w-full'
+                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
                         {...form.register('email', {
                             required: true,
                             minLength: 6, maxLength: 64,
@@ -104,8 +104,8 @@ export const ProfileEditPage = () => {
                         { form.formState.errors.email && '이메일을 입력해주시기 바랍니다.' }
                     </p>
                 </div>
-                <div className='pc:w-auto w-full pc:px-0'>
-                    <h2 className='font-bold pc:text-[18px] text-[14px] text-[#5f5f5f]'>
+                <div className='md:w-auto w-full md:px-0'>
+                    <h2 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
                         휴대전화번호
                     </h2>
                     <input
@@ -120,17 +120,17 @@ export const ProfileEditPage = () => {
                         })}
                         type='text'
                         placeholder='휴대폰번호를 입력해주세요.'
-                        className='border border-gray-400 rounded px-2 py-1 pc:w-96 w-full'
+                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
                     />
                     <p className='mt-1 text-red-500 text-xs font-normal h-3'>
                         { form.formState.errors.mobile && '휴대전화번호를 입력해주세요.' }
                     </p>
                 </div>
-                <h2 className='text-center font-extrabold pc:text-[18px] mt-[12px] text-[15px] text-[#4f4f4f]'>
+                <h2 className='text-center font-extrabold md:text-[18px] mt-[12px] text-[15px] text-[#4f4f4f]'>
                     { '< 비밀변호 변경은 필수입력 사항이 아닙니다. >' }
                 </h2>
-                <div className='pc:w-auto w-full pc:px-0'>
-                    <h2 className='font-bold pc:text-[18px] text-[14px] text-[#5f5f5f]'>
+                <div className='md:w-auto w-full md:px-0'>
+                    <h2 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
                         비밀번호 변경
                     </h2>
                     <input
@@ -146,9 +146,9 @@ export const ProfileEditPage = () => {
                         })}
                         type={ showPW ? 'text' : 'password' }
                         placeholder='수정할 비밀번호를 입력해주세요.'
-                        className='border border-gray-400 rounded px-2 py-1 pc:w-96 w-full'
+                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
                     />
-                    <div className='flex justify-between mb-[18px] pc:w-96 w-full'>
+                    <div className='flex justify-between mb-[18px] md:w-96 w-full'>
                         <div className='mt-[4px] text-red-500 text-[11px] font-normal h-[12px]'>
                             {form.formState.errors.password &&
                                 <h2 className='relative'>
@@ -171,7 +171,7 @@ export const ProfileEditPage = () => {
                             { showPW ? '비밀번호 숨김' : '비밀번호 확인' }
                         </button>
                     </div>
-                    <h1 className='font-bold pc:text-[18px] text-[14px] text-[#5f5f5f]'>
+                    <h1 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
                         비밀번호 변경 재확인
                     </h1>
                     <input
@@ -188,9 +188,9 @@ export const ProfileEditPage = () => {
                         })}
                         type={ showConfirmPW ? 'text' : 'password' }
                         placeholder='비밀번호를 다시 한번 입력해주세요.'
-                        className='border border-gray-400 rounded px-2 py-1 pc:w-96 w-full'
+                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
                     />
-                    <div className='flex justify-between pc:w-96 w-full'>
+                    <div className='flex justify-between md:w-96 w-full'>
                         <p className='mt-1 text-red-500 text-xs font-normal h-3'>
                             { form.formState.errors.passwordConfirm && '비밀번호가 동일하지 않습니다.' }
                         </p>
@@ -210,7 +210,7 @@ export const ProfileEditPage = () => {
                         loading: loading,
                     }}
                     type='submit'
-                    className='mt-[32px] w-full py-[8px] flex justify-center mb-[12px] cursor-pointer text-[18px] pc:text-[22px] items-center bg-orange-500 rounded-[16px] text-white'
+                    className='mt-[32px] w-full py-[8px] flex justify-center mb-[12px] cursor-pointer text-[18px] md:text-[22px] items-center bg-orange-500 rounded-[16px] text-white'
                 />
             </form>
         </div>

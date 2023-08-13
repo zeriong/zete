@@ -18,19 +18,20 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'pc': '900px',
+        'side-menu-md': '920px',
       },
       fontSize: {...createRemEntries(50)},
       colors: {
         'brand': '#fec107',
+        'memo': '#fff8d9',
+        'gpt': '#19C37D',
+
         'zete': {
           'scroll-gray': '#a0a0a0',
           'placeHolder': '#767676',
           'md-placeHolder': '#f3f3f3',
           'memo-border': '#e0e0e0',
-          'primary-500': '#fec107',
-          'primary-300': '#FFE794',
-          'primary-200': '#fff8d9',
+
           'tagBlack': '#313131',
           'dark': '#2f2f2f',
           'dark-500': '#303030',
@@ -49,9 +50,7 @@ module.exports = {
           'light-gray-200': '#f2f2f2',
           'light-gray-100': '#f5f5f5',
           'gpt-black': '#202123',
-          'gpt-500': '#19C37D',
-          'gpt-400': '#27bd7f',
-          'gpt-300': '#42be8b',
+
           'gpt-200': '#70c9a5',
           'gpt-100': '#a0e3c7',
         }

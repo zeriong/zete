@@ -21,7 +21,7 @@ export const MemoLayout = () => {
 
     // 사이즈 변화에 따른 사이드 네비게이션 활성화
     useEffect(() => {
-        if (windowResize.width <= 900) {
+        if (windowResize.width <= 920) {
             if (isShowSideNav) dispatch(setShowSideNavReducer(false));
         } else {
             if (!isShowSideNav) dispatch(setShowSideNavReducer(true));
@@ -44,17 +44,20 @@ export const MemoLayout = () => {
             <Header/>
             <Aside/>
             <main
-                className={`${ isShowSideNav ? 'pl-[256px] max-md:pl-0' : 'pl-0' }
-                flex relative flex-col justify-center h-full text-center items-center pt-[46px]
-                duration-300 ease-in-out`}
+                className={`${ isShowSideNav ? 'pl-0 md:pl-[256px]' : 'pl-0' }
+                flex relative flex-col justify-center h-full text-center items-center pt-[46px] duration-300 ease-in-out`}
             >
                 <div className='w-full h-full flex relative pt-[46px]'>
-                    <header className='flex fixed top-[46px] h-[46px] items-center justify-between w-full ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 pl-16px md:pl-20px'>
-                        <div className={`flex items-center ${ categoryName === '카테고리가 존재하지않습니다.' && 'text-zete-scroll-gray' }`}>
-                            <CategoryIcon className='w-20px mr-10px'/>
-                            { categoryName }
+                    <header className='flex fixed top-[46px] h-[46px] items-center justify-between w-full ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 pl-[16px] md:pl-[20px]'>
+                        <div className={`flex items-center  ${ categoryName === '카테고리가 존재하지않습니다.' && 'text-zete-scroll-gray' }`}>
+                            <div className='w-[16px] md:w-[20px] mr-[10px]'>
+                                <CategoryIcon className=''/>
+                            </div>
+                            <p className='line-clamp-1'>
+                                { categoryName }
+                            </p>
                         </div>
-                        <div className='block md:hidden pr-16px'>
+                        <div className='block md:hidden pr-[16px]'>
                             <SearchMemo/>
                         </div>
                     </header>

@@ -8,6 +8,7 @@ import {setShowSideNavReducer} from '../../../store/layout/layout.slice';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../store';
 import {useWindowResize} from '../../../hooks/useWindowResize';
+import CustomScroller from '../../../common/components/customScroller';
 
 export const HomeLayout = () => {
     const [modalControl, setModalControl] = useState(false);
@@ -19,7 +20,7 @@ export const HomeLayout = () => {
 
     // 사이즈 변화에 따른 사이드 네비게이션 활성화
     useEffect(() => {
-        if (windowResize.width <= 900) {
+        if (windowResize.width <= 920) {
             if (isShowSideNav) dispatch(setShowSideNavReducer(false));
         } else {
             if (!isShowSideNav) dispatch(setShowSideNavReducer(true));
@@ -29,8 +30,10 @@ export const HomeLayout = () => {
     return (
         <>
             <HomeNav/>
-            <main className='flex w-full h-full overflow-auto pt-[60px] max-md:pt-[48px]'>
-                <Outlet/>
+            <main className='flex w-full h-full pt-[48px] md:pt-[60px] md:min-w-[1100px]'>
+                <CustomScroller autoHide={false}>
+                    <Outlet/>
+                </CustomScroller>
             </main>
             <SuccessSignupModal isShow={ modalControl } setIsShow={ setModalControl }/>
             <SignupModal successControl={ setModalControl }/>

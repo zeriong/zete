@@ -30,7 +30,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
         setSearchParams(searchParams);
     };
 
-    const handleOnSubmit = form.handleSubmit(async () => {
+    const signupSubmit = form.handleSubmit(async () => {
         const { passwordConfirm, ...input } = form.getValues();
         await Api.user.createAccount(input)
             .then((res) => {
@@ -72,18 +72,18 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                 leaveFrom='opacity-100 scale-100'
                                 leaveTo='opacity-0 scale-95'
                             >
-                                <Dialog.Panel className='w-full max-w-sm overflow-hidden rounded-[8px] bg-white p-[24px] pc:p-[32px] text-left shadow-xl'>
+                                <Dialog.Panel className='w-full max-w-sm overflow-hidden rounded-[8px] bg-white p-[24px] md:p-[32px] text-left shadow-xl'>
                                     <div className='flex justify-between items-end mb-[30px]'>
                                         <h1 className='text-[26px] font-bold'>
                                             회원가입
                                         </h1>
-                                        <p className='text-red-500 py-[4px] px-[8px] font-bold text-[14px] pc:text-[16px]'>
+                                        <p className='text-red-500 py-[4px] px-[8px] font-bold text-[14px] md:text-[16px]'>
                                             { errorMessage }
                                         </p>
                                     </div>
                                     <form
-                                        className='flex flex-col mx-auto gap-y-[20px] justify-center text-[15px] pc:text-[18px]'
-                                        onSubmit={ handleOnSubmit }
+                                        className='flex flex-col mx-auto gap-y-[20px] justify-center text-[15px] md:text-[18px]'
+                                        onSubmit={ signupSubmit }
                                     >
                                         <div>
                                             <input

@@ -12,7 +12,7 @@ function App() {
 
     useEffect(()=> {
         // 본인 정보를 불러오는 것으로 로그인 검증
-        (async () => dispatch(getProfile()))()
+        (async () => dispatch(await getProfile()))()
     },[dispatch]);
 
     return (

@@ -2,28 +2,29 @@ import React from 'react';
 import {UserProfileMenuPopover} from '../components/popovers/UserProfileMenu.popover';
 import {useDispatch} from 'react-redux';
 import {Link} from 'react-router-dom';
-import {BarsMenuIcon} from '../../../assets/vectors';
 import {SearchMemo} from '../components/SearchMemo';
 import {toggleSideNavReducer} from '../../../store/layout/layout.slice';
+import {HamburgerMenuIcon} from '../../../assets/vectors';
 
 export const Header = () => {
     const dispatch = useDispatch();
 
     return (
-        <header className='flex fixed h-[46px] items-center w-full z-30 ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 py-10px'>
-            <div className='flex relative items-center justify-between pr-10px md:px-10px w-full'>
+        <header className='flex fixed h-[46px] items-center w-full z-30 transition-all ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 py-[10px]'>
+            <div className='flex relative items-center justify-between px-[16px] side-menu-md:px-[10px] w-full'>
                 <div className='flex items-center'>
                     <button
                         type='button'
                         onClick={ () => dispatch(toggleSideNavReducer()) }
-                        className='ease-in-out duration-300 mr-7px md:hidden p-10px h-full'
+                        className='ease-in-out duration-300 block side-menu-md:hidden mr-[14px] h-full'
                     >
-                        <BarsMenuIcon/>
+                        <HamburgerMenuIcon height={20}/>
                     </button>
-                    <div className='w-26px h-26px bg-brand rounded-[4px] mr-10px'/>
+                    {/*브랜드마크*/}
+                    <div className='w-[26px] h-[26px] bg-brand rounded-[4px] mr-[10px]'/>
                     <Link
                         to='/memo'
-                        className='flex relative justify-start items-center text-17 font-medium transition-all duration-300 h-full'
+                        className='flex relative justify-start items-center text-[17px] font-medium transition-all duration-300 h-full'
                     >
                         ZETE
                     </Link>

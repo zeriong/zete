@@ -57,9 +57,10 @@ input, input:focus, input:active {
 /* ------  Masonry control  ------ */
 .my-masonry-grid_column {
     width: 100% !important;
+    max-width: 500px !important;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 768px) {
     .my-masonry-grid_column {
         width:300px !important;
     }

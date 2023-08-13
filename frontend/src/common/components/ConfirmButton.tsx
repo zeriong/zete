@@ -30,7 +30,7 @@ export const ConfirmButton = (props: ButtonProps) => {
 
     const buttonPropsOptions = Object.fromEntries(Object.entries(props).filter(([key]) => key !== 'options'));
 
-    const funcButtonOnClick = () => {
+    const funcButtonClick = () => {
         if (props.options.confirmCallback) props.options.confirmCallback();
         closeModal();
     }
@@ -71,7 +71,6 @@ export const ConfirmButton = (props: ButtonProps) => {
                     </Transition.Child>
                     <div
                         className='fixed inset-0'
-                        // 부모요소에 걸린 이벤트 상속방지
                         onClick={ (e) => e.stopPropagation() }
                     >
                         <div className='flex min-h-full items-center justify-center p-[16px] text-center'>
@@ -112,7 +111,7 @@ export const ConfirmButton = (props: ButtonProps) => {
                                     </div>
                                     <div className='grid grid-cols-2 text-[14px] font-medium'>
                                         <FuncButton
-                                            onClick={ funcButtonOnClick }
+                                            onClick={ funcButtonClick }
                                             options={ funcButtonOptions }
                                             type='button'
                                             className={`py-[12px] ${ props.options.isNegative ? 'bg-red-500/80 text-white' : 'bg-blue-500/90 text-white' }`}
