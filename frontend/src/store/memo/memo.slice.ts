@@ -131,6 +131,14 @@ export const memoSlice = createSlice({
                 state.memo.totalCount = data.totalCount;
                 state.memo.isLoading = false;
             } else {
+
+                // 데이터 누적
+                state.memo.list = [ ...state.memo.list, ...data.list ]
+                    .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
+                state.memo.offset = state.memo.offset + data.list.length;
+                state.memo.totalCount = data.totalCount;
+                state.memo.isLoading = false;
+
                 /**
                  * 추가 변경사항
                  * @description: 1. 현재 limit보다 db에서 가지고 있는 메모 갯수가 많은경우 observer가 페이징을 하지 않음.
@@ -141,13 +149,6 @@ export const memoSlice = createSlice({
                 if (data.list.length === MEMO_LIST_REQUEST_LIMIT) {
                     state.memo.pagingEffect = !state.memo.pagingEffect;
                 }
-
-                // 데이터 누적
-                state.memo.list = [ ...state.memo.list, ...data.list ]
-                    .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
-                state.memo.offset = state.memo.offset + data.list.length;
-                state.memo.totalCount = data.totalCount;
-                state.memo.isLoading = false;
             }
         });
         builder.addCase(searchMemosAction.rejected, (state) => {

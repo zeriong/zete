@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState, store} from '../../store';
 import {deleteAlertReducer, IAlertObject} from '../../store/alert/alert.slice';
-import {AlarmIcon} from '../../assets/vectors';
+import {AlarmIcon} from './Icons';
 
 export const Alert = () => {
     const alarmRef = useRef<HTMLDivElement>(null);

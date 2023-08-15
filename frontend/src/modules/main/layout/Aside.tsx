@@ -4,7 +4,7 @@ import {AppDispatch, RootState} from '../../../store';
 import CustomScroller from '../../../common/components/customScroller';
 import {CategoryEditModal} from '../components/modals/CategoryEdit.modal';
 import {Link, To, useSearchParams} from 'react-router-dom';
-import {AllIcon, CategoryIcon, StarIcon, TagIcon} from '../../../assets/vectors';
+import {AllIcon, CategoryIcon, StarIcon, TagIcon} from '../../../common/components/Icons';
 import {Tag} from '../../../openapi/generated';
 import {toggleSideNavReducer} from '../../../store/layout/layout.slice';
 import {getCategoriesAction} from '../../../store/memo/memo.actions';
@@ -28,11 +28,11 @@ export const Aside = () => {
             />
             <aside
                 className={`fixed w-[256px] bg-white z-50 md:z-20 ease-in-out duration-300 pt-0 md:pt-[46px] h-full
-                overflow-hidden border-r border-zete-light-gray-400
+                overflow-hidden border-r border-gray-300/80
                 ${ isShowSideNav ? 'left-0' : '-left-[256px]' }`}
             >
                 <CustomScroller customTrackVerticalStyle={{ width: 5 }}>
-                    <section className='h-full w-full p-[14px] text-zete-dark-500 font-light text-[14px]'>
+                    <section className='h-full w-full p-[14px] text-dark font-light text-[14px]'>
                         <div className='h-fit pb-[12px]'>
                             <ul className='flex flex-col justify-center gap-[4px]'>
                                 <CateItemList
@@ -52,7 +52,7 @@ export const Aside = () => {
                                     count={ cate.importantMemoCount }
                                 />
                             </ul>
-                            <p className='text-zete-dark-300 text-[11px] font-light pb-[14px] pt-[17px] pl-[12px]'>
+                            <p className='text-dark/90 text-[11px] font-light pb-[14px] pt-[17px] pl-[12px]'>
                                 카테고리
                             </p>
                             <ul className='grid gap-[4px]'>
@@ -90,12 +90,12 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
 
     return (
         <li
-            className={`font-bold group rounded-[5px] hover:bg-zete-light-gray-200
-            ${ isActiveCate && 'bg-zete-light-gray-200' }`}
+            className={`font-bold group rounded-[5px] hover:bg-gray-200/60
+            ${ isActiveCate && 'bg-gray-200/60' }`}
         >
             <Link
                 to={ props.to }
-                className='flex w-full justify-between items-center p-[10px] hover:bg-zete-light-gray-200 rounded-[5px]'
+                className='flex w-full justify-between items-center p-[10px] hover:bg-gray-200/60 rounded-[5px]'
             >
                 <div
                     className={`flex justify-start w-full font-light transition-all duration-150
@@ -105,8 +105,8 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                     <p>{ props.cateName }</p>
                 </div>
                 <div
-                    className={`rounded-full text-zete-dark-100 py-[2px] px-[8px] text-[12px] font-medium
-                    ${ isActiveCate ? 'bg-white' : 'group-hover:bg-white bg-zete-light-gray-300' }`}
+                    className={`rounded-full text-dark/80 py-[2px] px-[8px] text-[12px] font-medium
+                    ${ isActiveCate ? 'bg-white' : 'group-hover:bg-white bg-gray-200/60' }`}
                 >
                     <p className='relative bottom-[1px]'>
                         { props.count || 0 }
@@ -122,13 +122,11 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                     >
                         <Link
                             to={{ pathname: '/memo', search: `${ props.to.search }&tag=${ tag.name }` }}
-                            className={`flex w-full h-fit py-[8px] pl-[16px] rounded-[5px] mb-[1px] hover:bg-zete-light-gray-500
-                            ${ searchParams.get('tag') === tag.name && 'bg-zete-light-gray-500' }`}
+                            className={`flex w-full h-fit py-[8px] pl-[16px] rounded-[5px] mb-[1px] hover:bg-gray-300
+                            ${ searchParams.get('tag') === tag.name && 'bg-gray-300' }`}
                         >
-                            <TagIcon svgClassName='w-[14px] mr-[8px]' strokeClassName='fill-zete-dark-200'/>
-                            <p>
-                                { tag.name }
-                            </p>
+                            <TagIcon svgClassName='w-[14px] mr-[8px]' strokeClassName='fill-dark/90'/>
+                            <p>{ tag.name }</p>
                         </Link>
                     </li>
                 ))}

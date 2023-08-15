@@ -6,9 +6,10 @@ import {FuncButton} from '../../../common/components/FuncButton';
 import {showAlert} from '../../../store/alert/alert.actions';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {Api} from '../../../openapi/api';
-import {SET_USER} from '../../../store/user/user.slice';
+import {setUserReducer} from '../../../store/user/user.slice';
 import {PATTERNS} from '../../../common/constants';
 import {UpdateAccountInput} from '../../../openapi/generated';
+
 export const ProfileEditPage = () => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL, INPUT_PHONE } = PATTERNS;
 
@@ -30,6 +31,9 @@ export const ProfileEditPage = () => {
         },
     });
 
+    const subTitleStyle = 'font-bold md:text-[18px] text-[14px] text-[#5f5f5f]';
+    const inputStyle = 'border border-gray-400 rounded px-[8px] py-[4px] md:w-[384px] w-full';
+
     const toggleShowConfirmPW = () => setShowConfirmPW(!showConfirmPW);
     const toggleShowPW = () => setShowPW(!showPW);
 
@@ -39,7 +43,7 @@ export const ProfileEditPage = () => {
             .then((res) => {
                 console.log(res.data);
                 if (res.data.success) {
-                    dispatch(SET_USER({...userState, email, name, mobile }))
+                    dispatch(setUserReducer({...userState, email, name, mobile }))
                     showAlert('✔ 회원정보 수정이 완료되었습니다!');
                     return navigate(-1);
                 }
@@ -54,7 +58,7 @@ export const ProfileEditPage = () => {
     useEffect(() => setIsRender(true),[]);
 
     return  loading ? <div>로딩중...</div> :
-        <div className='w-full min-h-[640px] md:min-h-[700px] h-full relative flex justify-center items-center'>
+        <div className='w-full min-h-[640px] md:min-h-[700px] h-full relative flex justify-center items-center overflow-hidden'>
             <form
                 onSubmit={ onSubmit }
                 className={`flex flex-col justify-center relative bg-white text-start items-center shadow-2xl transition-all ease-in-out duration-500
@@ -66,7 +70,7 @@ export const ProfileEditPage = () => {
                     프로필 변경
                 </h1>
                 <div className='md:w-auto w-full md:px-0'>
-                    <h2 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
+                    <h2 className={ subTitleStyle }>
                         이름
                     </h2>
                     <input
@@ -74,38 +78,40 @@ export const ProfileEditPage = () => {
                             required: true,
                             minLength: 2, maxLength: 30,
                         })}
+                        tabIndex={ 1 }
                         placeholder='수정할 이름을 입력해주세요.'
-                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
+                        className={ inputStyle }
                     />
-                    <p className='mt-1 text-red-500 text-xs font-normal h-3'>
+                    <p className='mt-[4px] text-red-500 [12px] font-normal h-[12px]'>
                         { form.formState.errors.name && '성함을 입력해 주시기 바랍니다.' }
                     </p>
                 </div>
                 <div className='md:w-auto w-full md:px-0'>
-                    <p className='absolute -top-5 text-red-500 font-bold'>
+                    <p className='absolute -top-[20px] text-red-500 font-bold'>
                         { occurError }
                     </p>
-                    <h2 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
+                    <h2 className={ subTitleStyle }>
                         이메일
                         <span className='md:text-[14px] text-[12px] text-orange-400/80'>
                                 &nbsp;(현계정에 등록된 이메일 외 중복이메일은 등록불가)
                         </span>
                     </h2>
                     <input
-                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
                         {...form.register('email', {
                             required: true,
                             minLength: 6, maxLength: 64,
                             pattern: EMAIL,
                         })}
+                        tabIndex={ 2 }
                         placeholder='변경할 이메일을 입력해주세요.'
+                        className={ inputStyle }
                     />
-                    <p className='mt-1 text-red-500 text-xs font-normal h-3'>
+                    <p className='mt-1 text-red-500 [12px] font-normal h-3'>
                         { form.formState.errors.email && '이메일을 입력해주시기 바랍니다.' }
                     </p>
                 </div>
                 <div className='md:w-auto w-full md:px-0'>
-                    <h2 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
+                    <h2 className={ subTitleStyle }>
                         휴대전화번호
                     </h2>
                     <input
@@ -119,10 +125,11 @@ export const ProfileEditPage = () => {
                             },
                         })}
                         type='text'
+                        tabIndex={ 3 }
                         placeholder='휴대폰번호를 입력해주세요.'
-                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
+                        className={ inputStyle }
                     />
-                    <p className='mt-1 text-red-500 text-xs font-normal h-3'>
+                    <p className='mt-1 text-red-500 [12px] font-normal h-3'>
                         { form.formState.errors.mobile && '휴대전화번호를 입력해주세요.' }
                     </p>
                 </div>
@@ -130,7 +137,7 @@ export const ProfileEditPage = () => {
                     { '< 비밀변호 변경은 필수입력 사항이 아닙니다. >' }
                 </h2>
                 <div className='md:w-auto w-full md:px-0'>
-                    <h2 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
+                    <h2 className={ subTitleStyle }>
                         비밀번호 변경
                     </h2>
                     <input
@@ -145,8 +152,9 @@ export const ProfileEditPage = () => {
                             },
                         })}
                         type={ showPW ? 'text' : 'password' }
+                        tabIndex={ 4 }
                         placeholder='수정할 비밀번호를 입력해주세요.'
-                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
+                        className={ inputStyle }
                     />
                     <div className='flex justify-between mb-[18px] md:w-96 w-full'>
                         <div className='mt-[4px] text-red-500 text-[11px] font-normal h-[12px]'>
@@ -166,14 +174,14 @@ export const ProfileEditPage = () => {
                         <button
                             type='button'
                             onClick={ toggleShowPW }
-                            className='cursor-pointer text-xs bg-gray-400 h-fit text-gray-100 px-2 mr-1'
+                            className='cursor-pointer [12px] bg-gray-500 h-fit text-gray-100 px-2 mr-1'
                         >
                             { showPW ? '비밀번호 숨김' : '비밀번호 확인' }
                         </button>
                     </div>
-                    <h1 className='font-bold md:text-[18px] text-[14px] text-[#5f5f5f]'>
+                    <h2 className={ subTitleStyle }>
                         비밀번호 변경 재확인
-                    </h1>
+                    </h2>
                     <input
                         {...form.register('passwordConfirm', {
                             required: false,
@@ -187,17 +195,18 @@ export const ProfileEditPage = () => {
                             },
                         })}
                         type={ showConfirmPW ? 'text' : 'password' }
+                        tabIndex={ 5 }
                         placeholder='비밀번호를 다시 한번 입력해주세요.'
-                        className='border border-gray-400 rounded px-2 py-1 md:w-96 w-full'
+                        className={ inputStyle }
                     />
                     <div className='flex justify-between md:w-96 w-full'>
-                        <p className='mt-1 text-red-500 text-xs font-normal h-3'>
+                        <p className='mt-1 text-red-500 [12px] font-normal h-3'>
                             { form.formState.errors.passwordConfirm && '비밀번호가 동일하지 않습니다.' }
                         </p>
                         <button
                             type='button'
                             onClick={ toggleShowConfirmPW }
-                            className='cursor-pointer text-xs bg-gray-400 h-fit text-gray-100 px-2 mr-1'
+                            className='cursor-pointer [12px] bg-gray-500 h-fit text-gray-100 px-2 mr-1'
                         >
                             { showConfirmPW ? '비밀번호 숨김' : '비밀번호 확인' }
                         </button>

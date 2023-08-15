@@ -5,7 +5,7 @@ import {useForm} from 'react-hook-form';
 import {Memo, UpdateMemoInput} from '../../../../openapi/generated';
 import {useSearchParams} from 'react-router-dom';
 import {Dialog, Transition} from '@headlessui/react';
-import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from '../../../../assets/vectors';
+import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from '../../../../common/components/Icons';
 import {setDynamicInputWidth} from '../../../../libs/common.lib';
 import {showAlert} from '../../../../store/alert/alert.actions';
 import {Api} from '../../../../openapi/api';
@@ -182,7 +182,7 @@ export const MemoEditModal = () => {
                             <Dialog.Panel className='relative transform overflow-hidden bg-white text-left shadow-xl rounded-[5px]'>
                                 <article
                                     className='relative min-w-0 w-[300px] md:w-[400px] flex flex-col justify-between
-                                    border border-zete-light-gray-500 rounded-[8px] px-[18px] pb-[10px] pt-[12px] min-h-[212px] h-fit bg-memo memo-shadow'
+                                    border border-gray-300 rounded-[8px] px-[18px] pb-[10px] pt-[12px] min-h-[212px] h-fit bg-memo memo-shadow'
                                 >
                                     {(isLoadingMemoRef.current || !savedMemoRef.current) &&  // 응답을 받는중이거나 모달이 닫히는경우 form을 숨겨줌
                                         <div className='absolute left-0 top-0 w-full h-full bg-memo z-10 rounded-[5px]'/>
@@ -190,7 +190,7 @@ export const MemoEditModal = () => {
                                     <div className='w-full h-full flex flex-col min-h-[212px]'>
 
                                         <form onSubmit={ focusToContent } className='w-full h-full'>
-                                            <div className='flex justify-between items-center pb-[8px] border-b border-zete-memo-border h-full'>
+                                            <div className='flex justify-between items-center pb-[8px] border-b border-gray-300/90 h-full'>
                                                 <input
                                                     {...form.register('title', {
                                                         required: false,
@@ -198,7 +198,7 @@ export const MemoEditModal = () => {
                                                     })}
                                                     tabIndex={ 1 }
                                                     placeholder='제목'
-                                                    className='resize-none w-full pr-[6px] max-h-[80px] bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500
+                                                    className='resize-none w-full pr-[6px] max-h-[80px] bg-transparent text-gray-500 placeholder:text-gray-500
                                                     font-light placeholder:text-[15px] memo-custom-scroll'
                                                 />
                                                 <button
@@ -210,7 +210,7 @@ export const MemoEditModal = () => {
                                             </div>
                                             <div className='relative h-full w-full pt-[9px]'>
                                                 {isLoadingMemoRef.current &&
-                                                    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20px] whitespace-nowrap font-bold text-zete-gray-500/80 z-20'>
+                                                    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20px] whitespace-nowrap font-bold text-gray-500/80 z-20'>
                                                         메모를 불러오는 중입니다.
                                                     </div>
                                                 }
@@ -221,7 +221,7 @@ export const MemoEditModal = () => {
                                                     })}
                                                     rows={ 1 }
                                                     placeholder='메모 작성...'
-                                                    className='resize-none h-[280px] w-full bg-transparent text-zete-gray-500 placeholder:text-zete-gray-500
+                                                    className='resize-none h-[280px] w-full bg-transparent text-gray-500 placeholder:text-gray-500
                                                     font-light placeholder:text-[15px] memo-custom-scroll'
                                                 />
                                             </div>
@@ -231,15 +231,15 @@ export const MemoEditModal = () => {
                                                 <div className='flex w-full h-full relative pb-[8px] overflow-y-hidden'>
                                                     {form.watch('tags')?.map((tag, idx) => (
                                                         <div key={ idx } className='relative flex items-center pl-[9px] pr-[21px] py-[1px] mr-[4px] rounded-[4px] bg-black/10 cursor-default'>
-                                                            <span className='font-light text-[11px] text-zete-dark-400 whitespace-nowrap'>
+                                                            <span className='font-light text-[11px] text-dark/90 whitespace-nowrap'>
                                                                 { tag.name }
                                                             </span>
                                                             <button
                                                                 type='button'
                                                                 onClick={ () => deleteMemoTag(form, tag.name) }
-                                                                className='absolute right-[2px] group rounded-full grid place-content-center hover:bg-zete-dark-300/50 w-[14px] h-[14px]'
+                                                                className='absolute right-[2px] group rounded-full grid place-content-center hover:bg-dark/40 w-[14px] h-[14px]'
                                                             >
-                                                                <CloseIcon className='w-[10px] fill-zete-dark-400 group-hover:fill-white'/>
+                                                                <CloseIcon className='w-[10px] fill-dark/90 group-hover:fill-white'/>
                                                             </button>
                                                         </div>
                                                     ))}
@@ -248,12 +248,12 @@ export const MemoEditModal = () => {
                                                             addMemoTagSubmit(event, form);
                                                             setDynamicInputWidth(event.target[0]);
                                                         }}
-                                                        className='relative flex items-center text-zete-dark-400 text-[12px]'
+                                                        className='relative flex items-center text-dark/90 text-[12px]'
                                                     >
                                                         <input
                                                             onChange={ (event) => setDynamicInputWidth(event.target) }
                                                             placeholder='태그추가'
-                                                            className='min-w-[50px] w-[50px] px-[2px] placeholder:text-zete-placeHolder bg-transparent whitespace-nowrap'
+                                                            className='min-w-[50px] w-[50px] px-[2px] placeholder:text-gray-500/95 bg-transparent whitespace-nowrap'
                                                         />
                                                         <button type='submit' className='relative w-[14px] h-[14px] grid place-content-center'>
                                                             <PlusIcon svgClassName='w-[9px]' strokeClassName='fill-black'/>
@@ -261,8 +261,8 @@ export const MemoEditModal = () => {
                                                     </form>
                                                 </div>
                                             </HorizontalScroll>
-                                            <div className='flex justify-between items-center pt-[10px] border-t border-zete-memo-border'>
-                                                <div className='flex items-center border border-zete-memo-border rounded-md px-[8px] py-[4px]'>
+                                            <div className='flex justify-between items-center pt-[10px] border-t border-gray-300/90'>
+                                                <div className='flex items-center border border-gray-300/90 rounded-md px-[8px] py-[4px]'>
                                                     <CategoryIcon className='w-[18px] opacity-75 mr-[2px]'/>
                                                     <select
                                                         {...form.register('cateId', { required: true })}

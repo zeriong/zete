@@ -4,7 +4,7 @@ import {AppDispatch, RootState} from '../../../store';
 import {Outlet, useSearchParams} from 'react-router-dom';
 import {Header} from './Header';
 import {Aside} from './Aside';
-import {CategoryIcon} from '../../../assets/vectors';
+import {CategoryIcon} from '../../../common/components/Icons';
 import {SearchMemo} from '../components/SearchMemo';
 import {setShowSideNavReducer} from '../../../store/layout/layout.slice';
 import CustomScroller from '../../../common/components/customScroller';
@@ -48,8 +48,8 @@ export const MemoLayout = () => {
                 flex relative flex-col justify-center h-full text-center items-center pt-[46px] duration-300 ease-in-out`}
             >
                 <div className='w-full h-full flex relative pt-[46px]'>
-                    <header className='flex fixed top-[46px] h-[46px] items-center justify-between w-full ease-in-out duration-300 bg-white border-b border-zete-light-gray-400 pl-[16px] md:pl-[20px]'>
-                        <div className={`flex items-center  ${ categoryName === '카테고리가 존재하지않습니다.' && 'text-zete-scroll-gray' }`}>
+                    <header className='flex fixed top-[46px] h-[46px] items-center justify-between w-full ease-in-out duration-300 bg-white border-b border-gray-300/80 pl-[16px] md:pl-[20px]'>
+                        <div className={`flex items-center  ${ categoryName === '카테고리가 존재하지않습니다.' && 'text-gray-400' }`}>
                             <div className='w-[16px] md:w-[20px] mr-[10px]'>
                                 <CategoryIcon className=''/>
                             </div>
@@ -61,7 +61,7 @@ export const MemoLayout = () => {
                             <SearchMemo/>
                         </div>
                     </header>
-                    <div className='w-full h-full bg-zete-light-gray-100'>
+                    <div className='w-full h-full bg-gray-100'>
                         <CustomScroller autoHide={ false }>
                             <Outlet/>
                         </CustomScroller>

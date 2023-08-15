@@ -8,7 +8,7 @@ import {FuncButton} from '../FuncButton';
 import {CreateAccountInput} from '../../../openapi/generated';
 import {Api} from '../../../openapi/api';
 import {PATTERNS} from '../../constants';
-import {VisibilityOffIcon, VisibilityOnIcon} from '../../../assets/vectors';
+import {VisibilityOffIcon, VisibilityOnIcon} from '../Icons';
 
 
 export const SignupModal = (props: { successControl: React.Dispatch<React.SetStateAction<boolean>> }) => {

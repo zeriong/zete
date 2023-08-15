@@ -4,7 +4,7 @@ import { Fragment } from 'react'
 import {Link} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../../store';
-import {LogoutIcon, ProfileIcon, UserIcon} from '../../../../assets/vectors';
+import {LogoutIcon, ProfileIcon, UserIcon} from '../../../../common/components/Icons';
 import {logoutAction} from '../../../../store/auth/auth.actions';
 
 interface IMenuList {
@@ -54,7 +54,7 @@ export const UserProfileMenuPopover = () => {
                         leaveTo='opacity-0 translate-y-1'
                     >
                         <Popover.Panel className='absolute mt-[12px] w-[160px] md:w-[180px] bg-white right-0 p-[12px] shadow-lg rounded-[8px] overflow-hidden border border-black/10'>
-                            <h1 className='text-[18px] font-medium text-zete-dark p-[4px] mb-[4px] cursor-default'>
+                            <h1 className='text-[18px] font-medium text-dark p-[4px] mb-[4px] cursor-default'>
                                 {data?.name}
                             </h1>
                             {menuList.map((item) => (

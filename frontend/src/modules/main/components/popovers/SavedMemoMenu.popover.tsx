@@ -1,6 +1,6 @@
 import {Popover, Transition} from '@headlessui/react';
 import React, {Fragment, useState} from 'react';
-import {DeleteIcon, EditIcon, ThreeDotMenuIcon} from '../../../../assets/vectors';
+import {DeleteIcon, EditIcon, ThreeDotMenuIcon} from '../../../../common/components/Icons';
 import {ConfirmButton} from '../../../../common/components/ConfirmButton';
 import {AppDispatch} from '../../../../store';
 import {useDispatch} from 'react-redux';
@@ -31,7 +31,7 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                 {({open}) => {
                     return <>
                         <Popover.Button className={`${ open && 'bg-black/10' } hover:bg-black/10 p-[1px] rounded-full w-[26px] h-[26px]`}>
-                            <ThreeDotMenuIcon className='fill-zete-dark-200 cursor-pointer'/>
+                            <ThreeDotMenuIcon className='fill-dark/90 cursor-pointer'/>
                         </Popover.Button>
                         <Transition
                             as={ Fragment }
@@ -42,12 +42,12 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                             leaveFrom='opacity-100 translate-y-0'
                             leaveTo='opacity-0 translate-y-1'
                         >
-                            <Popover.Panel static className='absolute z-10 mt-[12px] right-0 bottom-[130%] px-0 w-[150px] py-[6px] bg-white font-normal text-[14px] text-zete-dark-300 shadow-lg border border-gray-500/10 rounded-[8px]'>
+                            <Popover.Panel static className='absolute z-10 mt-[12px] right-0 bottom-[130%] px-0 w-[150px] py-[6px] bg-white font-normal text-[14px] text-dark/90 shadow-lg border border-gray-500/10 rounded-[8px]'>
                                 <button
                                     type='button'
                                     className='flex items-center py-[5px] px-[12px] hover:bg-black/5 w-full'
                                 >
-                                    <EditIcon className='fill-zete-dark-100 mr-[6px] w-[18px] h-[18px]'/>
+                                    <EditIcon className='fill-dark/80 mr-[6px] w-[18px] h-[18px]'/>
                                     <p>메모수정</p>
                                 </button>
                                 <button
@@ -55,7 +55,7 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                                     onClick={ openConfirmModal }
                                     className='flex items-center py-[5px] px-[12px] hover:bg-black/5 w-full'
                                 >
-                                    <DeleteIcon className='fill-zete-dark-100 mr-[6px] w-[18px] h-[18px]'/>
+                                    <DeleteIcon className='fill-dark/80 mr-[6px] w-[18px] h-[18px]'/>
                                     <p>메모삭제</p>
                                 </button>
                             </Popover.Panel>

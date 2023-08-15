@@ -9,7 +9,7 @@ import {Api} from '../../../openapi/api';
 import {LoginInput} from '../../../openapi/generated';
 import {PATTERNS} from '../../constants';
 import {setLoginReducer, setLogoutReducer} from '../../../store/auth/auth.slice';
-import {VisibilityOffIcon, VisibilityOnIcon} from '../../../assets/vectors';
+import {VisibilityOffIcon, VisibilityOnIcon} from '../Icons';
 
 export const SigninModal = () => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL } = PATTERNS;

@@ -73,13 +73,13 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
 
     return (
         <section
-            className={`flex flex-col transition-all duration-300 w-full bg-zete-gpt-100 h-0 rounded-b-[8px] overflow-hidden z-50 shadow-2xl
+            className={`flex flex-col transition-all duration-300 w-full bg-gpt/50 h-0 rounded-b-[8px] overflow-hidden z-50 shadow-2xl
                 ${ props.isShow && ' h-[400px] p-[10px]' }`}
         >
             <div className='flex flex-col w-full h-full'>
-                <div className='relative flex flex-col grow text-start text-zete-dark-500 bg-white/80 rounded-[8px] p-[8px]'>
+                <div className='relative flex flex-col grow text-start text-dark bg-white/80 rounded-[8px] p-[8px]'>
                     <div className='relative text-center bg-gpt rounded-[8px] py-[4px]'>
-                        <h1 className='text-[14px] md:text-[16px] text-zete-gpt-black font-bold'>
+                        <h1 className='text-[14px] md:text-[16px] text-black/90 font-bold'>
                             Chat GPT
                         </h1>
                         <h2 className='absolute top-1/2 -translate-y-1/2 text-[10px] md:text-[13px] right-[10px] md:right-[13px] text-white'>
@@ -94,12 +94,12 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
                                         답변이 거의 완성되었어요!
                                     </h1>
                                     :
-                                    <h1 className='text-[20px] font-bold'>
+                                    <div className='text-[20px] font-bold'>
                                         gpt가 답변을 준비하고 있어요!
-                                        <h2 className='text-[17px] text-black/70'>
+                                        <p className='text-[17px] text-black/70'>
                                             다소 시간이 걸릴 수 있습니다.
-                                        </h2>
-                                    </h1>
+                                        </p>
+                                    </div>
                                 }
                             </div>
                         ) : (
@@ -113,7 +113,7 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
                                     />
                                 ) : (
                                     <div className='grid gap-[10px] w-full'>
-                                        <h1 className='text-[16px] md:text-[18px] text-center font-bold'>
+                                        <h1 className='text-[16px] md:text-[18px] text-center font-bold '>
                                             궁금한 것이 있다면 GPT에게 물어보세요!
                                         </h1>
                                         <ol className='list-disc pl-[16px] mb-[2px] md:mb-[8px] font-medium text-[12px] md:text-[14px]'>
@@ -126,16 +126,15 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
                                         <h2 className='font-bold text-[13px] md:text-[15px]'>※ 참고사항</h2>
                                         <ol className='list-decimal pl-[16px] font-medium text-[12px] md:text-[14px] grid gap-[6px] md:gap-[10px] leading-4'>
                                             <li>
-                                                GPT에게 질문 가능한 횟수는 계정당 하루에 <span className='bg-gpt/50 pl-[2px] pr-[3px]'>10회</span>까지 <br className='md:hidden'/>가능합니다.
+                                                GPT에게 질문 가능한 횟수는 계정당 하루에 <br className='xs:hidden'/><span className='bg-gpt/50 pl-[2px] pr-[3px]'>10회</span>가능합니다.
                                             </li>
                                             <li>
                                                 이전 대화에 이어서 <span className='bg-gpt/50 pl-[2px] pr-[3px]'>대화는 불가능</span>
-                                                하며 하나의 질문에만<br/>
-                                                답변만 할 수 있어요.
+                                                하며 하나의 질문에만<br className='hidden xs:block'/> 답변만 할 수 있어요.
                                             </li>
                                             <li>
-                                                GPT에게 질문 하고 답변을 기다리는 도중에 메모창이<br className='block md:hidden'/> 닫히거나<br className='hidden md:block'/>
-                                                Chat GPT 창이 닫히면 횟수만 차감되고 답변을<br className='block md:hidden'/> 받을 수 없습니다.
+                                                GPT에게 질문 하고 답변을 기다리는 도중 메모창이<br className='block md:hidden'/> 닫히거나<br className='hidden md:block'/>
+                                                Chat GPT 창이 닫히면 횟수만 차감되고<br className='block md:hidden'/> 답변을 받을 수 없습니다.
                                             </li>
                                         </ol>
                                     </div>
@@ -152,7 +151,7 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
                                 if (content === '') form.setValue('content', message);
                                 else form.setValue('content', content + '\n' + message);
                             }}
-                            className='absolute bottom-[12px] left-1/2 -translate-x-1/2 transition-all duration-300 bg-gpt py-[4px] px-[8px] rounded-[8px] text-zete-light-gray-100 z-50'
+                            className='absolute bottom-[12px] left-1/2 -translate-x-1/2 transition-all duration-300 bg-gpt py-[4px] px-[8px] rounded-[8px] text-gray-100 z-50'
                         >
                             메모에 추가하기 +
                         </button>
@@ -161,7 +160,7 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
                 <form
                     onSubmit={ handleSubmit }
                     className={`relative shrink flex items-center justify-between p-[5px_0px_5px_12px] shadow-1xl rounded-[12px] mt-[10px]
-                    border border-zete-light-gray-500 shadow-2xl ${ isLoading ? 'bg-zete-light-gray-300' : 'bg-white' }`}
+                    border border-gray-300 shadow-2xl ${ isLoading ? 'bg-gray-200' : 'bg-white' }`}
                 >
                     <div className='flex items-center w-full'>
                         <CustomScroller autoHeight={ true } autoHeightMax={ 88 } customTrackVerticalStyle={{ width: 6 }}>
@@ -171,7 +170,7 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
                                 rows={ 1 }
                                 disabled={ isLoading }
                                 placeholder='GPT에게 물어보세요! ( Shift + Enter 줄바꿈 )'
-                                className='flex resize-none bg-transparent placeholder:text-zete-gray-500 font-light placeholder:text-[14px] w-full h-fit'
+                                className='flex resize-none bg-transparent placeholder:text-gray-500 font-light placeholder:text-[14px] w-full h-fit'
                                 onChange={(event) => {
                                     setInputValue(event.target.value);
                                     setDynamicTextareaHeight(event.target);
@@ -185,7 +184,9 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
                     </div>
                     <button
                         type='submit'
-                        className='right-[12px] mx-[10px] px-[8px] bg-zete-gpt-200 text-white whitespace-nowrap h-fit text-[15px] rounded'
+                        disabled={ isLoading }
+                        className={`right-[12px] mx-[10px] px-[8px] whitespace-nowrap h-fit text-[15px] rounded
+                        ${ isLoading ? 'text-white/80 bg-gpt/50' : 'text-white bg-gpt/80' }`}
                     >
                         전송
                     </button>

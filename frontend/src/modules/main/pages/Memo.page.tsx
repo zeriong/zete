@@ -4,7 +4,7 @@ import {AppDispatch, RootState} from '../../../store';
 import {AddMemo} from '../components/AddMemo';
 import Masonry from 'react-masonry-css';
 import * as DOMPurify from 'dompurify';
-import {FillStarIcon, StarIcon} from '../../../assets/vectors';
+import {FillStarIcon, StarIcon} from '../../../common/components/Icons';
 import {MemoEditModal} from '../components/modals/MemoEdit.modal';
 import {SavedMemoMenuPopover} from '../components/popovers/SavedMemoMenu.popover';
 import {useSearchParams} from 'react-router-dom';
@@ -43,7 +43,9 @@ export const MemoPage = () => {
 
     const handleObserver = async (entities, observer) => {
         const target = entities[0];
-        if (target.isIntersecting) await loadMemos(dispatch, searchParams, false);
+        if (target.isIntersecting) {
+            await loadMemos(dispatch, searchParams, false);
+        }
     };
 
     // deps에 url변경을 카테고리, 태그, 검색에 대해서만 (메모수정인 view 제외)
@@ -94,12 +96,12 @@ export const MemoPage = () => {
                         >
                             <div
                                 className='relative flex flex-col justify-between border w-full
-                                border-zete-light-gray-500 rounded-[8px] px-[18px] pb-[12px] pt-[14px] min-h-[212px] bg-memo break-words'
+                                border-gray-300/70 rounded-[8px] px-[18px] pb-[12px] pt-[14px] min-h-[212px] bg-memo break-words'
                             >
                                 <div className='flex relative w-full'>
                                     <p
                                         dangerouslySetInnerHTML={{ __html: memo.title && DOMPurify.sanitize(memo.title.replace(/\n/g, '<br/>')) }}
-                                        className={`text-zete-gray-500 font-light text-[20px] text-start w-full mb-[10px] ${!memo.title && 'h-[20px] w-full mb-[10px] pr-[30px]'}`}
+                                        className={`text-gray-500 font-light text-[20px] text-start w-full mb-[10px] ${!memo.title && 'h-[20px] w-full mb-[10px] pr-[30px]'}`}
                                     />
                                     {/* 중요메모 버튼 */}
                                     <button
@@ -116,7 +118,7 @@ export const MemoPage = () => {
                                 <div className='items-end h-full w-full line-clamp-[14]'>
                                     <p
                                         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(memo.content).replace(/\n/g, '<br/>') }}
-                                        className='text-start text-zete-gray-500 font-light h-full w-full max-h-[336px]'
+                                        className='text-start text-gray-500 font-light h-full w-full max-h-[336px]'
                                     />
                                 </div>
                                 <div className='w-full flex'>
@@ -125,7 +127,7 @@ export const MemoPage = () => {
                                             <ul className='flex w-full h-full relative pt-[8px] pb-[9px] overflow-y-hidden'>
                                                 {memo.tags?.map((tag, idx) => (
                                                     <li key={ idx } className='flex items-center px-[9px] py-[1px] mr-[4px] rounded-[4px] bg-black bg-opacity-10 cursor-default'>
-                                                        <p className='font-light text-[11px] text-zete-dark-400 whitespace-nowrap'>
+                                                        <p className='font-light text-[11px] text-dark/90 whitespace-nowrap'>
                                                             { tag.name }
                                                         </p>
                                                     </li>
@@ -143,7 +145,7 @@ export const MemoPage = () => {
                 </Masonry>
                 <MemoEditModal/>
                 <div className='relative'>
-                    <div ref={loaderRef} className='absolute left-0 -top-[100px] w-[1px] h-[300px]'/>
+                    <div ref={loaderRef} className='absolute left-0 -top-[150px] w-[1px] h-[150px]'/>
                 </div>
             </section>
         </>

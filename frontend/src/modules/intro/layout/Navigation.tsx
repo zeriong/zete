@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../store';
 import {logoutAction} from '../../../store/auth/auth.actions';
-import {HamburgerMenuIcon} from '../../../assets/vectors';
+import {HamburgerMenuIcon} from '../../../common/components/Icons';
 
 export const HomeNav = ()=> {
     const [searchParams, setSearchParams] = useSearchParams();

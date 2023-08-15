@@ -5,7 +5,7 @@ import {
     CreateCategoryInput,
     DeleteCategoryInput,
     DeleteMemoInput, GetMemoInput,
-    SearchMemosInput, UpdateCategoryInput, UpdateMemoInput
+    SearchMemosInput, UpdateCategoryInput,
 } from '../../openapi/generated';
 
 /* ========================= 카테고리 ======================== */
