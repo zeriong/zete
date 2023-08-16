@@ -1,5 +1,4 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {logoutAction, refreshAccessTokenAction} from './auth.actions';
 
 interface IState {
     isLoggedIn: boolean;
@@ -20,35 +19,14 @@ export const authSlice = createSlice({
         setLoginReducer: (state: IState, { payload }: PayloadAction<string>) => {
             state.accessToken = payload;
             state.isLoggedIn = true;
+            state.loading = false;
         },
         setLogoutReducer: (state: IState) => {
             state.accessToken = '';
             state.isLoggedIn = false;
+            state.loading = false;
         },
     },
-    extraReducers: (builder) => {
-        // refreshToken
-        builder.addCase(refreshAccessTokenAction.fulfilled, (state: IState, { payload }) => {
-            if (payload.success) {
-                state.isLoggedIn = true;
-                state.accessToken = payload.accessToken;
-            } else {
-                state.isLoggedIn = false;
-                state.accessToken = '';
-            }
-            state.loading = false;
-        });
-        builder.addCase(refreshAccessTokenAction.rejected, (state: IState) => {
-            state.loading = false;
-        });
-        // logout
-        builder.addCase(logoutAction.fulfilled, (state: IState, { payload }) => {
-            if (payload.success) {
-                state.isLoggedIn = false;
-                state.accessToken = '';
-            }
-        });
-    }
 });
 
 export const { setLoginReducer, setLogoutReducer } = authSlice.actions;

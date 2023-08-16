@@ -8,10 +8,7 @@ import { UserService } from '../../user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(
-    private readonly config: ConfigService,
-    private readonly usersService: UserService,
-  ) {
+  constructor(private readonly config: ConfigService, private readonly usersService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // accessToken 헤더에서 받아옴
       ignoreExpiration: false,
@@ -19,21 +16,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
   async validate(payload: AccessPayload): Promise<User | null> {
-    // console.log('JwtStrategy: 접근');
     let user = null;
     try {
-      user = this.usersService.findById(payload.sub);
-      // console.log('JwtStrategy: 결과', user);
+      user = await this.usersService.findById(payload.sub);
+      if (!user) throw new UnauthorizedException();
     } catch (e) {
-      // console.log('JwtStrategy: 오류 - 1');
       throw new UnauthorizedException();
     }
-
-    if (!user) {
-      // console.log('JwtStrategy: 오류 - 2');
-      throw new UnauthorizedException();
-    }
-
     return user;
   }
 }

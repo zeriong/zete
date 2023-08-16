@@ -9,13 +9,13 @@ import {ConfirmButton} from '../../../../common/components/ConfirmButton';
 import {createCategoryAction, deleteCategoryAction, getCategoriesAction, updateCategoryAction} from '../../../../store/memo/memo.actions';
 import {CoreOutput} from '../../../../openapi/generated';
 
-export const CategoryEditModal = (props: { buttonText: string }) => {
+export const EditCategoryModal = (props: { buttonText: string }) => {
     const [isShow, setIsShow] = useState(false);
     const [createInputValue, setCreateInputValue] = useState('');
     const [updateInputValues, setUpdateInputValues] = useState<{ [key: number]: string }>({});
 
     const dispatch = useDispatch<AppDispatch>();
-    const { cate } = useSelector((state: RootState) => state.memo);
+    const memoState = useSelector((state: RootState) => state.memo);
 
     const openModal = () => setIsShow(true);
 
@@ -87,7 +87,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                     <div className='fixed inset-0'>
                         <div className='flex min-h-full items-center justify-center p-[16px] text-center'>
                             <Transition.Child
-                                as={Fragment}
+                                as={ Fragment }
                                 enter='ease-out duration-300'
                                 enterFrom='opacity-0 scale-95'
                                 enterTo='opacity-100 scale-100'
@@ -121,7 +121,7 @@ export const CategoryEditModal = (props: { buttonText: string }) => {
                                                     </button>
                                                 </form>
                                                 <ul className='text-dark/90 grid gap-[16px] py-[20px]'>
-                                                    {cate.list?.map((memo, idx) => (
+                                                    {memoState.cate.list?.map((memo, idx) => (
                                                         <li key={ idx }>
                                                             <form
                                                                 onSubmit={(event) => {

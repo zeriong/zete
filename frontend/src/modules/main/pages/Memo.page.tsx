@@ -5,7 +5,7 @@ import {AddMemo} from '../components/AddMemo';
 import Masonry from 'react-masonry-css';
 import * as DOMPurify from 'dompurify';
 import {FillStarIcon, StarIcon} from '../../../common/components/Icons';
-import {MemoEditModal} from '../components/modals/MemoEdit.modal';
+import {EditMemoModal} from '../components/modals/EditMemo.modal';
 import {SavedMemoMenuPopover} from '../components/popovers/SavedMemoMenu.popover';
 import {useSearchParams} from 'react-router-dom';
 import {changeImportantAction} from '../../../store/memo/memo.actions';
@@ -41,39 +41,44 @@ export const MemoPage = () => {
         dispatch(changeImportantAction({id: memo.id}));
     }
 
+    // 옵저버에 의해 센서가 노출되어 있음을 인식한 경우에 실행
     const handleObserver = async (entities, observer) => {
         const target = entities[0];
         if (target.isIntersecting) {
-            await loadMemos(dispatch, searchParams, false);
+            await loadMemos(false);
         }
-    };
+    }
 
-    // deps에 url변경을 카테고리, 태그, 검색에 대해서만 (메모수정인 view 제외)
+    // 카테고리, 태그, 검색에 의한 url 변화에 따른 처리
     useEffect(() => {
         if (observerRef.current) {
             (async () => {
-                observerRef.current.disconnect();
                 // 옵저버 & 메모리스트 초기화 후 로드
                 dispatch(resetMemosReducer());
-                await loadMemos(dispatch, searchParams, false);
-            })();
+                await loadMemos(false);
+            })()
         }
     },[searchParams.get('cate'), searchParams.get('tag'), searchParams.get('search')]);
 
     useEffect(() => {
-        const options = {
-            root: null, // viewport를 root로 설정
-            rootMargin: '20px', // 타겟의 교차상태를 판단할 때, 타겟의 마진을 추가로 고려
-            threshold: 0.2, // 타겟이 viewport에 20% 이상 보이면 교차상태로 판단 (사용자경험 + 중요메모에는 메모 폼이 없어 위치변경 문제발생을 해결하기 위함.)
-        };
+        if (memoState.memo.totalCount === -1 || memoState.memo.list.length < memoState.memo.totalCount) {
+            // 이미 존재한다면 종료
+            if (observerRef.current) observerRef.current.disconnect();
 
-        observerRef.current = new IntersectionObserver(handleObserver, options);
+            const options = {
+                root: null, // viewport를 root로 설정
+                rootMargin: '20px', // 타겟의 교차상태를 판단할 때, 타겟의 마진을 추가로 고려
+                threshold: 0.2, // 타겟이 viewport에 20% 이상 보이면 교차상태로 판단 (사용자경험 + 중요메모에는 메모 폼이 없어 위치변경 문제발생을 해결하기 위함.)
+            };
 
-        if (loaderRef.current) observerRef.current.observe(loaderRef.current);
+            observerRef.current = new IntersectionObserver(handleObserver, options);
+
+            if (loaderRef.current) observerRef.current.observe(loaderRef.current);
+        }
 
         return () => observerRef && observerRef.current.disconnect();
-        // deps에 limit와 응답 데이터 개수가 같은 경우 감지하여 실행
-    }, [memoState.memo.pagingEffect]);
+
+    }, [memoState.memo.list]);
 
     return (
         <>
@@ -101,12 +106,12 @@ export const MemoPage = () => {
                                 <div className='flex relative w-full'>
                                     <p
                                         dangerouslySetInnerHTML={{ __html: memo.title && DOMPurify.sanitize(memo.title.replace(/\n/g, '<br/>')) }}
-                                        className={`text-gray-500 font-light text-[20px] text-start w-full mb-[10px] ${!memo.title && 'h-[20px] w-full mb-[10px] pr-[30px]'}`}
+                                        className={`text-gray-500 font-light text-[20px] text-start w-full mb-[10px] ${ !memo.title && 'h-[20px] w-full mb-[10px] pr-[30px]' }`}
                                     />
                                     {/* 중요메모 버튼 */}
                                     <button
                                         type='button'
-                                        className={memo.title ? 'relative flex items-start' : 'absolute right-0'}
+                                        className={ memo.title ? 'relative flex items-start' : 'absolute right-0' }
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             changeMemoImportant(memo);
@@ -143,9 +148,9 @@ export const MemoPage = () => {
                         </article>
                     ))}
                 </Masonry>
-                <MemoEditModal/>
+                <EditMemoModal/>
                 <div className='relative'>
-                    <div ref={loaderRef} className='absolute left-0 -top-[150px] w-[1px] h-[150px]'/>
+                    <div ref={ loaderRef } className='absolute left-0 -top-[150px] w-[1px] h-[150px]'/>
                 </div>
             </section>
         </>

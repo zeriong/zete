@@ -15,10 +15,7 @@ const fromCookie = (req) => {
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
-  constructor(
-    private readonly config: ConfigService,
-    private readonly usersService: UserService,
-  ) {
+  constructor(private readonly config: ConfigService, private readonly usersService: UserService) {
     super({
       jwtFromRequest: fromCookie,
       ignoreExpiration: false,
@@ -29,19 +26,11 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
   async validate(payload: RefreshPayload): Promise<User | null> {
     let user = null;
     try {
-      console.log('JwtRefreshStrategy: 접근');
-      user = this.usersService.findById(payload.sub);
-      console.log('JwtRefreshStrategy: 검증');
+      user = await this.usersService.findById(payload.sub);
+      if (!user) throw new UnauthorizedException();
     } catch (e) {
-      console.log('JwtRefreshStrategy: 오류 - 1');
       throw new UnauthorizedException();
     }
-
-    if (!user) {
-      console.log('JwtRefreshStrategy: 오류 - 2');
-      throw new UnauthorizedException();
-    }
-
     return user;
   }
 }

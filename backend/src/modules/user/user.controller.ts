@@ -43,9 +43,9 @@ export class UserController {
   /** 프로필 response */
   @UseGuards(JwtAuthGuard)
   @ApiResponse({ type: User })
-  @Get('profile')
-  async profile(@Req() req): Promise<User> {
-    return await this.userService.findById(req.user.id);
+  @Get('getProfile')
+  async getProfile(@Req() req): Promise<User> {
+    return await this.userService.getProfile(req.user.id);
   }
 
   /** id로 유저데이터 삭제 */

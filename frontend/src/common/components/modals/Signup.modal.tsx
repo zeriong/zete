@@ -10,7 +10,6 @@ import {Api} from '../../../openapi/api';
 import {PATTERNS} from '../../constants';
 import {VisibilityOffIcon, VisibilityOnIcon} from '../Icons';
 
-
 export const SignupModal = (props: { successControl: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL, INPUT_PHONE } = PATTERNS;
 
@@ -20,7 +19,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const { loading } = useSelector((state: RootState) => state.auth);
+    const authState = useSelector((state: RootState) => state.auth);
 
     const form = useForm<CreateAccountInput & { passwordConfirm?: string }>({ mode: 'onChange' });
 
@@ -91,7 +90,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                     required: true,
                                                     minLength: 2, maxLength: 32,
                                                 })}
-                                                type='text'
+                                                tabIndex={ 1 }
                                                 placeholder='이름을 입력해주세요.'
                                                 className='border border-gray-400 rounded px-[8px] py-[4px] w-full'
                                             />
@@ -106,6 +105,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                     minLength: 6, maxLength: 64,
                                                     pattern: EMAIL,
                                                 })}
+                                                tabIndex={ 2 }
                                                 placeholder='이메일을 입력해주세요.'
                                                 className='border border-gray-400 rounded px-[8px] py-[4px] w-full'
                                             />
@@ -127,6 +127,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                         },
                                                     })}
                                                     type={ showPassword ? 'text' : 'password' }
+                                                    tabIndex={ 3 }
                                                     placeholder='비밀번호를 입력해주세요.'
                                                     className='border border-gray-400 rounded pl-[8px] pr-[30px] py-[4px] w-full'
                                                 />
@@ -170,6 +171,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                         },
                                                     })}
                                                     type={ showConfirmPassword ? 'text' : 'password' }
+                                                    tabIndex={ 4 }
                                                     placeholder='비밀번호를 다시 한번 입력해주세요.'
                                                     className='border border-gray-400 rounded=[4px] px-[8px] py-[4px] w-full'
                                                 />
@@ -196,7 +198,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                         event.target.value = value;
                                                     },
                                                 })}
-                                                type='text'
+                                                tabIndex={ 5 }
                                                 placeholder='휴대폰번호를 입력해주세요.'
                                                 className='border border-gray-400 rounded-[4px] px-[8px] py-[4px] w-full'
                                             />
@@ -208,7 +210,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                             options={{
                                                 text: '회원가입',
                                                 disabled: !form.formState.isValid,
-                                                loading: loading,
+                                                loading: authState.loading,
                                             }}
                                             type='submit'
                                             className='w-full py-[6px] bg-orange-500 text-white text-center cursor-pointer text-[22px] rounded-[16px] mt-[10px]'
@@ -221,5 +223,5 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                 </Dialog>
             </Transition>
         </>
-    );
-};
+    )
+}

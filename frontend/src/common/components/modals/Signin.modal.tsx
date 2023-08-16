@@ -10,6 +10,7 @@ import {LoginInput} from '../../../openapi/generated';
 import {PATTERNS} from '../../constants';
 import {setLoginReducer, setLogoutReducer} from '../../../store/auth/auth.slice';
 import {VisibilityOffIcon, VisibilityOnIcon} from '../Icons';
+import {getProfile} from '../../../store/user/user.actions';
 
 export const SigninModal = () => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL } = PATTERNS;
@@ -21,7 +22,7 @@ export const SigninModal = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
-    const { loading } = useSelector((state: RootState) => state.auth);
+    const authState = useSelector((state: RootState) => state.auth);
 
     const form = useForm<LoginInput>({ mode: 'onChange' });
 
@@ -39,14 +40,17 @@ export const SigninModal = () => {
     const signinSubmit = form.handleSubmit(async () => {
         await Api.auth.login(form.getValues())
             .then((res) => {
-                if (!res.data.success) {
-                    setErrorMessage(res.data.error);
-                    dispatch(setLogoutReducer());
-                    return;
-                }
-                closeModal();
-                dispatch(setLoginReducer(res.data.accessToken));
-                navigate('/memo');
+                (async () => {
+                    if (!res.data.success) {
+                        dispatch(await setLogoutReducer());
+                        setErrorMessage(res.data.error);
+                        return;
+                    }
+                    closeModal();
+                    dispatch(setLoginReducer(res.data.accessToken));
+                    dispatch(await getProfile());
+                    navigate('/memo');
+                })()
             })
             .catch((e) => {
                 setErrorMessage('서버와 통신할 수 없습니다.');
@@ -145,7 +149,7 @@ export const SigninModal = () => {
                                             options={{
                                                 text: '로그인',
                                                 disabled: !form.formState.isValid,
-                                                loading: loading,
+                                                loading: authState.loading,
                                             }}
                                             type='submit'
                                             className='w-full py-[6px] bg-orange-500 text-white mt-[12px] text-center cursor-pointer text-[20px] rounded-[16px]'
@@ -165,5 +169,5 @@ export const SigninModal = () => {
                 </Dialog>
             </Transition>
         </>
-    );
-};
+    )
+}

@@ -1,4 +1,4 @@
-import {createSlice, current} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 import {CategoryDto,
     Memo,
 } from '../../openapi/generated';
@@ -9,10 +9,8 @@ import {
     deleteCategoryAction,
     deleteMemoAction,
     getCategoriesAction,
-    getMemoAction,
     searchMemosAction,
 } from './memo.actions';
-import {MEMO_LIST_REQUEST_LIMIT} from '../../common/constants';
 
 interface IState {
     cate: {
@@ -26,7 +24,6 @@ interface IState {
         totalCount?: number;
         list?: Memo[];
         isLoading: boolean;
-        pagingEffect: boolean;
     }
 }
 const initState: IState = {
@@ -41,12 +38,6 @@ const initState: IState = {
         totalCount: -1,
         list: [],
         isLoading: false,
-        /**
-         * 추가 변경사항
-         * @description: 페이징시 db에서 보유한 기대 데이터가 limit보다 많을 가능성이 있는 경우
-         *               변경시켜 주어 useEffect의 deps에 넣어 주기 위한 state
-         * */
-        pagingEffect: false,
     }
 }
 
@@ -124,31 +115,14 @@ export const memoSlice = createSlice({
         });
         builder.addCase(searchMemosAction.fulfilled, (state, { payload: data, meta }) => {
             const refresh = meta.arg.refresh;
-            if (!data.success) return;
-            if (refresh) {
-                state.memo.list = data.list.sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
-                state.memo.offset = data.list.length;
+            const input = meta.arg.input;
+            if (data?.success) {
+                // refresh를 통해서 갱신, 스택 유형으로 업데이트
+                state.memo.offset = input.offset + data.list.length;
                 state.memo.totalCount = data.totalCount;
-                state.memo.isLoading = false;
-            } else {
-
-                // 데이터 누적
-                state.memo.list = [ ...state.memo.list, ...data.list ]
+                state.memo.list = (refresh ? data.list : [ ...state.memo.list, ...data.list ])
                     .sort((a, b) => new Date(b.updateAt).valueOf() - new Date(a.updateAt).valueOf());
-                state.memo.offset = state.memo.offset + data.list.length;
-                state.memo.totalCount = data.totalCount;
                 state.memo.isLoading = false;
-
-                /**
-                 * 추가 변경사항
-                 * @description: 1. 현재 limit보다 db에서 가지고 있는 메모 갯수가 많은경우 observer가 페이징을 하지 않음.
-                 *               2. 해당 state를 통해 effect를 일으켜 페이징를 재 시도함.
-                 *               3. 데이터에서 받은 데이터 갯수와 limit갯수가 같다면 db에 더 많은 데이터를 기대할 수 있기 때문에
-                 *                  state를 변경시켜 컴포넌트에서 useEffect를 통해 페이징 재시도를 할 수 있다.
-                 * */
-                if (data.list.length === MEMO_LIST_REQUEST_LIMIT) {
-                    state.memo.pagingEffect = !state.memo.pagingEffect;
-                }
             }
         });
         builder.addCase(searchMemosAction.rejected, (state) => {

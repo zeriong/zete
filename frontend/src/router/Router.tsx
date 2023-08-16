@@ -2,7 +2,7 @@ import React from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {Home} from '../modules/intro/pages/Home.page';
 import {MemoLayout} from '../modules/main/layout/Layout';
-import {ProfileEditPage} from '../modules/main/pages/ProfileEdit.page';
+import {EditProfilePage} from '../modules/main/pages/EditProfile.page';
 import {PrivateElement} from './PrivateElement';
 import {ProfilePage} from '../modules/main/pages/Profile.page';
 import {MemoPage} from '../modules/main/pages/Memo.page';
@@ -31,7 +31,7 @@ export const Router = () => {
                 <Route path='/memo/*' element={ <PrivateElement><MemoLayout/></PrivateElement> }>
                     <Route index element={ <MemoPage/> }/>
                     <Route path='profile' element={ <ProfilePage/> }/>
-                    <Route path='profile/edit' element={ <ProfileEditPage/> }/>
+                    <Route path='profile/edit' element={ <EditProfilePage/> }/>
                 </Route>
             </Routes>
         </BrowserRouter>

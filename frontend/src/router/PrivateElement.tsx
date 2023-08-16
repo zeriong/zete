@@ -4,11 +4,11 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 
 export const PrivateElement = (props: { children? : React.ReactElement }) : React.ReactElement => {
-    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+    const authState = useSelector((state: RootState) => state.auth);
 
     let location = useLocation();
 
-    if (isLoggedIn) return props.children;
+    if (authState.isLoggedIn) return props.children;
 
     return <Navigate to={'/'} state={{ from: location }}/>
 };

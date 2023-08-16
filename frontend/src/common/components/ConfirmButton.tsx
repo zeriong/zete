@@ -132,4 +132,4 @@ export const ConfirmButton = (props: ButtonProps) => {
             </Transition>
         </>
     )
-};
+}

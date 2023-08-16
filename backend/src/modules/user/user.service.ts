@@ -139,13 +139,25 @@ export class UserService {
     }
     return null;
   }
+
+  /** 프로필 응답 */
+  async getProfile(id: number): Promise<User | null> {
+    try {
+      const result = await this.findById(id);
+      if (result) return result;
+    } catch (e) {
+      this.logger.error(e);
+    }
+    return null;
+  }
+
   /** 모든유저정보 */
   async getAll(): Promise<User[]> {
     return this.userRepository.find();
   }
   /** id 검색 (실패시 오류반환) */
   async findById(id: number): Promise<User> {
-    return await this.userRepository.findOneByOrFail({ id });
+    return await this.userRepository.findOneBy({ id });
   }
   /** 업데이트 */
   async update(userId: number, updateData: QueryDeepPartialEntity<User>): Promise<boolean> {

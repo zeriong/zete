@@ -74,10 +74,10 @@ export const deleteCategoryAction = createAsyncThunk(
 
 export const searchMemosAction = createAsyncThunk(
     'memo/searchMemosAction',
-    async (input: { data: SearchMemosInput,  refresh?: boolean }, thunkAPI) => {
+    async ({ input, refresh }: { input: SearchMemosInput,  refresh: boolean }, thunkAPI) => {
         try {
-            /** 변경사항 = refresh타입 추가하여 리프레쉬인 경우와 아닌 경우 상태관리 다르게 함 */
-            const response = await Api.memo.searchMemos(input.data);
+            // 목록의 스택과 갱신을 함께 관리하기 위한 refresh 추가
+            const response = await Api.memo.searchMemos(input);
 
             if (!response) return thunkAPI.rejectWithValue(null);
 

@@ -163,9 +163,6 @@ export class MemoService {
         .where('Memo.userId = :userId', { userId: user.id })
         .orderBy('Memo.updateAt', 'DESC'); // updateAt 내림차순 정렬
 
-      // 추가 조건 쿼리 전 카운팅
-      const totalCount = await qb.getCount();
-
       // 조건
       if (input.search) {
         qb.andWhere('Memo.title LIKE :search OR Memo.content LIKE :search', {
@@ -194,14 +191,14 @@ export class MemoService {
           }
         }
       }
-
+      // 요청받은 메모리스트 카운팅
+      const totalCount = await qb.getCount();
       const list = await qb.skip(input.offset).take(input.limit).getMany();
 
       return {
         success: true,
         list,
         totalCount,
-        //importantMemoCount,
       };
     } catch (e) {
       this.logger.error(e);

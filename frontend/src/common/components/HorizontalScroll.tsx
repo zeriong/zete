@@ -2,14 +2,14 @@ import React, {ReactNode, useEffect, useRef, useState} from 'react';
 import CustomScroller from './customScroller';
 import {useWindowResize} from '../../hooks/useWindowResize';
 
-export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: string, className?: string, children: ReactNode }) => { // { type, text, disabled, loading, className, onClick }: IButtonProps
-    const scrollOuterRef = useRef<HTMLDivElement>(null)
-    const scrollInnerRef = useRef<HTMLDivElement>(null)
-    const scrollRefRef = useRef<CustomScroller>(null)
+export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: string, className?: string, children: ReactNode }) => {
+    const scrollOuterRef = useRef<HTMLDivElement>(null);
+    const scrollInnerRef = useRef<HTMLDivElement>(null);
+    const scrollRefRef = useRef<CustomScroller>(null);
 
-    const [ scrollLeft, setScrollLeft ] = useState(0)
-    const [ isShowLeftButton, setIsShowLeftButton ] = useState(false)
-    const [ isShowRightButton, setIsShowRightButton ] = useState(false)
+    const [scrollLeft, setScrollLeft] = useState(0);
+    const [isShowLeftButton, setIsShowLeftButton] = useState(false);
+    const [isShowRightButton, setIsShowRightButton] = useState(false);
 
     const windowResize = useWindowResize();
 
@@ -49,7 +49,7 @@ export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: stri
             <CustomScroller ref={ scrollRefRef } autoHeight={ true } autoHide={ true } customTrackHorizontalStyle={{ height: 4 }} onScrollFrame={(event: any) => {
                 setScrollLeft(event.left);
             }}>
-                <div className="flex shrink">
+                <div className='flex shrink'>
                     <div ref={ scrollInnerRef }>
                         { props.children }
                     </div>
@@ -65,9 +65,9 @@ export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: stri
                                 scrollRefRef.current?.scrollLeft(left);
                             }}
                             style={{background: `linear-gradient(-90deg,hsla(0,0%,100%,0),${ props.bgColor? props.bgColor: '#fff' } 50%)`}}
-                            className="absolute flex items-center justify-start top-0 left-0 w-[40px] h-full cursor-pointer"
+                            className='absolute flex items-center justify-start top-0 left-0 w-[40px] h-full cursor-pointer'
                         >
-                            <div className="w-[12px] h-[12px] border-t border-l border-black border-opacity-50 -rotate-45 ml-[2px]"/>
+                            <div className='w-[12px] h-[12px] border-t border-l border-black border-opacity-50 -rotate-45 ml-[2px]'/>
                         </div>
                     )}
                     {isShowRightButton && (
@@ -77,13 +77,13 @@ export const HorizontalScroll = (props: { isShowButton?: boolean, bgColor?: stri
                                 scrollRefRef.current?.scrollLeft(left);
                             }}
                             style={{background: `linear-gradient(90deg,hsla(0,0%,100%,0),${ props.bgColor? props.bgColor: '#fff' } 50%)`}}
-                            className="absolute flex items-center justify-end top-0 right-0 w-[40px] h-full cursor-pointer"
+                            className='absolute flex items-center justify-end top-0 right-0 w-[40px] h-full cursor-pointer'
                         >
-                            <div className="w-[12px] h-[12px] border-t border-l border-black/50 rotate-[135deg] mr-[2px]"/>
+                            <div className='w-[12px] h-[12px] border-t border-l border-black/50 rotate-[135deg] mr-[2px]'/>
                         </div>
                     )}
                 </>
             )}
         </div>
     )
-};
+}

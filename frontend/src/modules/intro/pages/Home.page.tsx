@@ -7,8 +7,8 @@ import memoImg from '../../../assets/scroll-g6570d2351_1920.png';
 export const Home = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const { isLoggedIn } = useSelector((state: RootState) => state.auth);
-    const { loading, data } = useSelector((state: RootState) => state.user);
+    const authState = useSelector((state: RootState) => state.auth);
+    const userState = useSelector((state: RootState) => state.user);
 
     const openSignInModal = () => {
         searchParams.set('modal','sign-in');
@@ -20,7 +20,7 @@ export const Home = () => {
         setSearchParams(searchParams);
     }
 
-    return loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
+    return userState.loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
         <div className='flex h-full w-full overflow-hidden'>
             <div className='flex flex-col items-center md:items-end justify-center w-full md:w-1/2 font-bold text-[48px] text-gray-800 z-20 text-center md:pr-[5%]'>
                 <div className='flex flex-col items-center w-[450px]'>
@@ -33,25 +33,28 @@ export const Home = () => {
                             </span>
                         </span>
                     </h1>
-                    {isLoggedIn ? (
+                    {authState.isLoggedIn ? (
                         <div className='flex flex-col mt-[40px]'>
                             <h1 className='flex text-[26px] font-bold justify-center'>
-                                { `어서오세요! ${data?.name}님` }
+                                { userState.data?.name && `어서오세요! ${ userState.data?.name }님` }
                             </h1>
-                            <Link to='memo' className='text-[30px] font-bold flex py-[8px] px-[20px] items-center bg-orange-500
-                                rounded-[16px] justify-center mt-[32px] cursor-pointer text-white'>
+                            <Link
+                                to='memo'
+                                className='text-[30px] font-bold flex py-[8px] px-[20px] items-center bg-orange-500
+                                rounded-[16px] justify-center mt-[32px] cursor-pointer text-white'
+                            >
                                 Let's Zete!
                             </Link>
                         </div>
                     ) : (
-                        <h1 className='text-[18px] md:text-[26px] font-medium mt-[30px] md:mt-[80px]'>
+                        <h1 className='text-[18px] md:text-[26px] font-medium mt-[30px] md:mt-[60px]'>
                             자주 잊는 계획이나 일정관리, 정산관리 등<br/>
                             다양한 메모를 좀 더 깔끔하게 정리하세요.<br/>
                             가입하고 무료로 시작하세요.
                         </h1>
                     )}
-                    {!isLoggedIn &&
-                        <div className='flex flex-row text-[16px] md:text-[22px] mt-[40px]'>
+                    {!authState.isLoggedIn &&
+                        <div className='flex flex-row text-[16px] md:text-[22px] mt-[30px] md:mt-[60px]'>
                             <button
                                 type='button'
                                 onClick={ openSignInModal }
@@ -80,4 +83,4 @@ export const Home = () => {
                 />
             </figure>
         </div>
-};
+}

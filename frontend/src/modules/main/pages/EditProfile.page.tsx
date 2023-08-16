@@ -4,13 +4,13 @@ import {RootState} from '../../../store';
 import {useForm} from 'react-hook-form';
 import {FuncButton} from '../../../common/components/FuncButton';
 import {showAlert} from '../../../store/alert/alert.actions';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {Api} from '../../../openapi/api';
 import {setUserReducer} from '../../../store/user/user.slice';
 import {PATTERNS} from '../../../common/constants';
 import {UpdateAccountInput} from '../../../openapi/generated';
 
-export const ProfileEditPage = () => {
+export const EditProfilePage = () => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL, INPUT_PHONE } = PATTERNS;
 
     const [showPW, setShowPW] = useState(false);
@@ -20,24 +20,22 @@ export const ProfileEditPage = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { data: userState, loading } = useSelector((state: RootState) => (state.user));
+    const userState = useSelector((state: RootState) => (state.user));
 
     const form = useForm<UpdateAccountInput & { passwordConfirm: string | null }>({
         mode: 'onChange',
         defaultValues: {
-            name: userState.name,
-            email: userState.email,
-            mobile: userState.mobile,
+            name: userState.data.name,
+            email: userState.data.email,
+            mobile: userState.data.mobile,
         },
     });
 
     const subTitleStyle = 'font-bold md:text-[18px] text-[14px] text-[#5f5f5f]';
     const inputStyle = 'border border-gray-400 rounded px-[8px] py-[4px] md:w-[384px] w-full';
+    const errorStyle = 'mt-[4px] text-red-500 [12px] font-normal h-[12px]';
 
-    const toggleShowConfirmPW = () => setShowConfirmPW(!showConfirmPW);
-    const toggleShowPW = () => setShowPW(!showPW);
-
-    const onSubmit = form.handleSubmit(async () => {
+    const editProfileSubmit = form.handleSubmit(async () => {
         const { email, password, name, mobile } = form.getValues();
         await Api.user.updateProfile({ email, name, mobile, password })
             .then((res) => {
@@ -57,14 +55,13 @@ export const ProfileEditPage = () => {
 
     useEffect(() => setIsRender(true),[]);
 
-    return  loading ? <div>로딩중...</div> :
+    return  userState.loading ? <div>로딩중...</div> :
         <div className='w-full min-h-[640px] md:min-h-[700px] h-full relative flex justify-center items-center overflow-hidden'>
             <form
-                onSubmit={ onSubmit }
+                onSubmit={ editProfileSubmit }
                 className={`flex flex-col justify-center relative bg-white text-start items-center shadow-2xl transition-all ease-in-out duration-500
-                md:gap-[16px] md:p-[20px] md:rounded-[16px] md:border md:border-gray-300 md:w-auto md:h-auto
-                h-full w-full gap-[14px] px-[16px]
-                ${isRender ? 'bottom-0' : '-bottom-full'}`}
+                md:gap-[16px] md:p-[20px] md:rounded-[16px] md:border md:border-gray-300 md:w-auto md:h-auto h-full w-full gap-[14px] px-[16px]
+                ${ isRender ? 'bottom-0' : '-bottom-full' }`}
             >
                 <h1 className='font-extrabold text-[24px] md:text-[30px] text-center'>
                     프로필 변경
@@ -82,7 +79,7 @@ export const ProfileEditPage = () => {
                         placeholder='수정할 이름을 입력해주세요.'
                         className={ inputStyle }
                     />
-                    <p className='mt-[4px] text-red-500 [12px] font-normal h-[12px]'>
+                    <p className={ errorStyle }>
                         { form.formState.errors.name && '성함을 입력해 주시기 바랍니다.' }
                     </p>
                 </div>
@@ -106,7 +103,7 @@ export const ProfileEditPage = () => {
                         placeholder='변경할 이메일을 입력해주세요.'
                         className={ inputStyle }
                     />
-                    <p className='mt-1 text-red-500 [12px] font-normal h-3'>
+                    <p className={ errorStyle }>
                         { form.formState.errors.email && '이메일을 입력해주시기 바랍니다.' }
                     </p>
                 </div>
@@ -129,7 +126,7 @@ export const ProfileEditPage = () => {
                         placeholder='휴대폰번호를 입력해주세요.'
                         className={ inputStyle }
                     />
-                    <p className='mt-1 text-red-500 [12px] font-normal h-3'>
+                    <p className={ errorStyle }>
                         { form.formState.errors.mobile && '휴대전화번호를 입력해주세요.' }
                     </p>
                 </div>
@@ -156,8 +153,8 @@ export const ProfileEditPage = () => {
                         placeholder='수정할 비밀번호를 입력해주세요.'
                         className={ inputStyle }
                     />
-                    <div className='flex justify-between mb-[18px] md:w-96 w-full'>
-                        <div className='mt-[4px] text-red-500 text-[11px] font-normal h-[12px]'>
+                    <div className='flex justify-between mb-[18px] md:w-[386px] w-full'>
+                        <div className={ errorStyle }>
                             {form.formState.errors.password &&
                                 <h2 className='relative'>
                                     비밀번호는 최소 8자입니다.
@@ -173,8 +170,8 @@ export const ProfileEditPage = () => {
                         </div>
                         <button
                             type='button'
-                            onClick={ toggleShowPW }
-                            className='cursor-pointer [12px] bg-gray-500 h-fit text-gray-100 px-2 mr-1'
+                            onClick={ () => setShowPW(!showPW) }
+                            className='cursor-pointer [12px] bg-gray-500 h-fit text-gray-100 px-[8px] mr-[4px]'
                         >
                             { showPW ? '비밀번호 숨김' : '비밀번호 확인' }
                         </button>
@@ -199,14 +196,14 @@ export const ProfileEditPage = () => {
                         placeholder='비밀번호를 다시 한번 입력해주세요.'
                         className={ inputStyle }
                     />
-                    <div className='flex justify-between md:w-96 w-full'>
-                        <p className='mt-1 text-red-500 [12px] font-normal h-3'>
+                    <div className='flex justify-between md:w-[386px] w-full'>
+                        <p className={ errorStyle }>
                             { form.formState.errors.passwordConfirm && '비밀번호가 동일하지 않습니다.' }
                         </p>
                         <button
                             type='button'
-                            onClick={ toggleShowConfirmPW }
-                            className='cursor-pointer [12px] bg-gray-500 h-fit text-gray-100 px-2 mr-1'
+                            onClick={ () => setShowConfirmPW(!showConfirmPW) }
+                            className='cursor-pointer [12px] bg-gray-500 h-fit text-gray-100 px-[8px] mr-[4px]'
                         >
                             { showConfirmPW ? '비밀번호 숨김' : '비밀번호 확인' }
                         </button>
@@ -216,11 +213,11 @@ export const ProfileEditPage = () => {
                     options={{
                         text: '프로필 변경하기',
                         disabled: !form.formState.isValid,
-                        loading: loading,
+                        loading: userState.loading,
                     }}
                     type='submit'
                     className='mt-[32px] w-full py-[8px] flex justify-center mb-[12px] cursor-pointer text-[18px] md:text-[22px] items-center bg-orange-500 rounded-[16px] text-white'
                 />
             </form>
         </div>
-};
+}

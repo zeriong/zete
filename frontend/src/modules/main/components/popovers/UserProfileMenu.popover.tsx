@@ -2,8 +2,8 @@ import React from 'react';
 import { Popover, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import {Link} from 'react-router-dom';
-import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from '../../../../store';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../../../store';
 import {LogoutIcon, ProfileIcon, UserIcon} from '../../../../common/components/Icons';
 import {logoutAction} from '../../../../store/auth/auth.actions';
 
@@ -15,8 +15,7 @@ interface IMenuList {
 }
 
 export const UserProfileMenuPopover = () => {
-    const dispatch = useDispatch<AppDispatch>();
-    const { loading, data } = useSelector((state: RootState) => state.user);
+    const userState = useSelector((state: RootState) => state.user);
 
     const menuList: IMenuList[] = [
         {
@@ -28,7 +27,7 @@ export const UserProfileMenuPopover = () => {
             name: '로그아웃',
             icon: <LogoutIcon/>,
             path: '/',
-            function: () => dispatch(logoutAction()),
+            function: async () => await logoutAction(),
         },
     ];
 
@@ -38,14 +37,14 @@ export const UserProfileMenuPopover = () => {
     }
 
     return (
-        <Popover className='relative h-28px z-50'>
+        <Popover className='relative z-50 w-[28px] h-[28px]'>
             {({ open, close }) => (
                 <>
                     <Popover.Button>
-                        <UserIcon/>
+                        <UserIcon className='absolute right-0 top-0'/>
                     </Popover.Button>
                     <Transition
-                        as={Fragment}
+                        as={ Fragment }
                         enter='transition ease-out duration-200'
                         enterFrom='opacity-0 translate-y-1'
                         enterTo='opacity-100 translate-y-0'
@@ -55,20 +54,20 @@ export const UserProfileMenuPopover = () => {
                     >
                         <Popover.Panel className='absolute mt-[12px] w-[160px] md:w-[180px] bg-white right-0 p-[12px] shadow-lg rounded-[8px] overflow-hidden border border-black/10'>
                             <h1 className='text-[18px] font-medium text-dark p-[4px] mb-[4px] cursor-default'>
-                                {data?.name}
+                                { userState.data?.name }
                             </h1>
                             {menuList.map((item) => (
                                 <Link
-                                    key={item.name}
-                                    to={item.path}
+                                    key={ item.name }
+                                    to={ item.path }
                                     onClick={ () => buttonOnClick(item, close) }
                                     className='flex items-center rounded-[8px] h-[48px] transition duration-150 ease-in-out whitespace-nowrap hover:bg-orange-100'
                                 >
                                     <div className='flex items-center justify-center h-[32px] md:h-[48px] w-[36px] text-white'>
-                                        {item.icon}
+                                        { item.icon }
                                     </div>
                                     <p className='ml-[8px] text-[14px] font-medium text-gray-900'>
-                                        {item.name}
+                                        { item.name }
                                     </p>
                                 </Link>
                             ))}

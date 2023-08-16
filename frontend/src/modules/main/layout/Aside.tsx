@@ -2,7 +2,7 @@ import React, {useEffect, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../store';
 import CustomScroller from '../../../common/components/customScroller';
-import {CategoryEditModal} from '../components/modals/CategoryEdit.modal';
+import {EditCategoryModal} from '../components/modals/EditCategory.modal';
 import {Link, To, useSearchParams} from 'react-router-dom';
 import {AllIcon, CategoryIcon, StarIcon, TagIcon} from '../../../common/components/Icons';
 import {Tag} from '../../../openapi/generated';
@@ -11,8 +11,8 @@ import {getCategoriesAction} from '../../../store/memo/memo.actions';
 
 export const Aside = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { isShowSideNav } = useSelector((state: RootState) => (state.layout));
-    const { cate } = useSelector((state: RootState) => state.memo);
+    const layoutState = useSelector((state: RootState) => (state.layout));
+    const memoState = useSelector((state: RootState) => state.memo);
 
     useEffect(() => {
         // 카테고리 목록 로드
@@ -22,14 +22,14 @@ export const Aside = () => {
     return (
         <>
             <section
-                onClick={() => dispatch(toggleSideNavReducer())}
+                onClick={ () => dispatch(toggleSideNavReducer()) }
                 className={`z-50 w-full h-full left-0 top-0 fixed bg-black block md:hidden ease-in-out duration-300
-                ${ isShowSideNav ? 'opacity-50 visible' : 'opacity-0 invisible' }`}
+                ${ layoutState.isShowSideNav ? 'opacity-50 visible' : 'opacity-0 invisible' }`}
             />
             <aside
                 className={`fixed w-[256px] bg-white z-50 md:z-20 ease-in-out duration-300 pt-0 md:pt-[46px] h-full
                 overflow-hidden border-r border-gray-300/80
-                ${ isShowSideNav ? 'left-0' : '-left-[256px]' }`}
+                ${ layoutState.isShowSideNav ? 'left-0' : '-left-[256px]' }`}
             >
                 <CustomScroller customTrackVerticalStyle={{ width: 5 }}>
                     <section className='h-full w-full p-[14px] text-dark font-light text-[14px]'>
@@ -41,7 +41,7 @@ export const Aside = () => {
                                     cateName='전체메모'
                                     iconComponent={ AllIcon }
                                     iconClassName='mr-[14px] w-[20px]'
-                                    count={ cate.totalMemoCount }
+                                    count={ memoState.cate.totalMemoCount }
                                 />
                                 <CateItemList
                                     to={{ pathname: '/memo', search: '?cate=important' }}
@@ -49,16 +49,16 @@ export const Aside = () => {
                                     cateName='중요메모'
                                     iconComponent={ StarIcon }
                                     iconClassName='mr-[14px] w-[20px]'
-                                    count={ cate.importantMemoCount }
+                                    count={ memoState.cate.importantMemoCount }
                                 />
                             </ul>
                             <p className='text-dark/90 text-[11px] font-light pb-[14px] pt-[17px] pl-[12px]'>
                                 카테고리
                             </p>
                             <ul className='grid gap-[4px]'>
-                                {cate.list.map((cate, idx) => (
+                                {memoState.cate.list.map((cate, idx) => (
                                     <CateItemList
-                                        key={idx}
+                                        key={ idx }
                                         to={{ pathname: '/memo', search: `?cate=${cate.id}` }}
                                         cateId={ String(cate.id) }
                                         cateName={ cate.name }
@@ -69,7 +69,7 @@ export const Aside = () => {
                                     />
                                 ))}
                             </ul>
-                            <CategoryEditModal buttonText={ cate.list.length > 0 ? '카테고리 수정' : '카테고리 추가' }/>
+                            <EditCategoryModal buttonText={ memoState.cate.list.length > 0 ? '카테고리 수정' : '카테고리 추가' }/>
                         </div>
                     </section>
                 </CustomScroller>
@@ -89,10 +89,7 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
     },[searchParams]);
 
     return (
-        <li
-            className={`font-bold group rounded-[5px] hover:bg-gray-200/60
-            ${ isActiveCate && 'bg-gray-200/60' }`}
-        >
+        <li className={`font-bold group rounded-[5px] hover:bg-gray-200/60 ${ isActiveCate && 'bg-gray-200/60' }`}>
             <Link
                 to={ props.to }
                 className='flex w-full justify-between items-center p-[10px] hover:bg-gray-200/60 rounded-[5px]'
@@ -104,10 +101,7 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                     <props.iconComponent className={ props.iconClassName }/>
                     <p>{ props.cateName }</p>
                 </div>
-                <div
-                    className={`rounded-full text-dark/80 py-[2px] px-[8px] text-[12px] font-medium
-                    ${ isActiveCate ? 'bg-white' : 'group-hover:bg-white bg-gray-200/60' }`}
-                >
+                <div className={`rounded-full text-dark/80 py-[2px] px-[8px] text-[12px] font-medium ${ isActiveCate ? 'bg-white' : 'group-hover:bg-white bg-gray-200/60' }`}>
                     <p className='relative bottom-[1px]'>
                         { props.count || 0 }
                     </p>
@@ -117,8 +111,7 @@ const CateItemList = (props: { to: To, iconComponent: any, iconClassName: string
                 {props.tags?.map((tag, idx) => (
                     <li
                         key={ idx }
-                        className={`overflow-hidden font-light text-[13px] transition-all duration-300 
-                        ${ isActiveCate ? 'max-h-[200px] mt-[6px]' : 'h-[0vh] p-0 m-0' }`}
+                        className={`overflow-hidden font-light text-[13px] transition-all duration-300 ${ isActiveCate ? 'max-h-[200px] mt-[6px]' : 'h-[0vh] p-0 m-0' }`}
                     >
                         <Link
                             to={{ pathname: '/memo', search: `${ props.to.search }&tag=${ tag.name }` }}

@@ -13,10 +13,10 @@
  */
 
 
-import type { Configuration } from "./configuration";
-import type { RequestArgs } from "./base";
+import type { Configuration } from './configuration';
+import type { RequestArgs } from './base';
 import type { AxiosInstance, AxiosResponse } from 'axios';
-import { RequiredError } from "./base";
+import { RequiredError } from './base';
 
 /**
  *
@@ -54,7 +54,7 @@ export const setApiKeyToObject = async function (object: any, keyParamName: stri
  */
 export const setBasicAuthToObject = function (object: any, configuration?: Configuration) {
     if (configuration && (configuration.username || configuration.password)) {
-        object["auth"] = { username: configuration.username, password: configuration.password };
+        object['auth'] = { username: configuration.username, password: configuration.password };
     }
 }
 
@@ -67,7 +67,7 @@ export const setBearerAuthToObject = async function (object: any, configuration?
         const accessToken = typeof configuration.accessToken === 'function'
             ? await configuration.accessToken()
             : await configuration.accessToken;
-        object["Authorization"] = "Bearer " + accessToken;
+        object['Authorization'] = 'Bearer ' + accessToken;
     }
 }
 
@@ -80,13 +80,13 @@ export const setOAuthToObject = async function (object: any, name: string, scope
         const localVarAccessTokenValue = typeof configuration.accessToken === 'function'
             ? await configuration.accessToken(name, scopes)
             : await configuration.accessToken;
-        object["Authorization"] = "Bearer " + localVarAccessTokenValue;
+        object['Authorization'] = 'Bearer ' + localVarAccessTokenValue;
     }
 }
 
-function setFlattenedQueryParams(urlSearchParams: URLSearchParams, parameter: any, key: string = ""): void {
+function setFlattenedQueryParams(urlSearchParams: URLSearchParams, parameter: any, key: string = ''): void {
     if (parameter == null) return;
-    if (typeof parameter === "object") {
+    if (typeof parameter === 'object') {
         if (Array.isArray(parameter)) {
             (parameter as any[]).forEach(item => setFlattenedQueryParams(urlSearchParams, item, key));
         } 
@@ -127,7 +127,7 @@ export const serializeDataIfNeeded = function (value: any, requestOptions: any, 
         : nonString;
     return needsSerialization
         ? JSON.stringify(value !== undefined ? value : {})
-        : (value || "");
+        : (value || '');
 }
 
 /**

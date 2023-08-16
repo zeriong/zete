@@ -1,33 +1,16 @@
-import {createAsyncThunk} from '@reduxjs/toolkit';
 import {Api} from '../../openapi/api';
+import {store} from '../index';
+import {userSlice} from '../user/user.slice';
+import {memoSlice} from '../memo/memo.slice';
+import {authSlice} from './auth.slice';
 
-export const logoutAction = createAsyncThunk(
-    'user/logout',
-    async (_, thunkAPI) => {
-        try {
-            const response = await Api.auth.logout();
-
-            if (!response || !response.data) return thunkAPI.rejectWithValue(null);
-
-            return response.data;
-        }
-        catch (err) {
-            return thunkAPI.rejectWithValue(err);
-        }
+export const logoutAction = async () => {
+    try {
+        await Api.auth.logout();
+    } catch (e) {
+        console.log(e)
     }
-);
-
-export const refreshAccessTokenAction = createAsyncThunk(
-    'user/refreshToken',
-    async (_, thunkAPI) => {
-        try {
-            const response = await Api.auth.refreshToken();
-
-            if (!response || !response.data) return thunkAPI.rejectWithValue(null);
-
-            return response.data;
-        } catch (e) {
-            return thunkAPI.rejectWithValue(e.response.message);
-        }
-    }
-);
+    store.dispatch(authSlice.actions.setLogoutReducer());
+    store.dispatch(memoSlice.actions.resetMemosReducer());
+    store.dispatch(userSlice.actions.setUserReducer(undefined));
+}

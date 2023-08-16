@@ -3,8 +3,8 @@ import {UseFormReturn} from 'react-hook-form';
 import {showAlert} from '../../../store/alert/alert.actions';
 import {Api} from '../../../openapi/api';
 import CustomScroller from '../../../common/components/customScroller';
-import {setDynamicTextareaHeight} from '../../../libs/common.lib';
 import axios from 'axios';
+import {AutoResizeTextarea} from '../../../common/components/AutoResizeTextarea';
 
 export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) => {
     const requestRef = useRef(null);
@@ -15,7 +15,7 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
     const [message, setMessage] = useState('');
     const [inputValue, setInputValue] = useState('');
 
-    const handleSubmit = (event) => {
+    const askAiSubmit = (event) => {
         event.preventDefault();
 
         if (usableCount <= 0) return showAlert('질문가능 횟수가 초과하였습니다, 매일 자정이 지나면 충전됩니다.');
@@ -158,26 +158,23 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
                     )}
                 </div>
                 <form
-                    onSubmit={ handleSubmit }
+                    onSubmit={ askAiSubmit }
                     className={`relative shrink flex items-center justify-between p-[5px_0px_5px_12px] shadow-1xl rounded-[12px] mt-[10px]
                     border border-gray-300 shadow-2xl ${ isLoading ? 'bg-gray-200' : 'bg-white' }`}
                 >
                     <div className='flex items-center w-full'>
                         <CustomScroller autoHeight={ true } autoHeightMax={ 88 } customTrackVerticalStyle={{ width: 6 }}>
-                            <textarea
+                            <AutoResizeTextarea
                                 value={ inputValue }
                                 maxLength={ 500 }
                                 rows={ 1 }
                                 disabled={ isLoading }
                                 placeholder='GPT에게 물어보세요! ( Shift + Enter 줄바꿈 )'
                                 className='flex resize-none bg-transparent placeholder:text-gray-500 font-light placeholder:text-[14px] w-full h-fit'
-                                onChange={(event) => {
-                                    setInputValue(event.target.value);
-                                    setDynamicTextareaHeight(event.target);
-                                }}
+                                onChange={(event) =>  setInputValue(event.target.value)}
                                 onKeyDown={(event) => {
                                     // shift + Enter = 줄바꿈, Enter = submit
-                                    if (event.key === 'Enter' && !event.shiftKey) handleSubmit(event);
+                                    if (event.key === 'Enter' && !event.shiftKey) askAiSubmit(event);
                                 }}
                             />
                         </CustomScroller>

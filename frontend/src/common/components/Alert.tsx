@@ -13,7 +13,7 @@ export const Alert = () => {
     const [isRender, setIsRender] = useState(false);
 
     const dispatch = useDispatch();
-    const { alerts } = useSelector((state:RootState) => state.alert);
+    const alertState = useSelector((state:RootState) => state.alert);
 
     const showAlert = () => {
         setIsRender(true);
@@ -38,7 +38,7 @@ export const Alert = () => {
         }
     }
 
-    useEffect(() => showAlert(), [alerts]);
+    useEffect(() => showAlert(), [alertState.alerts]);
 
     useEffect(() => {
         if (!isRunning && store.getState().alert.alerts.length === 0) {

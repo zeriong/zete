@@ -5,7 +5,7 @@ import {AppDispatch, RootState} from '../../../store';
 import {Controller, useForm} from 'react-hook-form';
 import {showAlert} from '../../../store/alert/alert.actions';
 import {CreateMemoInput, Memo} from '../../../openapi/generated';
-import {setDynamicInputWidth, setDynamicTextareaHeight} from '../../../libs/common.lib';
+import {removeSpace} from '../../../libs/common.lib';
 import {useSearchParams} from 'react-router-dom';
 import {deleteMemoTag, getCategoryId, addMemoTagSubmit, focusToContent} from '../../../libs/memo.lib';
 import {useOutsideClick} from '../../../hooks/useOutsideClick';
@@ -15,6 +15,7 @@ import {Api} from '../../../openapi/api';
 import {saveMemoReducer} from '../../../store/memo/memo.slice';
 import {getCategoriesAction} from '../../../store/memo/memo.actions';
 import {AutoResizeTextarea} from '../../../common/components/AutoResizeTextarea';
+import {AutoResizeInput} from '../../../common/components/AutoResizeInput';
 
 export const AddMemo = () => {
     const panelRef = useRef<HTMLDivElement>(null);
@@ -40,7 +41,6 @@ export const AddMemo = () => {
             tags: [],
             cateId: getCategoryId(searchParams),
         })
-        savedMemoRef.current = null;
     }
 
     // 메모 저장
@@ -50,7 +50,7 @@ export const AddMemo = () => {
         // 신규입력
         if (!savedMemoRef.current) {
             // 입력된 내용이 있다면 생성
-            if (data.title?.length > 0 || data.content?.length > 0) {
+            if (removeSpace(data?.title).length > 0 || removeSpace(data?.content).length > 0) {
                 try {
                     const res = await Api.memo.createMemo(data);
                     if (res.data.success) savedMemoRef.current = res.data.savedMemo;
@@ -61,7 +61,7 @@ export const AddMemo = () => {
             }
         } else {
             // 내용이 있는 경우 저장
-            if (data.title?.length > 0 || data.content?.length > 0) {
+            if (removeSpace(data?.title)?.length > 0 || removeSpace(data?.content).length > 0) {
                 try {
                     const res = await Api.memo.updateMemo({ ...data, id: savedMemoRef.current.id });
                     if (res.data.success) savedMemoRef.current = res.data.savedMemo;
@@ -98,6 +98,7 @@ export const AddMemo = () => {
         }
     }
 
+    // 메모작성 취소
     const cancelAddMemo = async () => {
         isCancelMemoRef.current = true;
         if (savedMemoRef.current) {
@@ -133,33 +134,34 @@ export const AddMemo = () => {
                 // idle일때 timeout 삭제하여 이중통신 방지
                 clearTimeout(saveDelayTimerRef.current);
                 saveDelayTimerRef.current = null;
-                // 메모 내용이 존재하는경우 메모 즉시저장
-                if (data.title?.length > 0 || data.content?.length > 0) {
+                // 메모 내용이 존재하는경우 메모 즉시 저장요청
+                if (removeSpace(data.title)?.length > 0 || removeSpace(data.content)?.length > 0) {
                     await saveMemo();
                     // 생성한 메모 카테고리가 현재 카테고리와 같거나 전체메모인 경우만 메모 렌더링
                     if (Number(searchParams.get('cate')) === data.cateId || !searchParams.get('cate')) {
                         dispatch(saveMemoReducer(savedMemoRef.current));
                     }
-                    // 카테고리 최신화
+                    // 카테고리 최신화, 임시저장된 메모 삭제
                     dispatch(await getCategoriesAction());
+                    savedMemoRef.current = null;
                 }
-                // 메모취소를 누른 것이 아니라면 폼 리셋
-                if (!isCancelMemoRef.current) resetForm();
-                else isCancelMemoRef.current = false;
-            })();
+            })()
+            // 메모취소를 누른 것이 아니라면 폼 리셋
+            if (!isCancelMemoRef.current) resetForm();
+            else isCancelMemoRef.current = false;
         }
     }, [formMode]);
 
     useEffect(() => {
         // url 변경시 변경된 카테고리 아이디 지정
         form.setValue('cateId', getCategoryId(searchParams));
-        setFormMode("idle");
+        setFormMode('idle');
     }, [searchParams]);
 
     return (
         <>
             <div
-                onTouchStart={ e => e.stopPropagation() }
+                onTouchStart={ (e) => e.stopPropagation() }
                 className={`block md:hidden fixed w-full top-[91px] left-0 z-[25] bg-gradient-to-b
                 ${formMode === 'edit' || formMode === 'askAI' ? 'h-full backdrop-blur' : 'h-[90px] backdrop-blur-sm'}`}
             />
@@ -195,43 +197,23 @@ export const AddMemo = () => {
                             </div>
                         )}
                         <div className='flex items-center'>
-                        {/*<textarea*/}
-                        {/*    {...form.register('content', {*/}
-                        {/*        required: false,*/}
-                        {/*        maxLength: 65535,*/}
-                        {/*        onChange: (event) => {*/}
-                        {/*            setDynamicTextareaHeight(event.target);*/}
-                        {/*        }*/}
-                        {/*    })}*/}
-                        {/*    onFocus={() => {*/}
-                        {/*        // 대기 상태라면 입력 모드로 전환*/}
-                        {/*        if (formMode === 'idle') setFormMode('edit');*/}
-                        {/*    }}*/}
-                        {/*    tabIndex={ 2 }*/}
-                        {/*    rows={ 1 }*/}
-                        {/*    placeholder='메모 작성...'*/}
-                        {/*    className={`resize-none max-h-[300px] w-full bg-transparent text-gray-500 placeholder:text-gray-500*/}
-                        {/*    font-light placeholder:text-[15px] memo-custom-scroll ${ formMode === 'idle' ? '!h-[24px]' : 'pb-[30px]'  입력창의 하단 여유를 만들기 위한 padding   }`}*/}
-                        {/*/>*/}
                             <Controller
-                                name="content"
-                                control={form.control}
+                                name='content'
+                                control={ form.control }
                                 rules={{ required: false, maxLength: 65535 }}
                                 render={({ field: { value, onChange } }) => (
                                     <AutoResizeTextarea
-                                        value={value}
-                                        onChange={onChange}
-                                        onFocus={(e) => {
+                                        value={ value }
+                                        onChange={ onChange }
+                                        onFocus={() => {
                                             // 대기 상태라면 입력 모드로 전환
                                             if (formMode === 'idle') setFormMode('edit');
                                         }}
                                         tabIndex={ 2 }
                                         rows={ 1 }
                                         placeholder='메모 작성...'
-                                        className={`
-                                            resize-none max-h-[300px] w-full bg-transparent text-gray-500 placeholder:text-gray-500
-                                            font-light placeholder:text-[15px] memo-custom-scroll ${ formMode === 'idle' ? '!h-[24px]' : 'pb-[26px]' /* 입력창의 하단 여유를 만들기 위한 padding  */ }
-                                        `}
+                                        className={`resize-none max-h-[300px] w-full bg-transparent text-gray-500 placeholder:text-gray-500
+                                        font-light placeholder:text-[15px] memo-custom-scroll ${ formMode === 'idle' ? '!h-[24px]' : 'pb-[26px]' }`}
                                     />
                                 )}
                             />
@@ -276,12 +258,11 @@ export const AddMemo = () => {
                                     <form
                                         onSubmit={ (event) => {
                                             addMemoTagSubmit(event, form);
-                                            setDynamicInputWidth(event.target[0]);
+                                            event.target[0].style.width = '50px'; // 인풋 width 초기화
                                         }}
                                         className='relative flex items-center text-dark/90 text-[12px]'
                                     >
-                                        <input
-                                            onChange={ (event) => setDynamicInputWidth(event.target) }
+                                        <AutoResizeInput
                                             placeholder='태그추가'
                                             className='min-w-[50px] w-[50px] px-[2px] placeholder:text-gray-500/95 bg-transparent whitespace-nowrap'
                                         />

@@ -4,20 +4,18 @@ import {DeleteIcon, EditIcon, ThreeDotMenuIcon} from '../../../../common/compone
 import {ConfirmButton} from '../../../../common/components/ConfirmButton';
 import {AppDispatch} from '../../../../store';
 import {useDispatch} from 'react-redux';
-import {useSearchParams} from 'react-router-dom';
 import {loadMemos} from '../../../../libs/memo.lib';
 import {deleteMemoAction, getCategoriesAction} from '../../../../store/memo/memo.actions';
 
 export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [searchParams, setSearchParams] = useSearchParams();
 
     const dispatch = useDispatch<AppDispatch>();
 
     const deleteMemo = () => {
         dispatch(deleteMemoAction({ id: memoId }));
         dispatch(getCategoriesAction());
-        loadMemos(dispatch, searchParams, true);
+        loadMemos(true);
     }
 
     const openConfirmModal = (event) => {
@@ -28,7 +26,7 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
     return (
         <>
             <Popover className='relative h-fit'>
-                {({open}) => {
+                {({ open }) => {
                     return <>
                         <Popover.Button className={`${ open && 'bg-black/10' } hover:bg-black/10 p-[1px] rounded-full w-[26px] h-[26px]`}>
                             <ThreeDotMenuIcon className='fill-dark/90 cursor-pointer'/>
@@ -76,6 +74,5 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
                 className='absolute z-50'
             />
         </>
-
     )
 }

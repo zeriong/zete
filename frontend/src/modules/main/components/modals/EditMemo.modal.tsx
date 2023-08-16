@@ -6,15 +6,16 @@ import {Memo, UpdateMemoInput} from '../../../../openapi/generated';
 import {useSearchParams} from 'react-router-dom';
 import {Dialog, Transition} from '@headlessui/react';
 import {CategoryIcon, CloseIcon, FillStarIcon, PlusIcon, StarIcon} from '../../../../common/components/Icons';
-import {setDynamicInputWidth} from '../../../../libs/common.lib';
+import {removeSpace} from '../../../../libs/common.lib';
 import {showAlert} from '../../../../store/alert/alert.actions';
 import {Api} from '../../../../openapi/api';
 import {deleteMemoTag, addMemoTagSubmit, focusToContent, loadMemos} from '../../../../libs/memo.lib';
 import {HorizontalScroll} from '../../../../common/components/HorizontalScroll';
 import {updateMemoReducer} from '../../../../store/memo/memo.slice';
 import {getCategoriesAction} from '../../../../store/memo/memo.actions';
+import {AutoResizeInput} from '../../../../common/components/AutoResizeInput';
 
-export const MemoEditModal = () => {
+export const EditMemoModal = () => {
     const savedMemoRef = useRef<Memo | null>(null);
     const saveDelayTimerRef = useRef<NodeJS.Timeout | null>(null);
     const getDelayTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -42,18 +43,22 @@ export const MemoEditModal = () => {
     }
 
     // 메모 수정
-    const updateMemo = async () => {
+    const updateMemo = async (auto?) => {
         clearTimeout(saveDelayTimerRef.current);
         saveDelayTimerRef.current = null;
         isSavingMemoRef.current = true;
 
         const data = form.getValues();
         const targetMemo = memoState.memo.list.find(memo => memo.id === requestMemoIdRef.current);
-        const diffTagLength = data.tags.length === 0 ? 0 : targetMemo.tags.filter(tag => data.tags.some(formTag => formTag.name === tag.name)).length;
+        const diffTagLength = data.tags?.length === 0 ? 0 : targetMemo.tags.filter(tag => data.tags.some(formTag => formTag.name === tag.name)).length;
+
         // 내용이 있고 변경사항이 있는 경우에만 요청
-        if (data.title?.length === 0 && data.content?.length === 0) showAlert('입력내용이 존재하지 않아 마지막 내용을 저장합니다.');
+        if (removeSpace(data.title).length === 0 && removeSpace(data.content).length === 0) {
+            if (auto) return;
+            return showAlert('입력내용이 존재하지 않아 마지막 내용을 저장합니다.');
+        }
         if (data.title === targetMemo.title && data.content === targetMemo.content && data.cateId === Number(targetMemo.cateId) &&
-            targetMemo.tags.length === diffTagLength && targetMemo.isImportant === data.isImportant) return;
+            targetMemo.tags?.length === diffTagLength && targetMemo.isImportant === data.isImportant) return;
 
         try {
             const res = await Api.memo.updateMemo({ ...data, id: savedMemoRef.current.id });
@@ -62,7 +67,7 @@ export const MemoEditModal = () => {
             dispatch(getCategoriesAction());
         } catch (e) {
             showAlert('메모 수정에 실패하였습니다.');
-            loadMemos(dispatch, searchParams, true);
+            loadMemos(true);
             dispatch(getCategoriesAction());
         }
         isSavingMemoRef.current = false;
@@ -77,10 +82,10 @@ export const MemoEditModal = () => {
         if (saveDelayTimerRef.current == null) {
             saveDelayTimerRef.current = setTimeout(async () => {
                 if (isSavingMemoRef.current) tryUpdateMemo();  // 저장중이라면 연기
-                else await updateMemo();  // 저장
+                else await updateMemo(true);  // 저장
             }, 3000);
         }
-    };
+    }
 
     // 수정할 메모를 요청해서 받은 데이터를 기반으로 세팅
     const setModal = () => {
@@ -102,7 +107,7 @@ export const MemoEditModal = () => {
                 showAlert('존재하지 않는 메모입니다.');
                 searchParams.delete('view');
                 setSearchParams(searchParams);
-                loadMemos(dispatch, searchParams, true);
+                loadMemos(true);
                 dispatch(getCategoriesAction());
             }
             isLoadingMemoRef.current = false;
@@ -246,12 +251,11 @@ export const MemoEditModal = () => {
                                                     <form
                                                         onSubmit={(event) => {
                                                             addMemoTagSubmit(event, form);
-                                                            setDynamicInputWidth(event.target[0]);
+                                                            event.target[0].style.width = '50px'; // 인풋 width 초기화
                                                         }}
                                                         className='relative flex items-center text-dark/90 text-[12px]'
                                                     >
-                                                        <input
-                                                            onChange={ (event) => setDynamicInputWidth(event.target) }
+                                                        <AutoResizeInput
                                                             placeholder='태그추가'
                                                             className='min-w-[50px] w-[50px] px-[2px] placeholder:text-gray-500/95 bg-transparent whitespace-nowrap'
                                                         />
@@ -265,7 +269,7 @@ export const MemoEditModal = () => {
                                                 <div className='flex items-center border border-gray-300/90 rounded-md px-[8px] py-[4px]'>
                                                     <CategoryIcon className='w-[18px] opacity-75 mr-[2px]'/>
                                                     <select
-                                                        {...form.register('cateId', { required: true })}
+                                                        { ...form.register('cateId', { required: true }) }
                                                         className='w-[130px] text-[13px] text-gray-500 bg-transparent'
                                                     >
                                                         <option value={0}>

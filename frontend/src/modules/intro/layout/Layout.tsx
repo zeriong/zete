@@ -14,16 +14,16 @@ export const HomeLayout = () => {
     const [modalControl, setModalControl] = useState(false);
 
     const dispatch = useDispatch();
-    const { isShowSideNav } = useSelector((state: RootState) => state.layout);
+    const layoutState = useSelector((state: RootState) => state.layout);
 
     const windowResize = useWindowResize();
 
     // 사이즈 변화에 따른 사이드 네비게이션 활성화
     useEffect(() => {
         if (windowResize.width <= 920) {
-            if (isShowSideNav) dispatch(setShowSideNavReducer(false));
+            if (layoutState.isShowSideNav) dispatch(setShowSideNavReducer(false));
         } else {
-            if (!isShowSideNav) dispatch(setShowSideNavReducer(true));
+            if (!layoutState.isShowSideNav) dispatch(setShowSideNavReducer(true));
         }
     },[windowResize]);
 
@@ -31,7 +31,7 @@ export const HomeLayout = () => {
         <>
             <HomeNav/>
             <main className='flex w-full h-full pt-[48px] md:pt-[60px] md:min-w-[1100px]'>
-                <CustomScroller autoHide={false}>
+                <CustomScroller autoHide={ false }>
                     <Outlet/>
                 </CustomScroller>
             </main>
@@ -40,4 +40,4 @@ export const HomeLayout = () => {
             <SigninModal/>
         </>
     )
-};
+}

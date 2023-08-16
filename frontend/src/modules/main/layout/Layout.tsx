@@ -9,8 +9,9 @@ import {SearchMemo} from '../components/SearchMemo';
 import {setShowSideNavReducer} from '../../../store/layout/layout.slice';
 import CustomScroller from '../../../common/components/customScroller';
 import {useWindowResize} from '../../../hooks/useWindowResize';
+
 export const MemoLayout = () => {
-    const [searchParams] = useSearchParams()
+    const [searchParams] = useSearchParams();
 
     const dispatch = useDispatch<AppDispatch>();
     const memoState = useSelector((state: RootState) => state.memo);
@@ -18,6 +19,17 @@ export const MemoLayout = () => {
     const { isShowSideNav } = useSelector((state: RootState) => state.layout);
 
     const windowResize = useWindowResize();
+
+    const categoryName = useMemo(() => {
+        const cate = searchParams.get('cate');
+        if (!cate) return '전체메모';
+        else if (cate === 'important') return '중요메모';
+        else {
+            const matchCate = memoState.cate.list.find((cate) => Number(cate.id) === Number(searchParams.get('cate')))?.name;
+            if (matchCate) return matchCate;
+            return '카테고리가 존재하지않습니다.';
+        }
+    }, [searchParams, memoState.cate]);
 
     // 사이즈 변화에 따른 사이드 네비게이션 활성화
     useEffect(() => {
@@ -27,17 +39,6 @@ export const MemoLayout = () => {
             if (!isShowSideNav) dispatch(setShowSideNavReducer(true));
         }
     },[windowResize]);
-
-    const categoryName = useMemo(() => {
-        const cate = searchParams.get('cate');
-        if (!cate) return '전체메모';
-        else if (cate === 'important') return '중요메모';
-        else {
-            const matchCate = memoState.cate.list.find((cate) => Number(cate.id) === Number(searchParams.get('cate')))?.name;
-            if (matchCate) return matchCate;
-            return '카테고리가 존재하지않습니다.'
-        }
-    }, [searchParams, memoState.cate]);
 
     return (loading && !data.name) ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
         <>
@@ -69,4 +70,4 @@ export const MemoLayout = () => {
                 </div>
             </main>
         </>
-};
+}

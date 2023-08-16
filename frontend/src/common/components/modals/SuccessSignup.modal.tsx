@@ -56,5 +56,5 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                 </article>
             </Dialog>
         </Transition>
-    );
-};
+    )
+}

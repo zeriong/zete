@@ -1,7 +1,6 @@
 import css from 'dom-css';
 
-
-/** -------- 커스텀스크롤 function start ------- */
+/** --------------------------- 커스텀스크롤 function start ----------------------------- */
 export const getInnerHeight = (el: HTMLDivElement) => {
     const { clientHeight } = el;
     const { paddingTop, paddingBottom } = getComputedStyle(el);
@@ -41,25 +40,27 @@ export const isString = (maybe: string | number) => typeof maybe === 'string';
 
 export const returnFalse = () => false;
 
+/** --------------------------- 커스텀스크롤 function end ----------------------------- */
+
 // 문자열이 정수로 이뤄져 있는지
 export const isIntegerString = (s?: string) => {
     const n = parseFloat(s);
     return !isNaN(n) && Number.isInteger(n);
-};
-
-// Textarea 입력에 따른 자동 높이 변화
-export const setDynamicTextareaHeight = (target) => {
-    if (target) {
-        target.style.height = 'auto';
-        target.style.height = target.scrollHeight + 'px';
-    }
 }
 
-// input 입력에 따른 자동 넓이 변화
-export const setDynamicInputWidth = (target) => {
-    if (target) {
-        target.style.width = '50px';
-        target.style.width = target.scrollWidth + 'px';
-    }
-}
+// 공백 및 줄바꿈 제거
+export const removeSpace = (text = '') => text.replace(/\s*|\n/g,'');
 
+export const getQueryParams = () => {
+    const url = window.location.href;
+    const urlObj = new URL(url);
+    const params = new URLSearchParams(urlObj.search);
+
+    // 파라미터를 객체로 변환
+    const queryParams = {};
+    for (const [key, value] of params.entries()) {
+        queryParams[key] = value;
+    }
+
+    return queryParams;
+}

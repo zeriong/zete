@@ -2,9 +2,9 @@ import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     options: {
-        disabled: boolean,
-        text: string,
-        loading?: boolean,
+        disabled: boolean;
+        text: string;
+        loading?: boolean;
     }
 }
 
