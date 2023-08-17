@@ -20,10 +20,8 @@ export const HomeLayout = () => {
 
     // 사이즈 변화에 따른 사이드 네비게이션 활성화
     useEffect(() => {
-        if (windowResize.width <= 920) {
+        if (windowResize.width > 767) {
             if (layoutState.isShowSideNav) dispatch(setShowSideNavReducer(false));
-        } else {
-            if (!layoutState.isShowSideNav) dispatch(setShowSideNavReducer(true));
         }
     },[windowResize]);
 

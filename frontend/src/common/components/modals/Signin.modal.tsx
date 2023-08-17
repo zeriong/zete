@@ -152,12 +152,12 @@ export const SigninModal = () => {
                                                 loading: authState.loading,
                                             }}
                                             type='submit'
-                                            className='w-full py-[6px] bg-orange-500 text-white mt-[12px] text-center cursor-pointer text-[20px] rounded-[16px]'
+                                            className='w-full py-[6px] bg-primary text-white text-center cursor-pointer text-[20px] rounded-[16px]'
                                         />
                                         <button
                                             type='button'
                                             onClick={ openSignupModal }
-                                            className='w-full py-[6px] bg-orange-500 text-white mb-[12px] text-center cursor-pointer text-[20px] rounded-[16px]'
+                                            className='w-full py-[6px] bg-deepPrimary text-white mb-[12px] text-center cursor-pointer text-[20px] rounded-[16px]'
                                         >
                                             회원가입
                                         </button>

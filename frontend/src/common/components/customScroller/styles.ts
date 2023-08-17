@@ -48,13 +48,15 @@ export const trackVerticalStyleDefault = {
 export const thumbHorizontalStyleDefault = {
     position: 'relative',
     display: 'block',
-    height: '100%'
+    height: '100%',
+    zIndex: '9999',
 };
 
 export const thumbVerticalStyleDefault = {
     position: 'relative',
     display: 'block',
-    width: '100%'
+    width: '100%',
+    zIndex: '9999',
 };
 
 export const disableSelectStyle = {

@@ -40,7 +40,7 @@ export const MemoLayout = () => {
         }
     },[windowResize]);
 
-    return (loading && !data.name) ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
+    return (!loading && data.name) &&
         <>
             <Header/>
             <Aside/>

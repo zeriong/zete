@@ -20,7 +20,7 @@ export const Home = () => {
         setSearchParams(searchParams);
     }
 
-    return userState.loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
+    return !userState.loading &&
         <div className='flex h-full w-full overflow-hidden'>
             <div className='flex flex-col items-center md:items-end justify-center w-full md:w-1/2 font-bold text-[48px] text-gray-800 z-20 text-center md:pr-[5%]'>
                 <div className='flex flex-col items-center w-[450px]'>
@@ -40,7 +40,7 @@ export const Home = () => {
                             </h1>
                             <Link
                                 to='memo'
-                                className='text-[30px] font-bold flex py-[8px] px-[20px] items-center bg-orange-500
+                                className='text-[30px] font-bold flex py-[8px] px-[20px] items-center bg-deepPrimary
                                 rounded-[16px] justify-center mt-[32px] cursor-pointer text-white'
                             >
                                 Let's Zete!
@@ -67,7 +67,7 @@ export const Home = () => {
                                 type='button'
                                 onClick={ openSignUpModal }
                                 className='w-[150px] md:w-[180px] py-[8px] flex justify-center mb-[12px] cursor-pointer
-                                    items-center bg-orange-500 rounded-[16px] text-white'
+                                    items-center bg-deepPrimary rounded-[16px] text-white'
                             >
                                 회원가입
                             </button>

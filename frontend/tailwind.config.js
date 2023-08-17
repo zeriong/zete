@@ -10,6 +10,7 @@ module.exports = {
         'xs': '365px',
       },
       colors: {
+        'deepPrimary': '#ffa600',
         'primary': '#fec107',
         'memo': '#fff8d9',
         'gpt': '#19C37D',

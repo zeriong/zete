@@ -46,7 +46,7 @@ export const SuccessSignupModal = (props: { isShow: boolean, setIsShow: React.Di
                                 <button
                                     type='button'
                                     onClick={ closeModal }
-                                    className='w-[160px] flex justify-center cursor-pointer rounded-[8px] p-[4px] bg-orange-500 text-white m-auto'
+                                    className='w-[160px] flex justify-center cursor-pointer rounded-[8px] p-[4px] bg-primary text-white m-auto'
                                 >
                                     확인
                                 </button>

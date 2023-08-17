@@ -213,7 +213,7 @@ export const SignupModal = (props: { successControl: React.Dispatch<React.SetSta
                                                 loading: authState.loading,
                                             }}
                                             type='submit'
-                                            className='w-full py-[6px] bg-orange-500 text-white text-center cursor-pointer text-[22px] rounded-[16px] mt-[10px]'
+                                            className='w-full py-[6px] bg-primary text-white text-center cursor-pointer text-[22px] rounded-[16px] mt-[10px]'
                                         />
                                     </form>
                                 </Dialog.Panel>

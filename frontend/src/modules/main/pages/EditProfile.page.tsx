@@ -33,15 +33,19 @@ export const EditProfilePage = () => {
 
     const subTitleStyle = 'font-bold md:text-[18px] text-[14px] text-[#5f5f5f]';
     const inputStyle = 'border border-gray-400 rounded px-[8px] py-[4px] md:w-[384px] w-full';
-    const errorStyle = 'mt-[4px] text-red-500 [12px] font-normal h-[12px]';
+    const errorStyle = 'mt-[4px] text-red-500 text-[12px] font-normal h-[12px]';
 
     const editProfileSubmit = form.handleSubmit(async () => {
         const { email, password, name, mobile } = form.getValues();
+        const data = userState.data;
+
+        if (data.name === name && data.email === email && data.mobile === mobile && password.length === 0) return navigate(-1);
+
         await Api.user.updateProfile({ email, name, mobile, password })
             .then((res) => {
                 console.log(res.data);
                 if (res.data.success) {
-                    dispatch(setUserReducer({...userState, email, name, mobile }))
+                    dispatch(setUserReducer({...userState, email, name, mobile }));
                     showAlert('✔ 회원정보 수정이 완료되었습니다!');
                     return navigate(-1);
                 }
@@ -55,7 +59,7 @@ export const EditProfilePage = () => {
 
     useEffect(() => setIsRender(true),[]);
 
-    return  userState.loading ? <div>로딩중...</div> :
+    return  !userState.loading &&
         <div className='w-full min-h-[640px] md:min-h-[700px] h-full relative flex justify-center items-center overflow-hidden'>
             <form
                 onSubmit={ editProfileSubmit }
@@ -130,7 +134,7 @@ export const EditProfilePage = () => {
                         { form.formState.errors.mobile && '휴대전화번호를 입력해주세요.' }
                     </p>
                 </div>
-                <h2 className='text-center font-extrabold md:text-[18px] mt-[12px] text-[15px] text-[#4f4f4f]'>
+                <h2 className='text-center font-extrabold md:text-[18px] mt-[12px] text-[15px] text-gray-500'>
                     { '< 비밀변호 변경은 필수입력 사항이 아닙니다. >' }
                 </h2>
                 <div className='md:w-auto w-full md:px-0'>
@@ -216,7 +220,7 @@ export const EditProfilePage = () => {
                         loading: userState.loading,
                     }}
                     type='submit'
-                    className='mt-[32px] w-full py-[8px] flex justify-center mb-[12px] cursor-pointer text-[18px] md:text-[22px] items-center bg-orange-500 rounded-[16px] text-white'
+                    className='mt-[32px] w-full py-[8px] flex justify-center mb-[12px] cursor-pointer text-[18px] md:text-[22px] items-center bg-primary rounded-[16px] text-white'
                 />
             </form>
         </div>

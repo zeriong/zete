@@ -17,11 +17,7 @@ function App() {
 
     return (
         <>
-            {
-                (authState.loading || userState.loading) ?
-                    <div className='flex h-full items-center justify-center'>로딩중...</div>
-                    : <Router/>
-            }
+            { (!authState.loading || !userState.loading) && <Router/> }
             <Alert/>
         </>
     )

@@ -5,12 +5,10 @@ import {RootState} from '../../../store';
 export const Guide = () => {
     const userState = useSelector((state: RootState) => state.user);
 
-    return (
-        userState.loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
-            <div className='m-auto text-center'>
-                <h1 className='text-[32px] font-bold mt-[40px]'>
-                    기능안내 페이지입니다.
-                </h1>
-            </div>
-    )
+    return !userState.loading &&
+        <div className='flex justify-center items-center w-full h-full text-center'>
+            <h1 className='text-[32px] font-bold'>
+                기능안내 페이지입니다.
+            </h1>
+        </div>
 }

@@ -5,12 +5,10 @@ import {RootState} from '../../../store';
 export const UserExp = () => {
     const userState = useSelector((state: RootState) => state.user);
 
-    return (
-        userState.loading ? <div className='flex h-full items-center justify-center'>로딩중...</div> :
-            <div className='m-auto text-center'>
-                <div className='text-[32px] font-bold mt-[40px]'>
-                    고객사례 페이지입니다.
-                </div>
-            </div>
-    )
+    return !userState.loading &&
+        <div className='flex justify-center items-center w-full h-full text-center'>
+            <h1 className='text-[32px] font-bold'>
+                고객사례 페이지입니다.
+            </h1>
+        </div>
 }

@@ -61,7 +61,7 @@ export const UserProfileMenuPopover = () => {
                                     key={ item.name }
                                     to={ item.path }
                                     onClick={ () => buttonOnClick(item, close) }
-                                    className='flex items-center rounded-[8px] h-[48px] transition duration-150 ease-in-out whitespace-nowrap hover:bg-orange-100'
+                                    className='flex items-center rounded h-[48px] transition duration-150 ease-in-out whitespace-nowrap hover:bg-gray-100/70'
                                 >
                                     <div className='flex items-center justify-center h-[32px] md:h-[48px] w-[36px] text-white'>
                                         { item.icon }
