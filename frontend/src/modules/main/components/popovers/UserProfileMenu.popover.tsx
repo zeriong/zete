@@ -31,7 +31,7 @@ export const UserProfileMenuPopover = () => {
         },
     ];
 
-    const buttonOnClick = (item, close) => {
+    const listOnClick = (item, close) => {
         if (item.function) item.function();
         close();
     }
@@ -60,7 +60,7 @@ export const UserProfileMenuPopover = () => {
                                 <Link
                                     key={ item.name }
                                     to={ item.path }
-                                    onClick={ () => buttonOnClick(item, close) }
+                                    onClick={ () => listOnClick(item, close) }
                                     className='flex items-center rounded h-[48px] transition duration-150 ease-in-out whitespace-nowrap hover:bg-gray-100/70'
                                 >
                                     <div className='flex items-center justify-center h-[32px] md:h-[48px] w-[36px] text-white'>

@@ -61,6 +61,7 @@ export const AskAI = (props: { isShow: boolean, memoForm: UseFormReturn<any> }) 
         } else {
             // 초기화
             if (requestRef.current) requestRef.current.cancel();
+
             // 응답받고 추가대기시간때도 알림을 띄움 (유저입장에선 똑같이 기다리는 상황이기 때문)
             if (isWaiting) showAlert('GPT 답변 요청이 취소되었습니다.');
             setUsableCount(0);

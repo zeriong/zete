@@ -22,6 +22,7 @@ export const EditProfilePage = () => {
     const navigate = useNavigate();
     const userState = useSelector((state: RootState) => (state.user));
 
+    // 컴포넌트가 마운트 되었을 때 store에 저장된 유저데이터로 form에 셋팅한다.
     const form = useForm<UpdateAccountInput & { passwordConfirm: string | null }>({
         mode: 'onChange',
         defaultValues: {
@@ -31,19 +32,23 @@ export const EditProfilePage = () => {
         },
     });
 
+    // jsx 태그의 복잡도를 낮추기 위해 반복되는 스타일 속성을
+    // 유형별로 나누어 변수에 저장하여 적용
+
     const subTitleStyle = 'font-bold md:text-[18px] text-[14px] text-[#5f5f5f]';
     const inputStyle = 'border border-gray-400 rounded px-[8px] py-[4px] md:w-[384px] w-full';
     const errorStyle = 'mt-[4px] text-red-500 text-[12px] font-normal h-[12px]';
 
+    // 프로필 수정 submit 함수
     const editProfileSubmit = form.handleSubmit(async () => {
         const { email, password, name, mobile } = form.getValues();
         const data = userState.data;
 
+        // 프로필에 변경사항이 없다면 요청하지 않고 이전 페이지로 이동 (일반적으로 이전페이지는 프로필페이지)
         if (data.name === name && data.email === email && data.mobile === mobile && password.length === 0) return navigate(-1);
 
         await Api.user.updateProfile({ email, name, mobile, password })
             .then((res) => {
-                console.log(res.data);
                 if (res.data.success) {
                     dispatch(setUserReducer({...userState, email, name, mobile }));
                     showAlert('✔ 회원정보 수정이 완료되었습니다!');
@@ -55,8 +60,10 @@ export const EditProfilePage = () => {
             .catch(e => console.log(e));
     });
 
+    // 폼 초기화
     useEffect(() => form.reset(), [form.reset, userState]);
 
+    // 밑에서 위로 올라오는 애니메이션을 위한 컴포넌트 마운트시 state 변경
     useEffect(() => setIsRender(true),[]);
 
     return  !userState.loading &&

@@ -50,7 +50,7 @@ export const HomeNav = ()=> {
                 Zete
             </Link>
 
-            {/* 모바일 환경 컴포넌트 */}
+            {/** 모바일 환경 컴포넌트 */}
             <section
                 className={`fixed md:static h-full md:h-auto w-[260px] md:w-full p-[28px] md:p-0 flex gap-[32px] justify-start bg-white bottom-0 flex-col ease-in-out duration-300 z-30
                 ${ layoutState.isShowSideNav ? 'right-0' : '-right-[260px]' }`}
@@ -112,7 +112,7 @@ export const HomeNav = ()=> {
                 </div>
             </section>
 
-            {/* pc 환경 컴포넌트 */}
+            {/** pc 환경 컴포넌트 */}
             {authState.isLoggedIn ? (
                 <section className='hidden md:flex flex-row items-center'>
                     <div className='text-[20px] font-bold text-gray-600 mr-[16px]'>
@@ -134,18 +134,20 @@ export const HomeNav = ()=> {
                 </section>
             ) : (
                 <section className='max-lg:invisible flex gap-[16px] items-center m-auto font-medium '>
-                    <div
+                    <button
+                        type='button'
                         onClick={ openSignInModal }
                         className={ mobileHeaderButtonStyle + 'border border-gray-500' }
                     >
                         로그인하기
-                    </div>
-                    <div
+                    </button>
+                    <button
+                        type='button'
                         onClick={ openSignUpModal }
                         className={ mobileHeaderButtonStyle + 'bg-deepPrimary text-white' }
                     >
                         회원가입
-                    </div>
+                    </button>
                 </section>
             )}
             <button

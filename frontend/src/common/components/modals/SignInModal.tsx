@@ -12,7 +12,7 @@ import {setLoginReducer, setLogoutReducer} from '../../../store/auth/auth.slice'
 import {VisibilityOffIcon, VisibilityOnIcon} from '../Icons';
 import {getProfile} from '../../../store/user/user.actions';
 
-export const SigninModal = () => {
+export const SignInModal = () => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL } = PATTERNS;
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -37,7 +37,7 @@ export const SigninModal = () => {
         form.reset();
     }
 
-    const signinSubmit = form.handleSubmit(async () => {
+    const signInSubmit = form.handleSubmit(async () => {
         await Api.auth.login(form.getValues())
             .then((res) => {
                 (async () => {
@@ -98,7 +98,7 @@ export const SigninModal = () => {
                                     </p>
                                     <form
                                         className='flex flex-col gap-[16px] mt-[6px]'
-                                        onSubmit={ signinSubmit }
+                                        onSubmit={ signInSubmit }
                                     >
                                         <div>
                                             <input

@@ -16,17 +16,21 @@ export const Alert = () => {
     const alertState = useSelector((state:RootState) => state.alert);
 
     const showAlert = () => {
+        // 초기에 보이지 않는 상태였기 때문에 실행시 display 재설정
         setIsRender(true);
         alarmRef.current.style.display = 'flex';
 
+        // 동작중이 아니고, 알람이 들어오면
         if (!isRunning && store.getState().alert.alerts.length > 0) {
             setIsRunning(true);
             setAlert(store.getState().alert.alerts[store.getState().alert.alerts.length - 1]);
             setIsShow(true);
 
+            // 팝업 알람이기 때문에 일정 시간 후 알람을 다시 숨김
             setTimeout(() => {
                 setIsShow(false);
 
+                // transition을 기다린 후 보이지않도록 display 재설정
                 setTimeout(() => {
                     dispatch(deleteAlertReducer());
                     setIsRunning(false);

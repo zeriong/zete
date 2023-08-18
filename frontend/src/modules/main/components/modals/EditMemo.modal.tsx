@@ -31,70 +31,32 @@ export const EditMemoModal = () => {
 
     const form = useForm<UpdateMemoInput>({ mode: 'onSubmit' });
 
-    const closeModal = async () => {
-        searchParams.delete('view');
-        setSearchParams(searchParams);
-        if (savedMemoRef.current) {
-            await updateMemo();
-            dispatch(updateMemoReducer(savedMemoRef.current));
+    // searchParams를 통한 메모수정 모달 컨트롤
+    useEffect(() => {
+        // 저장된 메모 클릭시 URL QueryParams가 view=memoId로 변경되기 때문에
+        // requestMemoIdRef에 id를 저장하여 업데이트할 메모를 요청할 때 사용한다.
+        requestMemoIdRef.current = Number(searchParams.get('view'));
+        if (requestMemoIdRef.current) {
+            form.reset();
+            setIsShow(true);
+            trySetModal();
+        } else {
+            setIsShow(false);
         }
-        form.reset();
-        savedMemoRef.current = null;
-    }
-
-    // 메모 수정
-    const updateMemo = async (auto?) => {
-        clearTimeout(saveDelayTimerRef.current);
-        saveDelayTimerRef.current = null;
-        isSavingMemoRef.current = true;
-
-        const data = form.getValues();
-        const targetMemo = memoState.memo.list.find(memo => memo.id === requestMemoIdRef.current);
-        const diffTagLength = data.tags?.length === 0 ? 0 : targetMemo.tags.filter(tag => data.tags.some(formTag => formTag.name === tag.name)).length;
-
-        // 내용이 있고 변경사항이 있는 경우에만 요청
-        if (removeSpace(data.title).length === 0 && removeSpace(data.content).length === 0) {
-            if (auto) return;
-            return showAlert('입력내용이 존재하지 않아 마지막 내용을 저장합니다.');
-        }
-        if (data.title === targetMemo.title && data.content === targetMemo.content && data.cateId === Number(targetMemo.cateId) &&
-            targetMemo.tags?.length === diffTagLength && targetMemo.isImportant === data.isImportant) return;
-
-        try {
-            const res = await Api.memo.updateMemo({ ...data, id: savedMemoRef.current.id });
-            if (res.data.success) savedMemoRef.current = res.data.savedMemo;
-            else showAlert(res.data.error);
-            dispatch(getCategoriesAction());
-        } catch (e) {
-            showAlert('메모 수정에 실패하였습니다.');
-            loadMemos(true);
-            dispatch(getCategoriesAction());
-        }
-        isSavingMemoRef.current = false;
-    }
-
-    // 메모 수정 시도
-    const tryUpdateMemo = () => {
-        if (saveDelayTimerRef.current != null) {
-            clearTimeout(saveDelayTimerRef.current);
-            saveDelayTimerRef.current = null;
-        }
-        if (saveDelayTimerRef.current == null) {
-            saveDelayTimerRef.current = setTimeout(async () => {
-                if (isSavingMemoRef.current) tryUpdateMemo();  // 저장중이라면 연기
-                else await updateMemo(true);  // 저장
-            }, 3000);
-        }
-    }
+    },[searchParams]);
 
     // 수정할 메모를 요청해서 받은 데이터를 기반으로 세팅
     const setModal = () => {
         (async () =>{
+            // 메모를 받아오기 전까지 로딩상태를 유지하기 위함
             isLoadingMemoRef.current = true;
+
             const res = await Api.memo.getMemo({ id: requestMemoIdRef.current });
             if (res.data.success) {
                 const memo = res.data.memo;
-                // 요청한 메모일 경우만 세팅 (지연로드 되는경우 대비)
+                // 인터넷환경이 좋지않아 지연로드 되는경우 잘못된 데이터가 세팅되는 것을 방지하기 위해
+                // 위 useEffect에서 URL QueryParams로 받은 id와 getMemo를 통해 서버에서 받은
+                // memo의 id가 일치하는 경우에만 폼을 해당 메모 내용으로 세팅해준다.
                 if (requestMemoIdRef.current === Number(res.data.memo.id)) {
                     savedMemoRef.current = memo;
                     form.setValue('title', memo.title || '');
@@ -114,9 +76,48 @@ export const EditMemoModal = () => {
         })()
     }
 
+    // 메모 수정 (auto 인자는 해당 함수를 자동저장인지 직접저장인지를 식별하는 용도)
+    const updateMemo = async (auto?) => {
+        clearTimeout(saveDelayTimerRef.current);
+        saveDelayTimerRef.current = null;
+        isSavingMemoRef.current = true;
+
+        const data = form.getValues();
+        const targetMemo = memoState.memo.list.find(memo => memo.id === requestMemoIdRef.current);
+        const diffTagLength = data.tags?.length === 0 ? 0 : targetMemo.tags.filter(tag => data.tags.some(formTag => formTag.name === tag.name)).length;
+
+        // 폼에 내부에 내용이 존재하지 않고 store에 저장된 메모의 내용들과
+        // useForm의 내용들을 비교하여 변경사항이 없다면 업데이트를 요청하지 않는다.
+        if (removeSpace(data.title).length === 0 && removeSpace(data.content).length === 0) {
+            // auto 인자를 전달받아 auto(자동저장인 경우)가 있는 경우라면 팝업알람을 띄우지 않지만
+            // 직접 배경을 눌러 update를 요청한 경우라면 팝업 알람을 띄워준다.
+            if (auto) return;
+            return showAlert('입력내용이 존재하지 않아 마지막 내용을 저장합니다.');
+        }
+        if (data.title === targetMemo.title && data.content === targetMemo.content && data.cateId === Number(targetMemo.cateId) &&
+            targetMemo.tags?.length === diffTagLength && targetMemo.isImportant === data.isImportant) return;
+
+        // 변경사항이 존재하고 폼에 내용이 존재한다면 수정된 내용을 저장할 수 있도록 요청
+        try {
+            const res = await Api.memo.updateMemo({ ...data, id: savedMemoRef.current.id });
+            if (res.data.success) savedMemoRef.current = res.data.savedMemo;
+            else showAlert(res.data.error);
+        } catch (e) {
+            showAlert('메모 수정에 실패하였습니다.');
+            loadMemos(true);
+        }
+
+        // 메모수정에 필요한 모든 작업이 끝난 후 사이드 네비게이션에 내용도 최신화된 데이터로 갱신시켜 주고
+        // 저장 진행상태를 가지고 있던 isSavingMemoRef.current를 false로 변경하여
+        // tryUpdateMemo에서 updateMemo함수를 실행 가능하도록 만들어준다.
+        dispatch(getCategoriesAction());
+        isSavingMemoRef.current = false;
+    }
+
     // 모달 세팅 시도
     const trySetModal = () => {
         (async () => {
+            // getDelayTimerRef의 타임아웃이 진행중이라면 취소
             if (getDelayTimerRef.current != null) {
                 clearTimeout(getDelayTimerRef.current);
                 getDelayTimerRef.current = null;
@@ -134,19 +135,34 @@ export const EditMemoModal = () => {
         })()
     }
 
-    // searchParams를 통한 메모수정 모달 컨트롤
-    useEffect(() => {
-        requestMemoIdRef.current = Number(searchParams.get('view'));
-        if (requestMemoIdRef.current) {
-            form.reset();
-            setIsShow(true);
-            trySetModal();
-        } else {
-            setIsShow(false);
+    // 메모 수정 시도
+    const tryUpdateMemo = () => {
+        // saveDelayTimerRef의 타임아웃이 진행중이라면 취소
+        if (saveDelayTimerRef.current != null) {
+            clearTimeout(saveDelayTimerRef.current);
+            saveDelayTimerRef.current = null;
         }
-    },[searchParams]);
+        // 메모 수정중인 상태라면 연기
+        if (saveDelayTimerRef.current == null) {
+            saveDelayTimerRef.current = setTimeout(async () => {
+                if (isSavingMemoRef.current) tryUpdateMemo();  // 저장중이라면 연기
+                else await updateMemo(true);  // 저장
+            }, 3000);
+        }
+    }
 
-    // 폼 입력 감지
+    const closeModal = async () => {
+        searchParams.delete('view');
+        setSearchParams(searchParams);
+        if (savedMemoRef.current) {
+            await updateMemo();
+            dispatch(updateMemoReducer(savedMemoRef.current));
+        }
+        form.reset();
+        savedMemoRef.current = null;
+    }
+
+    // 폼 입력 감지하여 메모 업데이트
     useEffect(() => {
         const subscription = form.watch((data, { name, type }) => {
             // 특정 항목이 입력될 경우

@@ -18,6 +18,7 @@ export const SavedMemoMenuPopover = ({ memoId }: { memoId: number }) => {
         loadMemos(true);
     }
 
+    // 최종 승인 모달 오픈
     const openConfirmModal = (event) => {
         event.stopPropagation();
         setIsOpen(true);

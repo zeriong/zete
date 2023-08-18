@@ -20,6 +20,7 @@ export const MemoLayout = () => {
 
     const windowResize = useWindowResize();
 
+    // useMemo를 통해서 URL QueryParams 변화에 따른 카테고리 이름을 알맞게 반환한다.
     const categoryName = useMemo(() => {
         const cate = searchParams.get('cate');
         if (!cate) return '전체메모';

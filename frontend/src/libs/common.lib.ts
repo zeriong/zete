@@ -1,6 +1,6 @@
 import css from 'dom-css';
 
-/** --------------------------- 커스텀스크롤 function start ----------------------------- */
+/* --------------------------- 커스텀스크롤 function start ----------------------------- */
 export const getInnerHeight = (el: HTMLDivElement) => {
     const { clientHeight } = el;
     const { paddingTop, paddingBottom } = getComputedStyle(el);
@@ -40,17 +40,18 @@ export const isString = (maybe: string | number) => typeof maybe === 'string';
 
 export const returnFalse = () => false;
 
-/** --------------------------- 커스텀스크롤 function end ----------------------------- */
+/* --------------------------- 커스텀스크롤 function end ----------------------------- */
 
-// 문자열이 정수로 이뤄져 있는지
+/** 문자열이 정수로 이뤄져 있는지 확인하는 함수 */
 export const isIntegerString = (s?: string) => {
     const n = parseFloat(s);
     return !isNaN(n) && Number.isInteger(n);
 }
 
-// 공백 및 줄바꿈 제거
+/** 공백 및 줄바꿈 제거함수 */
 export const removeSpace = (text = '') => text.replace(/\s*|\n/g,'');
 
+/** URL QueryParams 획득 함수 */
 export const getQueryParams = () => {
     const url = window.location.href;
     const urlObj = new URL(url);

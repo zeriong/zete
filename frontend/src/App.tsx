@@ -11,7 +11,7 @@ function App() {
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(()=> {
-        // 본인 정보를 불러오는 것으로 로그인 검증
+        // 계정정보를 불러오는 것으로 로그인 검증
         (async () => dispatch(await getProfile()))()
     },[dispatch]);
 

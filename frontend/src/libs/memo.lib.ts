@@ -4,18 +4,18 @@ import {store} from '../store';
 import {searchMemosAction} from '../store/memo/memo.actions';
 import {MEMO_LIST_REQUEST_LIMIT} from '../common/constants';
 
-// url 파라미터 기준 카테고리 아이디 반환
+/** URL QueryParams기준으로 카테고리 id를 반환하는 함수 */
 export const getCategoryId = (searchParams): number => {
     return isIntegerString(searchParams.get('cate')) ? Number(searchParams.get('cate')) : 0;
 }
 
-// 태그 삭제
+/** 태그 삭제 함수 */
 export const deleteMemoTag = (form, name) => {
     const tags = form.getValues('tags');
     if (tags) form.setValue('tags', tags.filter(tag => tag.name !== name));
 }
 
-// 태그 추가
+/** 태그 추가 submit 함수 */
 export const addMemoTagSubmit = (event, form) => {
     event.preventDefault();
 
@@ -32,7 +32,7 @@ export const addMemoTagSubmit = (event, form) => {
     input.value = '';
 }
 
-// 제목 인풋에서 enter시 내용으로 이동
+/** 메모작성의 제목 input에서 enter입력시 내용으로 이동하는 함수 */
 export const focusToContent = (event) => {
     event.preventDefault();
     // 제목 -> 내용 포커싱
@@ -40,7 +40,7 @@ export const focusToContent = (event) => {
     input.focus();
 }
 
-// 메모리스트 로드
+/** URL QueryParams에 따른 메모리스트를 요청하는 함수 */
 export const loadMemos = (refresh) => {
     const queryParams = getQueryParams();
     const memoState = store.getState().memo.memo;

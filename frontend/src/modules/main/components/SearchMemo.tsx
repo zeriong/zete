@@ -7,8 +7,10 @@ import {showAlert} from '../../../store/alert/alert.actions';
 export const SearchMemo = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
+    // 폼 타입에 search를 추가한다.
     const form = useForm<{ search?: string }>();
 
+    // 검색 내용을 URL QueryParams로 추가한다.
     const search = (text) => {
         if (text && text.length > 0) {
             searchParams.set('search', encodeURI(text));
@@ -19,16 +21,18 @@ export const SearchMemo = () => {
         }
     }
 
-    const handleSubmit = form.handleSubmit(async data => search(data.search));
+    // 서버에 검색내용이 포함된 메모를 요청
+    const searchSubmit = form.handleSubmit(async data => search(data.search));
 
+    // 검색 시 에러가 나는 경우는 255자 이상으로 검색했을때로 한정지어 팝업 알람을 띄운다.
     useEffect(() => {
         if (form.formState.errors.search) showAlert('메모검색은 255자 까지 가능합니다.');
     },[form.formState.errors.search]);
 
     return (
         <form
-            onSubmit={ handleSubmit }
-            onBlur={ handleSubmit }
+            onSubmit={ searchSubmit }
+            onBlur={ searchSubmit }
             className='flex items-center w-[170px] md:w-[240px] px-[10px] py-[4px] text-[14px] md:border md:border-gray-300
             bg-gray-100 md:bg-white rounded-[4px] ml-[10px] md:m-0'
         >

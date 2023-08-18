@@ -4,6 +4,7 @@ export const AutoResizeTextarea = React.forwardRef<HTMLTextAreaElement, Textarea
     (props, ref) => {
         const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+        // 최종 타겟 ref를 inputRef로 지정
         useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement);
 
         const resizeTextarea = () => {

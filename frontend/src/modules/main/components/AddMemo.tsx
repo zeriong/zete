@@ -129,23 +129,29 @@ export const AddMemo = () => {
     useEffect(() => {
         // 대기 모드로 변경시 폼 초기화
         if (formMode === 'idle') {
+
             (async () => {
                 const data = form.getValues();
+
                 // idle일때 timeout 삭제하여 이중통신 방지
                 clearTimeout(saveDelayTimerRef.current);
                 saveDelayTimerRef.current = null;
+
                 // 메모 내용이 존재하는경우 메모 즉시 저장요청
                 if (removeSpace(data.title)?.length > 0 || removeSpace(data.content)?.length > 0) {
                     await saveMemo();
+
                     // 생성한 메모 카테고리가 현재 카테고리와 같거나 전체메모인 경우만 메모 렌더링
                     if (Number(searchParams.get('cate')) === data.cateId || !searchParams.get('cate')) {
                         dispatch(saveMemoReducer(savedMemoRef.current));
                     }
+
                     // 카테고리 최신화, 임시저장된 메모 삭제
                     dispatch(await getCategoriesAction());
                     savedMemoRef.current = null;
                 }
             })()
+
             // 메모취소를 누른 것이 아니라면 폼 리셋
             if (!isCancelMemoRef.current) resetForm();
             else isCancelMemoRef.current = false;

@@ -10,7 +10,7 @@ import {Api} from '../../../openapi/api';
 import {PATTERNS} from '../../constants';
 import {VisibilityOffIcon, VisibilityOnIcon} from '../Icons';
 
-export const SignupModal = (props: { successControl: React.Dispatch<React.SetStateAction<boolean>> }) => {
+export const SignUpModal = (props: { successControl: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const { VALID_PASSWORD, INPUT_PASSWORD, EMAIL, INPUT_PHONE } = PATTERNS;
 
     const [searchParams, setSearchParams] = useSearchParams();

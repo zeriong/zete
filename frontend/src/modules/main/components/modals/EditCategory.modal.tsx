@@ -41,7 +41,7 @@ export const EditCategoryModal = (props: { buttonText: string }) => {
         if (val && val.length > 1 && val !== prevVal) {
             dispatch(updateCategoryAction({ id: id, name: val })).then((value) => {
                 const data = value.payload as CoreOutput;
-                // 업데이트 실패시 원래 값으로 되돌림
+                // 업데이트 실패시 원래 값으로
                 if (!data.success) {
                     input.value = prevVal;
                     showAlert(data.error);

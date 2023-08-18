@@ -8,6 +8,7 @@ export const PrivateElement = (props: { children? : React.ReactElement }) : Reac
 
     let location = useLocation();
 
+    // 로그인중 = 다음페이지, 로그인상태가 아니라면 홈("/")으로
     if (authState.isLoggedIn) return props.children;
 
     return <Navigate to={'/'} state={{ from: location }}/>
