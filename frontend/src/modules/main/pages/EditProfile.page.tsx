@@ -147,7 +147,7 @@ export const EditProfilePage = () => {
                 <h2 className='text-center font-extrabold md:text-[18px] mt-[12px] text-[15px] text-gray-500'>
                     { '< 비밀변호 변경은 필수입력 사항이 아닙니다. >' }
                 </h2>
-                <div className='md:w-auto w-full md:px-0'>
+                <div className='w-full md:px-0'>
                     <h2 className={ subTitleStyle }>
                         비밀번호 변경
                     </h2>
@@ -176,21 +176,19 @@ export const EditProfilePage = () => {
                             { showPassword ? <VisibilityOnIcon/> : <VisibilityOffIcon/>}
                         </button>
                     </div>
-                    <div className='flex justify-between mb-[18px] md:w-[386px] w-full'>
-                        <div className={ errorStyle }>
-                            {form.formState.errors.password &&
-                                <div className='relative'>
-                                    비밀번호는 최소 8자입니다.
-                                    <h3 className='absolute top-[80%] text-[9px] whitespace-nowrap'>
-                                        숫자, 영문, 특수문자
-                                        <span className='px-[2px] mr-[2px] overflow-hidden font-bold'>
+                    <div className={ `${errorStyle} mb-[18px] w-full` }>
+                        {form.formState.errors.password &&
+                            <div className='relative'>
+                                비밀번호는 최소 8자입니다.
+                                <h3 className='absolute top-[80%] text-[9px] whitespace-nowrap'>
+                                    숫자, 영문, 특수문자
+                                    <span className='px-[2px] mr-[2px] overflow-hidden font-bold'>
                                             @$!%*#?&
                                         </span>
-                                        를 포함해야 합니다.
-                                    </h3>
-                                </div>
-                            }
-                        </div>
+                                    를 포함해야 합니다.
+                                </h3>
+                            </div>
+                        }
                     </div>
                     <h2 className={ subTitleStyle }>
                         비밀번호 변경 재확인
@@ -221,11 +219,9 @@ export const EditProfilePage = () => {
                             { showConfirmPassword ? <VisibilityOnIcon/> : <VisibilityOffIcon/> }
                         </button>
                     </div>
-                    <div className='flex justify-between md:w-[386px] w-full'>
-                        <p className={ errorStyle }>
-                            { form.formState.errors.confirmPassword && '비밀번호가 동일하지 않습니다.' }
-                        </p>
-                    </div>
+                    <p className={ errorStyle }>
+                        { form.formState.errors.confirmPassword && '비밀번호가 동일하지 않습니다.' }
+                    </p>
                 </div>
                 <FuncButton
                     options={{
