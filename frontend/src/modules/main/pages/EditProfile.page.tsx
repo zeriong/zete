@@ -53,12 +53,14 @@ export const EditProfilePage = () => {
                 if (res.data.success) {
                     dispatch(setUserReducer({...userState, email, name, mobile }));
                     showAlert('✔ 회원정보 수정이 완료되었습니다!');
-                    return navigate(-1);
+                } else {
+                    setOccurError(res.data.error);
+                    showAlert('❌ 회원정보 수정에 실패했습니다.');
                 }
-                setOccurError(res.data.error);
-                showAlert('❌ 회원정보 수정에 실패했습니다.');
             })
             .catch(e => console.log(e));
+
+        return navigate(-1);
     });
 
     // 폼 초기화
